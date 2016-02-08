@@ -5,9 +5,8 @@
 .split-pane {
 }
 
-.split-pane-divider {
-    -fx-background-size: 0;
-    -fx-cursor: default;
+.split-pane *.split-pane-divider {
+    -fx-padding: 0 1 0 1;
 }
 
 .vbox {

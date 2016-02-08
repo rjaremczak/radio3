@@ -24,6 +24,11 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        radio3.shutdown();
+    }
 
     public static void main(String[] args) {
         launch(args);

@@ -14,6 +14,10 @@ public class Status {
         return new Status(false, message);
     }
 
+    public static Status error(Throwable th) {
+        return new Status(false, th.getMessage());
+    }
+
     Status(boolean ok, String message) {
         this.ok = ok;
         this.message = message;
@@ -25,5 +29,10 @@ public class Status {
 
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String toString() {
+        return ok ? "ok" : "error: "+message;
     }
 }
