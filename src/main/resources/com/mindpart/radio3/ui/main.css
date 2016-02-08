@@ -1,0 +1,14 @@
+.root {
+    -fx-background-image: url("background.jpg");
+}
+
+.split-pane {
+}
+
+.split-pane-divider {
+    -fx-background-size: 0;
+    -fx-cursor: default;
+}
+
+.vbox {
+}
