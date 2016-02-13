@@ -5,116 +5,72 @@ import com.mindpart.utils.Binary;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.mindpart.radio3.Status.error;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Robert Jaremczak
  * Date: 2016.02.07
  */
 public class DeviceConnection implements AutoCloseable {
+    private static Logger logger = Logger.getLogger(DeviceConnection.class);
+
     public static final int TIMEOUT_MS = 200;
     public static final int BAUD_RATE = SerialPort.BAUDRATE_115200;
     public static final int DATA_BITS = SerialPort.DATABITS_8;
     public static final int STOP_BITS = SerialPort.STOPBITS_1;
     public static final int PARITY = SerialPort.PARITY_NONE;
 
-    private static Map<Integer, Class<? extends Frame>> frameClasses = new HashMap<>();
-
-    static {
-        frameClasses.put(DevicePropertiesResponse.TYPE.getCode(), DevicePropertiesResponse.class);
-    }
-
     private SerialPort serialPort;
-    private Status status = Status.OK;
 
     public DeviceConnection(String portName) {
         this.serialPort = new SerialPort(portName);
     }
 
-    public Status open() {
-        try {
-            serialPort.openPort();
-            this.serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY);
-        } catch (SerialPortException e) {
-            status = error(e);
-        }
-        return status;
+    public void open() throws SerialPortException {
+        serialPort.openPort();
+        this.serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY);
     }
 
     public boolean isConnected() {
         return serialPort!=null && serialPort.isOpened();
     }
 
-    protected void sendWord(int word) throws SerialPortException {
-        serialPort.writeByte((byte)Binary.lowByte(word));
-        serialPort.writeByte((byte)Binary.highByte(word));
+    void sendWord(int word) throws SerialPortException {
+        serialPort.writeByte((byte)Binary.uint8low(word));
+        serialPort.writeByte((byte)Binary.uint8high(word));
     }
 
-    public Status sendFrame(Frame frame) {
-        try {
-            sendWord(frame.getType().getCode());
-            if(frame.getType().hasPayload()) {
-                sendWord(frame.getPayloadSize());
-                serialPort.writeBytes(frame.getPayload());
-            }
-            status = Status.OK;
-        } catch (SerialPortException e) {
-            status = error(e);
+    int readWord() throws SerialPortException, SerialPortTimeoutException {
+        return Binary.uint16(serialPort.readBytes(2, TIMEOUT_MS));
+    }
+
+    public void sendFrame(Frame frame) throws SerialPortException {
+        sendWord(frame.getHeader());
+        if(frame.hasPayload()) {
+            sendWord(frame.getPayloadSize());
+            serialPort.writeBytes(frame.getPayload());
         }
-        return status;
-    }
-
-    protected int readWord() throws SerialPortException, SerialPortTimeoutException {
-        return Binary.word(serialPort.readBytes(2, TIMEOUT_MS));
     }
 
     public void close() {
         try {
             serialPort.closePort();
-            status = Status.OK;
         } catch (SerialPortException e) {
-            status = error(e);
+            logger.error("exception closing port "+serialPort.getPortName(),e);
         }
     }
 
-    public Status getStatus() {
-        return status;
+    public Frame receiveFrame() throws SerialPortException, SerialPortTimeoutException {
+        Frame frame = new Frame(readWord());
+        if(frame.hasPayload()) {
+            int size = readWord();
+            byte[] bytes = serialPort.readBytes(size, TIMEOUT_MS);
+            frame.setPayload(bytes);
+        }
+        return frame;
     }
 
-    private Frame createInstance(int typeCode) {
-        Class frameClass = frameClasses.get(typeCode);
-        if(frameClass!=null) {
-            status = Status.OK;
-            try {
-                return (Frame) frameClass.newInstance();
-            } catch (InstantiationException|IllegalAccessException e) {
-                status = error(e.getMessage());
-                return null;
-            }
-        } else {
-            status = error(String.format("unknown frame type: %X", typeCode));
-            return null;
-        }
-    }
-
-    public Frame receiveFrame() {
-        try {
-            Frame frame = createInstance(readWord());
-            if(status.isOk()) {
-                if(frame.getType().hasPayload()) {
-                    int size = readWord();
-                    byte[] bytes = serialPort.readBytes(size, TIMEOUT_MS);
-                    frame.setPayload(bytes);
-                }
-                return frame;
-            }
-        } catch (SerialPortException|SerialPortTimeoutException e) {
-            status = error(e.getMessage());
-        }
-        return null;
+    public byte[] readAll() throws SerialPortException, SerialPortTimeoutException {
+        return serialPort.readBytes(serialPort.getInputBufferBytesCount(), TIMEOUT_MS);
     }
 }

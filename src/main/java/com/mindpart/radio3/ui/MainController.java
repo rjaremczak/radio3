@@ -1,13 +1,16 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.Radio3;
+import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
-import com.mindpart.radio3.device.DevicePropertiesResponse;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 
 import java.net.URL;
 import java.util.List;
@@ -72,9 +75,9 @@ public class MainController implements Initializable {
     }
 
     public void readDeviceProperties() {
-        DevicePropertiesResponse response = deviceService.readProperties();
+        DeviceInfo info = deviceService.readDeviceInfo();
         if(deviceService.getStatus().isOk()) {
-            deviceProperties.setText(response.getFirmwareVersion());
+            deviceProperties.setText(info.getFirmwareVersionStr());
         } else {
             deviceProperties.setText(deviceService.getStatus().toString());
         }

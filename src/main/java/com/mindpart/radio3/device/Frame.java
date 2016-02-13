@@ -1,70 +1,65 @@
 package com.mindpart.radio3.device;
 
+import com.mindpart.utils.Binary;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.02.08
  */
-public class Frame {
-    public static final int HEADER_SIZE = 2;
-    public static final int MAX_PAYLOAD_SIZE = 65535;
 
-    protected Type type;
-    protected int payloadSize;
-    protected byte[] payload;
+class Frame {
+    private int header;
+    private int payloadSize;
+    private byte[] payload;
 
-    public static class Type {
-        private int code;
-
-        public Type(int code) {
-            this.code = code;
-        }
-
-        public boolean hasPayload() {
-            return (code & 0x8000) != 0;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Type)) return false;
-
-            Type type = (Type) o;
-
-            return code == type.code;
-
-        }
-
-        @Override
-        public int hashCode() {
-            return code;
-        }
+    Frame(int header) {
+        this.header = header;
     }
 
-    protected Frame(Type type) {
-        this.type = type;
+    boolean hasPayload() {
+        return (header & 0x8000) != 0;
+    }
+
+    boolean hasCrc16() {
+        return (header & 0x4000) != 0;
+    }
+
+    void setPayload(byte[] bytes) {
+        if(!hasPayload()) {
+            throw new UnsupportedOperationException("no payload allowed for this frame");
+        }
+
+        if(bytes.length > 65535) {
+            throw new IllegalArgumentException("payload too large");
+        }
+
+        payloadSize = bytes.length;
+        payload = bytes;
+    }
+
+    public int getHeader() {
+        return header;
     }
 
     public int getPayloadSize() {
         return payloadSize;
     }
 
-    public Type getType() {
-        return type;
-    }
-
     public byte[] getPayload() {
         return payload;
     }
 
-    protected void setPayload(byte[] payload) {
-        if(payload.length > MAX_PAYLOAD_SIZE) {
-            throw new IllegalArgumentException("payload can't exceed "+MAX_PAYLOAD_SIZE+" bytes");
-        }
-        this.payload = payload;
-        this.payloadSize = payload!=null ? payload.length + HEADER_SIZE : 0;
+    public int getByte(int offset) {
+        return Binary.uint8(payload, offset);
     }
+
+    public int getWord(int offset) {
+        return Binary.uint16(payload, offset);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%04X, payload size: %d", header, payloadSize);
+    }
+
 }

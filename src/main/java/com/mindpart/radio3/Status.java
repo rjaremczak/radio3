@@ -33,6 +33,6 @@ public class Status {
 
     @Override
     public String toString() {
-        return ok ? "ok" : "error: "+message;
+        return ok ? "ok" : message;
     }
 }

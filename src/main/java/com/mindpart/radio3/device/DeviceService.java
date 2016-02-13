@@ -1,7 +1,6 @@
 package com.mindpart.radio3.device;
 
 import com.mindpart.radio3.Status;
-import com.mindpart.utils.Binary;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import org.apache.log4j.Logger;
@@ -17,10 +16,13 @@ import static com.mindpart.radio3.Status.error;
  * Date: 2016.02.07
  */
 public class DeviceService {
-    private static Logger logger = Logger.getLogger(DeviceService.class);
+    private static final int MAX_ATTEMPTS = 3;
+    private static final Logger logger = Logger.getLogger(DeviceService.class);
 
     private DeviceConnection connection;
-    private Status status = Status.OK;
+    private Status status = OK;
+
+    private DeviceInfoParser deviceInfoParser = new DeviceInfoParser();
 
     public boolean isConnected() {
         return connection!=null && connection.isConnected();
@@ -32,48 +34,46 @@ public class DeviceService {
             status = error("already connected");
         } else {
             connection = new DeviceConnection(portName);
-            status = connection.open();
+            try {
+                connection.open();
+                status = OK;
+            } catch (SerialPortException e) {
+                status = error(e);
+            }
         }
 
         logger.debug(status);
         return status;
     }
 
-    public DevicePropertiesResponse readProperties() {
+    public DeviceInfo readDeviceInfo() {
         if(!isConnected()) {
             status = error("not connected");
         } else {
-            try {
-                connection.sendWord(0x1234);
-                int major = connection.readWord();
-                int minor = connection.readWord();
-
-                byte[] bytes = new byte[4];
-                bytes[0] = (byte)Binary.lowByte(major);
-                bytes[1] = (byte)Binary.highByte(major);
-                bytes[2] = (byte)Binary.lowByte(minor);
-                bytes[3] = (byte)Binary.highByte(minor);
-                DevicePropertiesResponse response = new DevicePropertiesResponse();
-                response.setPayload(bytes);
-                status = OK;
-                return response;
-
-            } catch (Exception e) {
-                status = error(e);
-            }
-            /*
-            if(connection.sendFrame(DeviceStatusRequest.FRAME).isOk()) {
-                Frame response = connection.receiveFrame();
-                if(connection.getStatus().isOk()) {
-                    status = Status.OK;
-                    return (DevicePropertiesResponse) response;
-                } else {
-                    status = connection.getStatus();
+            for(int i=0; i<MAX_ATTEMPTS; i++) {
+                DeviceInfo deviceInfo = (DeviceInfo)performRequest(DeviceInfoParser.REQUEST, deviceInfoParser);
+                if(status == OK) {
+                    return deviceInfo;
                 }
-            } else {
-                status = connection.getStatus();
+                logger.warn("attempt "+(i+1)+"/"+MAX_ATTEMPTS+" failed: "+status);
             }
-            */
+        }
+        return null;
+    }
+
+    Object performRequest(Frame request, FrameParser frameParser) {
+        try {
+            connection.sendFrame(request);
+            Frame response = connection.receiveFrame();
+            if(frameParser.recognizes(response)) {
+                status = OK;
+                return frameParser.parse(response);
+            } else {
+                int remaining = connection.readAll().length;
+                status = error("unexpected frame: "+response+" (remaining bytes: "+remaining+")");
+            }
+        } catch (Exception e) {
+            status = error(e);
         }
         return null;
     }
@@ -84,15 +84,10 @@ public class DeviceService {
             status = error("not connected");
         } else {
             connection.close();
-            status = connection.getStatus();
             connection = null;
         }
         logger.debug(status);
         return status;
-    }
-
-    public DeviceConnection getConnection() {
-        return connection;
     }
 
     public List<String> availableSerialPorts() {
