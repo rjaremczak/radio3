@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.control.cell.*?>
 
 <VBox minHeight="400.0" minWidth="600.0" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.MainController">
     <children>
@@ -15,8 +16,8 @@
             <items>
                 <Label text="Device" />
                 <ChoiceBox fx:id="deviceSelection" minWidth="212.0" prefHeight="27.0" prefWidth="212.0" />
-                <Button fx:id="deviceSelectionRefresh" mnemonicParsing="false" onAction="#initDeviceSection" text="Refresh" />
-                <Button fx:id="deviceConnect" mnemonicParsing="false" onAction="#connectDisconnect" text="Connect" />
+                <Button fx:id="deviceSelectionRefresh" mnemonicParsing="false" onAction="#refreshAvailablePorts" text="Refresh" />
+                <Button fx:id="deviceConnect" mnemonicParsing="false" onAction="#doConnectDisconnect" text="Connect" />
                 <Label fx:id="deviceStatus" text="Label" />
             </items>
         </ToolBar>
@@ -25,12 +26,36 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <TitledPane animated="false" text="Device properties">
+                  <TitledPane animated="false" text="Device Info">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <Button layoutX="104.0" layoutY="1.0" mnemonicParsing="false" onAction="#readDeviceProperties" text="Read properties" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                              <Label fx:id="deviceProperties" alignment="TOP_LEFT" layoutX="117.0" layoutY="28.0" text="Label" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0" />
+                              <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <Button fx:id="deviceInfoRefresh" mnemonicParsing="false" onAction="#doDeviceInfoRefresh" text="refresh">
+                                       <VBox.margin>
+                                          <Insets bottom="10.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                    <TableView fx:id="devicePropertiesTable">
+                                      <columns>
+                                        <TableColumn editable="false" prefWidth="75.0" text="Property">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="name" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                        <TableColumn editable="false" sortable="false" text="Value">
+                                            <cellValueFactory>
+                                                <PropertyValueFactory property="value" />
+                                            </cellValueFactory>
+                                        </TableColumn>
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TableView>
+                                 </children>
+                              </VBox>
                            </children>
                         </AnchorPane>
                     </content>

@@ -1,5 +1,4 @@
 .root {
-    -fx-background-image: url("background.jpg");
 }
 
 .split-pane {
@@ -10,4 +9,12 @@
 }
 
 .vbox {
+}
+
+.table-view {
+    -fx-font-size: 90%;
+}
+
+.table-view .column-header {
+    -fx-font-weight: normal;
 }

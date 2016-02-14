@@ -4,16 +4,13 @@ import com.mindpart.radio3.Radio3;
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -24,11 +21,15 @@ public class MainController implements Initializable {
     private Radio3 radio3;
     private DeviceService deviceService;
 
-    @FXML public ChoiceBox<String> deviceSelection;
-    @FXML public Button deviceSelectionRefresh;
-    @FXML public Button deviceConnect;
-    @FXML public Label deviceStatus;
-    @FXML public Label deviceProperties;
+    @FXML ChoiceBox<String> deviceSelection;
+    @FXML Button deviceSelectionRefresh;
+    @FXML Button deviceConnect;
+    @FXML Button deviceInfoRefresh;
+    @FXML Label deviceStatus;
+    @FXML TableView<Property> devicePropertiesTable;
+
+    private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
+    private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
 
     public MainController(Radio3 radio3) {
         this.radio3 = radio3;
@@ -41,9 +42,8 @@ public class MainController implements Initializable {
         }
     }
 
-    public void initDeviceSection(ActionEvent actionEvent) {
-        List<String> availablePortNames = deviceService.availableSerialPorts();
-        deviceSelection.setItems(FXCollections.observableList(availablePortNames));
+    public void refreshAvailablePorts(ActionEvent actionEvent) {
+        availablePortNames.setAll(deviceService.availableSerialPorts());
         if(availablePortNames.isEmpty()) {
             disableControls(true, deviceSelection, deviceConnect);
             deviceStatus.setText("no devices found");
@@ -54,10 +54,10 @@ public class MainController implements Initializable {
         }
     }
 
-    public void connectDisconnect() {
+    public void doConnectDisconnect() {
         if(deviceService.isConnected()) {
             if(deviceService.disconnect().isOk()) {
-                disableControls(false, deviceSelection, deviceSelectionRefresh);
+                disableControls(false, deviceSelection, deviceSelectionRefresh, deviceInfoRefresh, devicePropertiesTable);
                 deviceStatus.setText("disconnected");
                 deviceConnect.setText("Connect");
             } else {
@@ -65,7 +65,7 @@ public class MainController implements Initializable {
             }
         } else {
             if(deviceService.connect(deviceSelection.getValue()).isOk()) {
-                disableControls(true, deviceSelection, deviceSelectionRefresh);
+                disableControls(true, deviceSelection, deviceSelectionRefresh, deviceInfoRefresh, devicePropertiesTable);
                 deviceConnect.setText("Disconnect");
                 deviceStatus.setText("connected");
             } else {
@@ -74,17 +74,24 @@ public class MainController implements Initializable {
         }
     }
 
-    public void readDeviceProperties() {
-        DeviceInfo info = deviceService.readDeviceInfo();
+    public void doDeviceInfoRefresh() {
+        DeviceInfo deviceInfo = deviceService.readDeviceInfo();
         if(deviceService.getStatus().isOk()) {
-            deviceProperties.setText(info.getFirmwareVersionStr());
+            deviceProperties.setAll(
+                    new Property("hardware", deviceInfo.getHardwareVersionStr()),
+                    new Property("firmware", deviceInfo.getFirmwareVersionStr()),
+                    new Property("DDS", deviceInfo.getDdsType().name()),
+                    new Property("freq. meter", deviceInfo.getFrequencyMeter().name()));
         } else {
-            deviceProperties.setText(deviceService.getStatus().toString());
+            deviceProperties.clear();
+            devicePropertiesTable.setPlaceholder(new Label(deviceService.getStatus().toString()));
         }
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        initDeviceSection(null);
+        refreshAvailablePorts(null);
+        devicePropertiesTable.setItems(deviceProperties);
+        deviceSelection.setItems(availablePortNames);
     }
 }
