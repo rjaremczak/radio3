@@ -3,6 +3,7 @@ package com.mindpart.radio3.device;
 import com.mindpart.radio3.Status;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import jssc.SerialPortTimeoutException;
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
@@ -19,13 +20,13 @@ public class DeviceService {
     private static final int MAX_ATTEMPTS = 3;
     private static final Logger logger = Logger.getLogger(DeviceService.class);
 
-    private DeviceConnection connection;
+    private DataLink dataLink;
     private Status status = OK;
 
     private DeviceInfoParser deviceInfoParser = new DeviceInfoParser();
 
     public boolean isConnected() {
-        return connection!=null && connection.isConnected();
+        return dataLink!=null && dataLink.isConnected();
     }
 
     public Status connect(String portName) {
@@ -33,11 +34,11 @@ public class DeviceService {
         if(isConnected()) {
             status = error("already connected");
         } else {
-            connection = new DeviceConnection(portName);
+            dataLink = new DataLink(portName);
             try {
-                connection.open();
+                dataLink.connect();
                 status = OK;
-            } catch (SerialPortException e) {
+            } catch (SerialPortException|SerialPortTimeoutException e) {
                 status = error(e);
             }
         }
@@ -63,13 +64,13 @@ public class DeviceService {
 
     Object performRequest(Frame request, FrameParser frameParser) {
         try {
-            connection.sendFrame(request);
-            Frame response = connection.receiveFrame();
+            dataLink.writeFrame(request);
+            Frame response = dataLink.readFrame();
             if(frameParser.recognizes(response)) {
                 status = OK;
                 return frameParser.parse(response);
             } else {
-                int remaining = connection.readAll().length;
+                int remaining = dataLink.readAll().length;
                 status = error("unexpected frame: "+response+" (remaining bytes: "+remaining+")");
             }
         } catch (Exception e) {
@@ -83,8 +84,9 @@ public class DeviceService {
         if(!isConnected()) {
             status = error("not connected");
         } else {
-            connection.close();
-            connection = null;
+            dataLink.disconnect();
+            dataLink = null;
+            status = OK;
         }
         logger.debug(status);
         return status;

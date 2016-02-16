@@ -23,7 +23,7 @@ public class DeviceInfo {
     }
 
     private String formatVersion(int version) {
-        return String.format("%X.%02X", Binary.uint8high(version), Binary.uint8low(version));
+        return String.format("%X.%02X", Binary.uInt8high(version), Binary.uInt8low(version));
     }
 
     public String getFirmwareVersionStr() {

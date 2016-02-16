@@ -36,42 +36,62 @@ public class MainController implements Initializable {
         this.deviceService = radio3.getDeviceService();
     }
 
-    private void disableControls(boolean disable, Control... controls) {
+    private void disableControls(Control... controls) {
         for(Control control : controls) {
-            control.setDisable(disable);
+            control.setDisable(true);
         }
     }
 
-    public void refreshAvailablePorts(ActionEvent actionEvent) {
+    private void enableControls(Control... controls) {
+        for(Control control : controls) {
+            control.setDisable(false);
+        }
+    }
+
+    public void refreshAvailablePorts() {
         availablePortNames.setAll(deviceService.availableSerialPorts());
         if(availablePortNames.isEmpty()) {
-            disableControls(true, deviceSelection, deviceConnect);
-            deviceStatus.setText("no devices found");
+            disableControls(deviceSelection, deviceConnect);
         } else {
-            disableControls(false, deviceSelection, deviceConnect);
+            enableControls(deviceSelection, deviceConnect);
             deviceSelection.getSelectionModel().selectFirst();
-            deviceStatus.setText("disconnected");
+        }
+    }
+
+    private void refreshOnConnected() {
+        disableControls(deviceSelection, deviceSelectionRefresh);
+        enableControls(deviceInfoRefresh);
+        deviceStatus.setText("connected");
+        deviceConnect.setText("Disconnect");
+    }
+
+    private void refreshOnDisconnected() {
+        enableControls(deviceSelection, deviceSelectionRefresh);
+        disableControls(deviceInfoRefresh);
+        deviceStatus.setText("disconnected");
+        deviceConnect.setText("Connect");
+        deviceProperties.clear();
+        devicePropertiesTable.setPlaceholder(new Label(""));
+    }
+
+    private void doConnect() {
+        if(deviceService.connect(deviceSelection.getValue()).isOk()) {
+            refreshOnConnected();
+        } else {
+            deviceStatus.setText(deviceService.getStatus().toString());
+        }
+    }
+
+    private void doDisconnect() {
+        if(deviceService.disconnect().isOk()) {
+            refreshOnDisconnected();
+        } else {
+            deviceStatus.setText(deviceService.getStatus().toString());
         }
     }
 
     public void doConnectDisconnect() {
-        if(deviceService.isConnected()) {
-            if(deviceService.disconnect().isOk()) {
-                disableControls(false, deviceSelection, deviceSelectionRefresh, deviceInfoRefresh, devicePropertiesTable);
-                deviceStatus.setText("disconnected");
-                deviceConnect.setText("Connect");
-            } else {
-                deviceStatus.setText(deviceService.getStatus().toString());
-            }
-        } else {
-            if(deviceService.connect(deviceSelection.getValue()).isOk()) {
-                disableControls(true, deviceSelection, deviceSelectionRefresh, deviceInfoRefresh, devicePropertiesTable);
-                deviceConnect.setText("Disconnect");
-                deviceStatus.setText("connected");
-            } else {
-                deviceStatus.setText(deviceService.getStatus().toString());
-            }
-        }
+        if(deviceService.isConnected()) { doDisconnect(); } else { doConnect(); };
     }
 
     public void doDeviceInfoRefresh() {
@@ -84,14 +104,15 @@ public class MainController implements Initializable {
                     new Property("freq. meter", deviceInfo.getFrequencyMeter().name()));
         } else {
             deviceProperties.clear();
-            devicePropertiesTable.setPlaceholder(new Label(deviceService.getStatus().toString()));
+            devicePropertiesTable.setPlaceholder(new Label(""));
         }
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        refreshAvailablePorts(null);
         devicePropertiesTable.setItems(deviceProperties);
         deviceSelection.setItems(availablePortNames);
+        refreshOnDisconnected();
+        refreshAvailablePorts();
     }
 }
