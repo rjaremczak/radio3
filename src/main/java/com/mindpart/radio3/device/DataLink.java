@@ -1,6 +1,7 @@
 package com.mindpart.radio3.device;
 
 import com.mindpart.utils.Binary;
+import com.mindpart.utils.Crc8;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
@@ -29,10 +30,7 @@ public class DataLink {
     public void connect() throws SerialPortException, SerialPortTimeoutException {
         serialPort.openPort();
         this.serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY);
-        int remaining = readAll().length;
-        if(remaining>0) {
-            logger.debug(remaining+" remaining bytes in read buffer");
-        }
+        flushReadBuffer();
     }
 
     public boolean isConnected() {
@@ -47,17 +45,39 @@ public class DataLink {
         }
     }
 
-    public Frame readFrame() throws SerialPortException, SerialPortTimeoutException {
-        FrameHeader header = new FrameHeader(readWord());
+    public Frame readFrame() throws SerialPortException, SerialPortTimeoutException, Crc8.Error {
+        Crc8 crc8 = new Crc8();
+        byte[] headerBytes = serialPort.readBytes(2, TIMEOUT_MS);
+        crc8.add(headerBytes);
+        FrameHeader header = new FrameHeader(Binary.uInt16(headerBytes));
         if(header.getSizeBytesCount()>0) {
-            header.setSizeBytes(serialPort.readBytes(Math.max(2, header.getSizeBytesCount()), TIMEOUT_MS));
+            byte[] sizeBytes = serialPort.readBytes(Math.max(2, header.getSizeBytesCount()), TIMEOUT_MS);
+            header.setSizeBytes(sizeBytes);
+            crc8.add(sizeBytes);
         }
         byte[] payload = serialPort.readBytes(header.getPayloadSize(), TIMEOUT_MS);
+        crc8.add(payload);
+        if(serialPort.getInputBufferBytesCount()>0) {
+            int receivedCrc = serialPort.readBytes(1, TIMEOUT_MS)[0] & 0xff;
+            if(receivedCrc != crc8.getCrc()) {
+                throw new Crc8.Error(receivedCrc, crc8.getCrc());
+            }
+        }
         return new Frame(header.getType(), payload);
     }
 
-    public byte[] readAll() throws SerialPortException, SerialPortTimeoutException {
-        return serialPort.readBytes(serialPort.getInputBufferBytesCount(), TIMEOUT_MS);
+    public int flushReadBuffer() {
+        try {
+            int remaining = serialPort.getInputBufferBytesCount();
+            if(remaining>0) {
+                serialPort.readBytes(remaining, TIMEOUT_MS);
+                logger.debug("flushed "+remaining+" bytes from read buffer");
+            }
+            return remaining;
+        } catch (Exception e) {
+            logger.error("error flushing read buffer", e);
+        }
+        return 0;
     }
 
     private void writeWord(int word) throws SerialPortException {

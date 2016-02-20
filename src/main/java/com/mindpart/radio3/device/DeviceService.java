@@ -1,6 +1,7 @@
 package com.mindpart.radio3.device;
 
 import com.mindpart.radio3.Status;
+import com.mindpart.utils.Crc8;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
@@ -17,7 +18,7 @@ import static com.mindpart.radio3.Status.error;
  * Date: 2016.02.07
  */
 public class DeviceService {
-    private static final int MAX_ATTEMPTS = 3;
+    private static final int MAX_ATTEMPTS = 5;
     private static final Logger logger = Logger.getLogger(DeviceService.class);
 
     private DataLink dataLink;
@@ -48,33 +49,40 @@ public class DeviceService {
     }
 
     public DeviceInfo readDeviceInfo() {
-        if(!isConnected()) {
-            status = error("not connected");
+        return (DeviceInfo)performRequest(DeviceInfoParser.REQUEST, deviceInfoParser);
+    }
+
+    private Object performRequestRaw(Frame request, FrameParser frameParser) throws SerialPortException, Crc8.Error, SerialPortTimeoutException {
+        dataLink.writeFrame(request);
+        Frame response = dataLink.readFrame();
+        if(frameParser.recognizes(response)) {
+            status = OK;
+            return frameParser.parse(response);
         } else {
-            for(int i=0; i<MAX_ATTEMPTS; i++) {
-                DeviceInfo deviceInfo = (DeviceInfo)performRequest(DeviceInfoParser.REQUEST, deviceInfoParser);
-                if(status == OK) {
-                    return deviceInfo;
-                }
-                logger.warn("attempt "+(i+1)+"/"+MAX_ATTEMPTS+" failed: "+status);
-            }
+            status = error("unexpected frame " + response);
+            return null;
         }
-        return null;
     }
 
     Object performRequest(Frame request, FrameParser frameParser) {
-        try {
-            dataLink.writeFrame(request);
-            Frame response = dataLink.readFrame();
-            if(frameParser.recognizes(response)) {
-                status = OK;
-                return frameParser.parse(response);
-            } else {
-                int remaining = dataLink.readAll().length;
-                status = error("unexpected frame: "+response+" (remaining bytes: "+remaining+")");
+        if(!isConnected()) {
+            status = error("not connected");
+            return null;
+        }
+
+        for(int attempt = 0; attempt<MAX_ATTEMPTS; attempt++) {
+            try {
+                Object result = performRequestRaw(request, frameParser);
+                if(result!=null) {
+                    return result;
+                }
+            } catch (Exception e) {
+                String str = "attempt "+(attempt+1)+"/"+MAX_ATTEMPTS+": "+e.getMessage();
+                status = error(str);
+                logger.error(str);
+            } finally {
+                dataLink.flushReadBuffer();
             }
-        } catch (Exception e) {
-            status = error(e);
         }
         return null;
     }
