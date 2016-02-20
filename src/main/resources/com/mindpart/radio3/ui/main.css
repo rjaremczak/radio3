@@ -2,19 +2,29 @@
 }
 
 .split-pane {
+    -fx-padding: 0;
 }
 
 .split-pane *.split-pane-divider {
-    -fx-padding: 0 1 0 1;
+    -fx-padding: 0 0 0 1;
 }
 
 .vbox {
+    -fx-padding: 0;
 }
 
 .table-view {
     -fx-font-size: 90%;
 }
 
+.table-view {
+    -fx-padding: 0;
+}
+
 .table-view .column-header {
     -fx-font-weight: normal;
+}
+
+.titled-pane .content AnchorPane {
+    -fx-padding: 0;
 }

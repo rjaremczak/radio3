@@ -54,7 +54,9 @@ public class DeviceService {
 
     private Object performRequestRaw(Frame request, FrameParser frameParser) throws SerialPortException, Crc8.Error, SerialPortTimeoutException {
         dataLink.writeFrame(request);
+        logger.debug("sent request: "+request+" - waiting for response...");
         Frame response = dataLink.readFrame();
+        logger.debug("response: "+response);
         if(frameParser.recognizes(response)) {
             status = OK;
             return frameParser.parse(response);
@@ -76,6 +78,7 @@ public class DeviceService {
                 if(result!=null) {
                     return result;
                 }
+                logger.error(status);
             } catch (Exception e) {
                 String str = "attempt "+(attempt+1)+"/"+MAX_ATTEMPTS+": "+e.getMessage();
                 status = error(str);

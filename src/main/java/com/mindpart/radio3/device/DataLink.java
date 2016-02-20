@@ -17,11 +17,11 @@ public class DataLink {
 
     private SerialPort serialPort;
 
-    public static final int TIMEOUT_MS = 200;
-    public static final int BAUD_RATE = SerialPort.BAUDRATE_115200;
-    public static final int DATA_BITS = SerialPort.DATABITS_8;
-    public static final int STOP_BITS = SerialPort.STOPBITS_1;
-    public static final int PARITY = SerialPort.PARITY_NONE;
+    private static final int TIMEOUT_MS = 200;
+    private static final int BAUD_RATE = SerialPort.BAUDRATE_115200;
+    private static final int DATA_BITS = SerialPort.DATABITS_8;
+    private static final int STOP_BITS = SerialPort.STOPBITS_1;
+    private static final int PARITY = SerialPort.PARITY_NONE;
 
     public DataLink(String portName) {
         this.serialPort = new SerialPort(portName);
@@ -29,7 +29,8 @@ public class DataLink {
 
     public void connect() throws SerialPortException, SerialPortTimeoutException {
         serialPort.openPort();
-        this.serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY);
+        serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY, false, false);
+        serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
         flushReadBuffer();
     }
 
@@ -48,20 +49,18 @@ public class DataLink {
     public Frame readFrame() throws SerialPortException, SerialPortTimeoutException, Crc8.Error {
         Crc8 crc8 = new Crc8();
         byte[] headerBytes = serialPort.readBytes(2, TIMEOUT_MS);
-        crc8.add(headerBytes);
+        crc8.addBuf(headerBytes);
         FrameHeader header = new FrameHeader(Binary.uInt16(headerBytes));
         if(header.getSizeBytesCount()>0) {
             byte[] sizeBytes = serialPort.readBytes(Math.max(2, header.getSizeBytesCount()), TIMEOUT_MS);
             header.setSizeBytes(sizeBytes);
-            crc8.add(sizeBytes);
+            crc8.addBuf(sizeBytes);
         }
         byte[] payload = serialPort.readBytes(header.getPayloadSize(), TIMEOUT_MS);
-        crc8.add(payload);
-        if(serialPort.getInputBufferBytesCount()>0) {
-            int receivedCrc = serialPort.readBytes(1, TIMEOUT_MS)[0] & 0xff;
-            if(receivedCrc != crc8.getCrc()) {
-                throw new Crc8.Error(receivedCrc, crc8.getCrc());
-            }
+        crc8.addBuf(payload);
+        int receivedCrc = serialPort.readBytes(1, TIMEOUT_MS)[0] & 0xff;
+        if(receivedCrc != crc8.getCrc()) {
+            throw new Crc8.Error(receivedCrc, crc8.getCrc());
         }
         return new Frame(header.getType(), payload);
     }
@@ -90,10 +89,19 @@ public class DataLink {
     }
 
     public void writeFrame(Frame frame) throws SerialPortException {
+        serialPort.purgePort(SerialPort.PURGE_TXCLEAR|SerialPort.PURGE_RXCLEAR);
         FrameHeader header = new FrameHeader(frame);
+        Crc8 crc8 = new Crc8();
         writeWord(header.getHeader());
+        crc8.addWord(header.getHeader());
         if(header.getSizeBytesCount()>0) {
             serialPort.writeBytes(header.getSizeBytes());
+            crc8.addBuf(header.getSizeBytes());
         }
+        if(frame.getPayloadSize()>0) {
+            serialPort.writeBytes(frame.getPayload());
+            crc8.addBuf(frame.getPayload());
+        }
+        serialPort.writeByte((byte)(crc8.getCrc() & 0xff));
     }
 }

@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -24,9 +25,15 @@ public class MainController implements Initializable {
     @FXML ChoiceBox<String> deviceSelection;
     @FXML Button deviceSelectionRefresh;
     @FXML Button deviceConnect;
-    @FXML Button deviceInfoRefresh;
     @FXML Label deviceStatus;
     @FXML TableView<Property> devicePropertiesTable;
+    @FXML TitledPane deviceInfoPane;
+
+    @FXML TitledPane ddsPane;
+    @FXML TextField ddsFrequency;
+    @FXML Button ddsSetFrequency;
+
+    @FXML Button testBtn;
 
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
@@ -60,22 +67,23 @@ public class MainController implements Initializable {
 
     private void refreshOnConnected() {
         disableControls(deviceSelection, deviceSelectionRefresh);
-        enableControls(deviceInfoRefresh);
         deviceStatus.setText("connected");
         deviceConnect.setText("Disconnect");
+        deviceInfoPane.setExpanded(true);
     }
 
     private void refreshOnDisconnected() {
         enableControls(deviceSelection, deviceSelectionRefresh);
-        disableControls(deviceInfoRefresh);
         deviceStatus.setText("disconnected");
         deviceConnect.setText("Connect");
         deviceProperties.clear();
         devicePropertiesTable.setPlaceholder(new Label(""));
+        deviceInfoPane.setExpanded(false);
     }
 
     private void doConnect() {
         if(deviceService.connect(deviceSelection.getValue()).isOk()) {
+            doDeviceInfoRefresh();
             refreshOnConnected();
         } else {
             deviceStatus.setText(deviceService.getStatus().toString());
@@ -104,8 +112,23 @@ public class MainController implements Initializable {
                     new Property("freq. meter", deviceInfo.getFrequencyMeter().name()));
         } else {
             deviceProperties.clear();
-            devicePropertiesTable.setPlaceholder(new Label(""));
+            devicePropertiesTable.setPlaceholder(new Label("no data"));
         }
+    }
+
+    private void disableHeader(TableView tableView) {
+        Pane header = (Pane) tableView.lookup("TableHeaderRow");
+        if(header!=null && header.isVisible()) {
+            header.setMaxHeight(0);
+            header.setMinHeight(0);
+            header.setPrefHeight(0);
+            header.setVisible(false);
+            header.setManaged(false);
+        }
+    }
+
+    public void doTest() {
+        doDeviceInfoRefresh();
     }
 
     @Override
@@ -114,5 +137,9 @@ public class MainController implements Initializable {
         deviceSelection.setItems(availablePortNames);
         refreshOnDisconnected();
         refreshAvailablePorts();
+    }
+
+    public void postDisplayInit() {
+        disableHeader(devicePropertiesTable);
     }
 }

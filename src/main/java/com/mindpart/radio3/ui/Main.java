@@ -22,6 +22,7 @@ public class Main extends Application {
         primaryStage.setTitle("Radio 3");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+        mainController.postDisplayInit();
     }
 
     @Override
