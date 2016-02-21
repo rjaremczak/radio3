@@ -16,9 +16,9 @@ class DeviceInfoParser implements FrameParser<DeviceInfo> {
     @Override
     public DeviceInfo parse(Frame frame) {
         return new DeviceInfo(
-                frame.getWord(0),
-                frame.getWord(2),
-                frame.getByte(4),
-                frame.getByte(5));
+                frame.getUInt16(0),
+                frame.getUInt16(2),
+                frame.getUInt8(4),
+                frame.getUInt8(5));
     }
 }

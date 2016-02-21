@@ -34,7 +34,7 @@
                      <items>
                         <Button fx:id="testBtn" mnemonicParsing="false" onAction="#doTest" text="Test" />
                      </items></ToolBar>
-                  <TitledPane fx:id="deviceInfoPane" animated="false" expanded="false" prefWidth="274.0" text="Device Info">
+                  <TitledPane fx:id="deviceInfoPane" animated="false" prefWidth="274.0" text="Device Info">
                     <content>
                       <AnchorPane>
                            <children>
@@ -59,7 +59,7 @@
                         </AnchorPane>
                     </content>
                   </TitledPane>
-                  <TitledPane fx:id="ddsPane" animated="false" prefHeight="110.0" text="DDS">
+                  <TitledPane fx:id="vfoPane" animated="false" prefHeight="110.0" text="VFO">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -74,10 +74,10 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <TextField fx:id="ddsFrequency" GridPane.columnIndex="1" />
+                                    <TextField fx:id="vfoFrequency" GridPane.columnIndex="1" />
                                     <Label text="Frequency" />
                                     <Label text="Hz" GridPane.columnIndex="2" />
-                                    <Button fx:id="ddsSetFrequency" mnemonicParsing="false" text="Set" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Button fx:id="vfoSetFrequency" mnemonicParsing="false" onAction="#doVfoSetFrequency" text="Set" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                  </children>
                                  <padding>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

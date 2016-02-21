@@ -7,23 +7,23 @@ import com.mindpart.utils.Binary;
  * Date: 2016.02.13
  */
 public class DeviceInfo {
-    public enum DdsType { NONE, AD9850 }
-    public enum FrequencyMeter { NONE, STM32 }
+    public enum VfoType { NONE, AD9850}
+    public enum FrequencyMeter { NONE, STM32}
 
     private int firmwareVersion;
     private int hardwareVersion;
-    private DdsType ddsType;
+    private VfoType vfoType;
     private FrequencyMeter frequencyMeter;
 
     public DeviceInfo(int firmwareVersion, int hardwareVersion, int ddsCode, int frequencyMeterCode) {
         this.firmwareVersion = firmwareVersion;
         this.hardwareVersion = hardwareVersion;
-        this.ddsType = DdsType.values()[ddsCode];
+        this.vfoType = VfoType.values()[ddsCode];
         this.frequencyMeter = FrequencyMeter.values()[frequencyMeterCode];
     }
 
     private String formatVersion(int version) {
-        return String.format("%X.%02X", Binary.uInt8high(version), Binary.uInt8low(version));
+        return String.format("%X.%02X", Binary.toUInt8high(version), Binary.toUInt8low(version));
     }
 
     public String getFirmwareVersionStr() {
@@ -34,8 +34,8 @@ public class DeviceInfo {
         return formatVersion(hardwareVersion);
     }
 
-    public DdsType getDdsType() {
-        return ddsType;
+    public VfoType getVfoType() {
+        return vfoType;
     }
 
     public FrequencyMeter getFrequencyMeter() {

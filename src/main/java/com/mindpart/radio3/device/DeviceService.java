@@ -25,6 +25,7 @@ public class DeviceService {
     private Status status = OK;
 
     private DeviceInfoParser deviceInfoParser = new DeviceInfoParser();
+    private ResponseCodeParser responseCodeParser = new ResponseCodeParser();
 
     public boolean isConnected() {
         return dataLink!=null && dataLink.isConnected();
@@ -48,8 +49,12 @@ public class DeviceService {
         return status;
     }
 
-    public DeviceInfo readDeviceInfo() {
+    public DeviceInfo getDeviceInfo() {
         return (DeviceInfo)performRequest(DeviceInfoParser.REQUEST, deviceInfoParser);
+    }
+
+    public boolean setVfoFrequency(int frequency) {
+        return performRequest(new VfoSetFrequencyRequest(frequency), responseCodeParser) == OK;
     }
 
     private Object performRequestRaw(Frame request, FrameParser frameParser) throws SerialPortException, Crc8.Error, SerialPortTimeoutException {

@@ -3,9 +3,9 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.Radio3;
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -29,11 +29,12 @@ public class MainController implements Initializable {
     @FXML TableView<Property> devicePropertiesTable;
     @FXML TitledPane deviceInfoPane;
 
-    @FXML TitledPane ddsPane;
-    @FXML TextField ddsFrequency;
-    @FXML Button ddsSetFrequency;
+    @FXML TitledPane vfoPane;
+    @FXML TextField vfoFrequency;
+    @FXML Button vfoSetFrequency;
 
     @FXML Button testBtn;
+
 
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
@@ -77,12 +78,16 @@ public class MainController implements Initializable {
         deviceStatus.setText("disconnected");
         deviceConnect.setText("Connect");
         deviceProperties.clear();
-        devicePropertiesTable.setPlaceholder(new Label(""));
         deviceInfoPane.setExpanded(false);
     }
 
     private void doConnect() {
         if(deviceService.connect(deviceSelection.getValue()).isOk()) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             doDeviceInfoRefresh();
             refreshOnConnected();
         } else {
@@ -103,17 +108,21 @@ public class MainController implements Initializable {
     }
 
     public void doDeviceInfoRefresh() {
-        DeviceInfo deviceInfo = deviceService.readDeviceInfo();
+        DeviceInfo deviceInfo = deviceService.getDeviceInfo();
         if(deviceService.getStatus().isOk()) {
             deviceProperties.setAll(
-                    new Property("hardware", deviceInfo.getHardwareVersionStr()),
-                    new Property("firmware", deviceInfo.getFirmwareVersionStr()),
-                    new Property("DDS", deviceInfo.getDdsType().name()),
-                    new Property("freq. meter", deviceInfo.getFrequencyMeter().name()));
+                    new Property("Hardware", deviceInfo.getHardwareVersionStr()),
+                    new Property("Firmware", deviceInfo.getFirmwareVersionStr()),
+                    new Property("VFO", deviceInfo.getVfoType().name()),
+                    new Property("Freq. Meter", deviceInfo.getFrequencyMeter().name()));
         } else {
             deviceProperties.clear();
-            devicePropertiesTable.setPlaceholder(new Label("no data"));
         }
+    }
+
+    public void doVfoSetFrequency() {
+        int frequency = Integer.parseInt(vfoFrequency.getText());
+        deviceService.setVfoFrequency(frequency);
     }
 
     private void disableHeader(TableView tableView) {
@@ -141,5 +150,8 @@ public class MainController implements Initializable {
 
     public void postDisplayInit() {
         disableHeader(devicePropertiesTable);
+        devicePropertiesTable.setFixedCellSize(25);
+        devicePropertiesTable.prefHeightProperty().bind(devicePropertiesTable.fixedCellSizeProperty().multiply(Bindings.size(devicePropertiesTable.getItems())));
+
     }
 }

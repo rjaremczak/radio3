@@ -16,8 +16,8 @@ public final class Crc8 {
     }
 
     public void addWord(int word) {
-        addByte((byte) Binary.uInt8low(word));
-        addByte((byte) Binary.uInt8high(word));
+        addByte((byte) Binary.toUInt8low(word));
+        addByte((byte) Binary.toUInt8high(word));
     }
 
     public void addByte(byte data) {

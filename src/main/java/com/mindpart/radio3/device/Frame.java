@@ -31,16 +31,16 @@ public class Frame {
         return payload != null ? payload.length : 0;
     }
 
-    public int getByte(int offset) {
-        return Binary.uInt8(payload, offset);
+    public int getUInt8(int offset) {
+        return Binary.toUInt8(payload, offset);
     }
 
-    public int getWord(int offset) {
-        return Binary.uInt16(payload, offset);
+    public int getUInt16(int offset) {
+        return Binary.toUInt16(payload, offset);
     }
 
-    public int getDWord(int offset) {
-        return Binary.uInt32(payload, offset);
+    public int getUInt32(int offset) {
+        return Binary.toUInt32(payload, offset);
     }
 
     @Override

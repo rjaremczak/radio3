@@ -94,7 +94,7 @@ class FrameHeader {
         if(isFormatB()) {
             size = bytes[0] & 0xff;
         } else if(isFormatC()){
-            size = Binary.uInt16(bytes);
+            size = Binary.toUInt16(bytes);
         }
     }
 
@@ -110,9 +110,9 @@ class FrameHeader {
 
     public byte[] getSizeBytes() {
         if(isFormatB()) {
-            return new byte[]{ (byte)Binary.uInt8low(size) };
+            return new byte[]{ (byte)Binary.toUInt8low(size) };
         } else if(isFormatC()) {
-            return new byte[]{ (byte)Binary.uInt8low(size), (byte)Binary.uInt8high(size) };
+            return new byte[]{ (byte)Binary.toUInt8low(size), (byte)Binary.toUInt8high(size) };
         } else {
             return null;
         }

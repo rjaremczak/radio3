@@ -50,7 +50,7 @@ public class DataLink {
         Crc8 crc8 = new Crc8();
         byte[] headerBytes = serialPort.readBytes(2, TIMEOUT_MS);
         crc8.addBuf(headerBytes);
-        FrameHeader header = new FrameHeader(Binary.uInt16(headerBytes));
+        FrameHeader header = new FrameHeader(Binary.toUInt16(headerBytes));
         if(header.getSizeBytesCount()>0) {
             byte[] sizeBytes = serialPort.readBytes(Math.max(2, header.getSizeBytesCount()), TIMEOUT_MS);
             header.setSizeBytes(sizeBytes);
@@ -80,12 +80,12 @@ public class DataLink {
     }
 
     private void writeWord(int word) throws SerialPortException {
-        serialPort.writeByte((byte)Binary.uInt8low(word));
-        serialPort.writeByte((byte)Binary.uInt8high(word));
+        serialPort.writeByte((byte)Binary.toUInt8low(word));
+        serialPort.writeByte((byte)Binary.toUInt8high(word));
     }
 
     private int readWord() throws SerialPortException, SerialPortTimeoutException {
-        return Binary.uInt16(serialPort.readBytes(2, TIMEOUT_MS));
+        return Binary.toUInt16(serialPort.readBytes(2, TIMEOUT_MS));
     }
 
     public void writeFrame(Frame frame) throws SerialPortException {
