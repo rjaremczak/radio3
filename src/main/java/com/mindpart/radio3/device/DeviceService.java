@@ -26,6 +26,7 @@ public class DeviceService {
 
     private DeviceInfoParser deviceInfoParser = new DeviceInfoParser();
     private ResponseCodeParser responseCodeParser = new ResponseCodeParser();
+    private FrequencyMeterParser frequencyMeterParser = new FrequencyMeterParser();
 
     public boolean isConnected() {
         return dataLink!=null && dataLink.isConnected();
@@ -49,8 +50,12 @@ public class DeviceService {
         return status;
     }
 
-    public DeviceInfo getDeviceInfo() {
-        return (DeviceInfo)performRequest(DeviceInfoParser.REQUEST, deviceInfoParser);
+    public DeviceInfo readDeviceInfo() {
+        return (DeviceInfo)performRequest(DeviceInfoParser.READ_REQUEST, deviceInfoParser);
+    }
+
+    public int readFrequency() {
+        return (Integer)performRequest(FrequencyMeterParser.READ_REQUEST, frequencyMeterParser);
     }
 
     public boolean setVfoFrequency(int frequency) {

@@ -8,18 +8,18 @@ import com.mindpart.utils.Binary;
  */
 public class DeviceInfo {
     public enum VfoType { NONE, AD9850}
-    public enum FrequencyMeter { NONE, STM32}
+    public enum FrequencyMeterType { NONE, STM32}
 
     private int firmwareVersion;
     private int hardwareVersion;
     private VfoType vfoType;
-    private FrequencyMeter frequencyMeter;
+    private FrequencyMeterType frequencyMeterType;
 
     public DeviceInfo(int firmwareVersion, int hardwareVersion, int ddsCode, int frequencyMeterCode) {
         this.firmwareVersion = firmwareVersion;
         this.hardwareVersion = hardwareVersion;
         this.vfoType = VfoType.values()[ddsCode];
-        this.frequencyMeter = FrequencyMeter.values()[frequencyMeterCode];
+        this.frequencyMeterType = FrequencyMeterType.values()[frequencyMeterCode];
     }
 
     private String formatVersion(int version) {
@@ -38,7 +38,7 @@ public class DeviceInfo {
         return vfoType;
     }
 
-    public FrequencyMeter getFrequencyMeter() {
-        return frequencyMeter;
+    public FrequencyMeterType getFrequencyMeterType() {
+        return frequencyMeterType;
     }
 }

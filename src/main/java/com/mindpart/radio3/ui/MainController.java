@@ -33,8 +33,11 @@ public class MainController implements Initializable {
     @FXML TextField vfoFrequency;
     @FXML Button vfoSetFrequency;
 
-    @FXML Button testBtn;
+    @FXML TextField freqMeterValue;
+    @FXML Button freqMeterRead;
+    @FXML ToggleButton freqMeterPoll;
 
+    @FXML Button testBtn;
 
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
@@ -108,13 +111,13 @@ public class MainController implements Initializable {
     }
 
     public void doDeviceInfoRefresh() {
-        DeviceInfo deviceInfo = deviceService.getDeviceInfo();
+        DeviceInfo deviceInfo = deviceService.readDeviceInfo();
         if(deviceService.getStatus().isOk()) {
             deviceProperties.setAll(
                     new Property("Hardware", deviceInfo.getHardwareVersionStr()),
                     new Property("Firmware", deviceInfo.getFirmwareVersionStr()),
                     new Property("VFO", deviceInfo.getVfoType().name()),
-                    new Property("Freq. Meter", deviceInfo.getFrequencyMeter().name()));
+                    new Property("Freq. Meter", deviceInfo.getFrequencyMeterType().name()));
         } else {
             deviceProperties.clear();
         }
@@ -123,6 +126,14 @@ public class MainController implements Initializable {
     public void doVfoSetFrequency() {
         int frequency = Integer.parseInt(vfoFrequency.getText());
         deviceService.setVfoFrequency(frequency);
+    }
+
+    public void doFreqMeterRead() {
+        freqMeterValue.setText(Integer.toString(deviceService.readFrequency()));
+    }
+
+    public void doFreqMeterPoll() {
+
     }
 
     private void disableHeader(TableView tableView) {

@@ -65,18 +65,19 @@
                            <children>
                               <GridPane hgap="5.0" prefHeight="90.0" prefWidth="272.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="127.0" minWidth="10.0" prefWidth="92.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="183.0" minWidth="10.0" prefWidth="155.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="179.0" minWidth="10.0" prefWidth="28.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="127.0" minWidth="10.0" prefWidth="83.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="183.0" minWidth="10.0" prefWidth="78.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="179.0" minWidth="10.0" prefWidth="70.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="179.0" minWidth="10.0" prefWidth="21.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <TextField fx:id="vfoFrequency" GridPane.columnIndex="1" />
+                                    <TextField fx:id="vfoFrequency" promptText="frequency" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
                                     <Label text="Frequency" />
-                                    <Label text="Hz" GridPane.columnIndex="2" />
+                                    <Label text="Hz" GridPane.columnIndex="3" />
                                     <Button fx:id="vfoSetFrequency" mnemonicParsing="false" onAction="#doVfoSetFrequency" text="Set" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                  </children>
                                  <padding>
@@ -92,19 +93,21 @@
                            <children>
                               <GridPane hgap="5.0" prefHeight="90.0" prefWidth="272.0" vgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="148.0" minWidth="10.0" prefWidth="148.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="34.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="84.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="148.0" minWidth="10.0" prefWidth="60.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="1.0" prefWidth="85.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="20.0" />
                                 </columnConstraints>
                                 <rowConstraints>
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="37.0" minHeight="10.0" prefHeight="37.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
                                     <Label text="Frequency" />
-                                    <TextField GridPane.columnIndex="1" />
-                                    <Button mnemonicParsing="false" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Label text="Hz" GridPane.columnIndex="2" />
+                                    <TextField fx:id="freqMeterValue" editable="false" focusTraversable="false" promptText="frequency" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                                    <Button fx:id="freqMeterRead" mnemonicParsing="false" onAction="#doFreqMeterRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Label text="Hz" GridPane.columnIndex="3" />
+                                    <ToggleButton fx:id="freqMeterPoll" mnemonicParsing="false" text="Poll" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                  </children>
                                  <padding>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
