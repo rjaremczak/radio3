@@ -6,7 +6,7 @@ import com.mindpart.utils.Binary;
  * Created by Robert Jaremczak
  * Date: 2016.02.22
  */
-public class FrequencyMeterParser implements FrameParser<Integer> {
+public class FMeterParser implements FrameParser<Long> {
     static final int READ_TYPE = 0x002;
     static final Frame READ_REQUEST = new Frame(READ_TYPE);
 
@@ -16,7 +16,7 @@ public class FrequencyMeterParser implements FrameParser<Integer> {
     }
 
     @Override
-    public Integer parse(Frame frame) {
+    public Long parse(Frame frame) {
         return Binary.toUInt32(frame.getPayload());
     }
 }

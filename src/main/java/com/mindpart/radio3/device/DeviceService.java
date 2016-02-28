@@ -24,15 +24,16 @@ public class DeviceService {
     private DataLink dataLink;
     private Status status = OK;
 
+    private InvalidFrameParser invalidFrameParser = new InvalidFrameParser();
     private DeviceInfoParser deviceInfoParser = new DeviceInfoParser();
     private ResponseCodeParser responseCodeParser = new ResponseCodeParser();
-    private FrequencyMeterParser frequencyMeterParser = new FrequencyMeterParser();
+    private FMeterParser fMeterParser = new FMeterParser();
 
     public boolean isConnected() {
         return dataLink!=null && dataLink.isConnected();
     }
 
-    public Status connect(String portName) {
+    synchronized public Status connect(String portName) {
         logger.debug("connect to "+portName);
         if(isConnected()) {
             status = error("already connected");
@@ -51,32 +52,35 @@ public class DeviceService {
     }
 
     public DeviceInfo readDeviceInfo() {
-        return (DeviceInfo)performRequest(DeviceInfoParser.READ_REQUEST, deviceInfoParser);
+        return performRequest(DeviceInfoParser.READ_REQUEST, deviceInfoParser);
     }
 
-    public int readFrequency() {
-        return (Integer)performRequest(FrequencyMeterParser.READ_REQUEST, frequencyMeterParser);
+    synchronized public Long readFrequency() {
+        return performRequest(FMeterParser.READ_REQUEST, fMeterParser);
     }
 
-    public boolean setVfoFrequency(int frequency) {
+    synchronized public boolean setVfoFrequency(int frequency) {
         return performRequest(new VfoSetFrequencyRequest(frequency), responseCodeParser) == OK;
     }
 
     private Object performRequestRaw(Frame request, FrameParser frameParser) throws SerialPortException, Crc8.Error, SerialPortTimeoutException {
         dataLink.writeFrame(request);
-        logger.debug("sent request: "+request+" - waiting for response...");
+        logger.debug("request: "+request);
         Frame response = dataLink.readFrame();
         logger.debug("response: "+response);
         if(frameParser.recognizes(response)) {
             status = OK;
             return frameParser.parse(response);
+        } else if(invalidFrameParser.recognizes(response)) {
+            status = error(invalidFrameParser.parse(response));
+            return null;
         } else {
             status = error("unexpected frame " + response);
             return null;
         }
     }
 
-    Object performRequest(Frame request, FrameParser frameParser) {
+    private <T> T performRequest(Frame request, FrameParser frameParser) {
         if(!isConnected()) {
             status = error("not connected");
             return null;
@@ -85,8 +89,8 @@ public class DeviceService {
         for(int attempt = 0; attempt<MAX_ATTEMPTS; attempt++) {
             try {
                 Object result = performRequestRaw(request, frameParser);
-                if(result!=null) {
-                    return result;
+                if(status.isOk() && result!=null) {
+                    return (T)result;
                 }
                 logger.error(status);
             } catch (Exception e) {
@@ -100,7 +104,7 @@ public class DeviceService {
         return null;
     }
 
-    public Status disconnect() {
+    synchronized public Status disconnect() {
         logger.debug("disconnect");
         if(!isConnected()) {
             status = error("not connected");
@@ -113,7 +117,7 @@ public class DeviceService {
         return status;
     }
 
-    public List<String> availableSerialPorts() {
+    synchronized public List<String> availableSerialPorts() {
         return Arrays.asList(SerialPortList.getPortNames());
     }
 

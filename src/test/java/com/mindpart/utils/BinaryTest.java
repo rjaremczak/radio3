@@ -50,7 +50,10 @@ public class BinaryTest {
 
     @Test
     public void testToUInt32() {
-        byte[] bytes = {(byte)0x01, (byte)0x1b, (byte)0x2c, (byte)0x3d};
-        assertEquals(0x3d2c1b0a, bytes);
+        byte[] bytes = {(byte)0x0a, (byte)0x1b, (byte)0x2c, (byte)0x3d};
+        assertEquals(0x3d2c1b0aL, Binary.toUInt32(bytes));
+
+        byte[] bytes2 = {-115, -122, -62, -36};
+        assertEquals(3703735949L, Binary.toUInt32(bytes2));
     }
 }

@@ -39,7 +39,7 @@ public class Frame {
         return Binary.toUInt16(payload, offset);
     }
 
-    public int getUInt32(int offset) {
+    public long getUInt32(int offset) {
         return Binary.toUInt32(payload, offset);
     }
 

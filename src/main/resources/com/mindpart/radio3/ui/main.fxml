@@ -104,10 +104,10 @@
                                 </rowConstraints>
                                  <children>
                                     <Label text="Frequency" />
-                                    <TextField fx:id="freqMeterValue" editable="false" focusTraversable="false" promptText="frequency" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-                                    <Button fx:id="freqMeterRead" mnemonicParsing="false" onAction="#doFreqMeterRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <TextField fx:id="fMeterValue" editable="false" focusTraversable="false" promptText="frequency" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                                    <Button fx:id="fMeterRead" mnemonicParsing="false" onAction="#doFMeterRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     <Label text="Hz" GridPane.columnIndex="3" />
-                                    <ToggleButton fx:id="freqMeterPoll" mnemonicParsing="false" text="Poll" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <ToggleButton fx:id="fMeterPoll" mnemonicParsing="false" text="Poll" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                  </children>
                                  <padding>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

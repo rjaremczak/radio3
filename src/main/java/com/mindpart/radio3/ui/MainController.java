@@ -13,14 +13,14 @@ import javafx.scene.layout.Pane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by Robert Jaremczak
  * Date: 2016.02.04
  */
 public class MainController implements Initializable {
-    private Radio3 radio3;
-    private DeviceService deviceService;
 
     @FXML ChoiceBox<String> deviceSelection;
     @FXML Button deviceSelectionRefresh;
@@ -33,14 +33,17 @@ public class MainController implements Initializable {
     @FXML TextField vfoFrequency;
     @FXML Button vfoSetFrequency;
 
-    @FXML TextField freqMeterValue;
-    @FXML Button freqMeterRead;
-    @FXML ToggleButton freqMeterPoll;
+    @FXML TextField fMeterValue;
+    @FXML Button fMeterRead;
+    @FXML ToggleButton fMeterPoll;
 
     @FXML Button testBtn;
 
+    private Radio3 radio3;
+    private DeviceService deviceService;
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
+    private ScheduledExecutorService pollingExecutor = Executors.newSingleThreadScheduledExecutor();
 
     public MainController(Radio3 radio3) {
         this.radio3 = radio3;
@@ -128,11 +131,12 @@ public class MainController implements Initializable {
         deviceService.setVfoFrequency(frequency);
     }
 
-    public void doFreqMeterRead() {
-        freqMeterValue.setText(Integer.toString(deviceService.readFrequency()));
+    public void doFMeterRead() {
+        Long frequency = deviceService.readFrequency();
+        fMeterValue.setText(frequency==null ? "" : frequency.toString());
     }
 
-    public void doFreqMeterPoll() {
+    public void doFMeterPoll() {
 
     }
 
