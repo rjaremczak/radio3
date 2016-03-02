@@ -37,7 +37,8 @@ public class MainController implements Initializable {
     @FXML Button fMeterRead;
     @FXML ToggleButton fMeterPoll;
 
-    @FXML Button testBtn;
+    @FXML Button deviceInfoBtn;
+    @FXML Label deviceInfo;
 
     private Radio3 radio3;
     private DeviceService deviceService;
@@ -74,6 +75,7 @@ public class MainController implements Initializable {
 
     private void refreshOnConnected() {
         disableControls(deviceSelection, deviceSelectionRefresh);
+        enableControls(deviceInfo, deviceInfoBtn);
         deviceStatus.setText("connected");
         deviceConnect.setText("Disconnect");
         deviceInfoPane.setExpanded(true);
@@ -81,6 +83,8 @@ public class MainController implements Initializable {
 
     private void refreshOnDisconnected() {
         enableControls(deviceSelection, deviceSelectionRefresh);
+        disableControls(deviceInfo, deviceInfoBtn);
+        deviceInfo.setText("not connected");
         deviceStatus.setText("disconnected");
         deviceConnect.setText("Connect");
         deviceProperties.clear();
@@ -114,14 +118,18 @@ public class MainController implements Initializable {
     }
 
     public void doDeviceInfoRefresh() {
-        DeviceInfo deviceInfo = deviceService.readDeviceInfo();
+        DeviceInfo di = deviceService.readDeviceInfo();
         if(deviceService.getStatus().isOk()) {
+            deviceInfo.setText("connected, firmware: "+di.getFirmwareVersionStr()+" hardware: "+di.getHardwareVersionStr());
+
             deviceProperties.setAll(
-                    new Property("Hardware", deviceInfo.getHardwareVersionStr()),
-                    new Property("Firmware", deviceInfo.getFirmwareVersionStr()),
-                    new Property("VFO", deviceInfo.getVfoType().name()),
-                    new Property("Freq. Meter", deviceInfo.getFrequencyMeterType().name()));
+                    new Property("Hardware", di.getHardwareVersionStr()),
+                    new Property("Firmware", di.getFirmwareVersionStr()),
+                    new Property("VFO", di.getVfoType().name()),
+                    new Property("Freq. Meter", di.getFrequencyMeterType().name()),
+                    new Property("Timestamp", Long.toString(di.getTimestamp())));
         } else {
+            deviceInfo.setText("not connected");
             deviceProperties.clear();
         }
     }
@@ -151,7 +159,7 @@ public class MainController implements Initializable {
         }
     }
 
-    public void doTest() {
+    public void doDeviceInfo() {
         doDeviceInfoRefresh();
     }
 

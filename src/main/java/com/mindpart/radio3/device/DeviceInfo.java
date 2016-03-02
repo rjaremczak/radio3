@@ -10,12 +10,14 @@ public class DeviceInfo {
     public enum VfoType { NONE, AD9850}
     public enum FrequencyMeterType { NONE, STM32}
 
+    private long timestamp;
     private int firmwareVersion;
     private int hardwareVersion;
     private VfoType vfoType;
     private FrequencyMeterType frequencyMeterType;
 
-    public DeviceInfo(int firmwareVersion, int hardwareVersion, int ddsCode, int frequencyMeterCode) {
+    public DeviceInfo(long timestamp, int firmwareVersion, int hardwareVersion, int ddsCode, int frequencyMeterCode) {
+        this.timestamp = timestamp;
         this.firmwareVersion = firmwareVersion;
         this.hardwareVersion = hardwareVersion;
         this.vfoType = VfoType.values()[ddsCode];
@@ -40,5 +42,9 @@ public class DeviceInfo {
 
     public FrequencyMeterType getFrequencyMeterType() {
         return frequencyMeterType;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
     }
 }
