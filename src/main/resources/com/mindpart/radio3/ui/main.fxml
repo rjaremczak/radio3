@@ -30,7 +30,7 @@
                      </children>
                   </VBox>
                </children></AnchorPane>
-            <VBox prefWidth="100.0">
+            <VBox fx:id="toolsPane" prefWidth="100.0">
                <children>
                   <ToolBar prefHeight="40.0" prefWidth="200.0" />
                   <TitledPane fx:id="deviceInfoPane" animated="false" expanded="false" prefWidth="274.0" text="Device Info">
@@ -106,7 +106,7 @@
                                     <TextField fx:id="fMeterValue" editable="false" focusTraversable="false" promptText="frequency" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
                                     <Button fx:id="fMeterRead" mnemonicParsing="false" onAction="#doFMeterRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     <Label text="Hz" GridPane.columnIndex="3" />
-                                    <ToggleButton fx:id="fMeterPoll" mnemonicParsing="false" text="Poll" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <ToggleButton fx:id="fMeterPoll" mnemonicParsing="false" onAction="#doFMeterPoll" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                  </children>
                                  <padding>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -120,11 +120,7 @@
             </VBox>
             </items>
         </SplitPane>
-      <ToolBar prefHeight="40.0" prefWidth="200.0">
-         <items>
-                <Label fx:id="deviceStatus" text="Label" />
-         </items>
-      </ToolBar>
+      <ToolBar prefHeight="40.0" prefWidth="200.0" />
     </children>
     <stylesheets>
         <URL value="@main.css" />
