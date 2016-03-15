@@ -24,7 +24,7 @@
          <children>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <tabs>
-                <Tab text="Manual Control">
+                <Tab fx:id="manualControlTab" text="Manual Control">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -91,7 +91,7 @@
                                                       <TextField fx:id="fMeterValue" editable="false" focusTraversable="false" promptText="frequency" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
                                                       <Button fx:id="fMeterRead" mnemonicParsing="false" onAction="#doFMeterRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                       <Label text="Hz" GridPane.columnIndex="3" />
-                                                      <ToggleButton fx:id="fMeterPoll" mnemonicParsing="false" onAction="#doFMeterPoll" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                      <ToggleButton fx:id="fMeterStart" mnemonicParsing="false" onAction="#doFMeterStart" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                    </children>
                                                    <padding>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -110,11 +110,11 @@
                                              <children>
                                                 <GridPane hgap="5.0" prefHeight="90.0" prefWidth="272.0" vgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <children>
-                                                      <Label text="Level" />
-                                                      <TextField fx:id="fMeterValue1" editable="false" focusTraversable="false" promptText="frequency" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-                                                      <Button fx:id="fMeterRead1" mnemonicParsing="false" onAction="#doFMeterRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <Label text="Gain" />
+                                                      <TextField fx:id="logProbeGain" editable="false" focusTraversable="false" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                                                      <Button fx:id="logProbeRead" mnemonicParsing="false" onAction="#doLogProbeRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                       <Label text="dB" GridPane.columnIndex="3" />
-                                                      <ToggleButton fx:id="fMeterPoll1" mnemonicParsing="false" onAction="#doFMeterPoll" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                      <ToggleButton fx:id="logProbeStart" mnemonicParsing="false" onAction="#doLogProbeStart" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                    </children>
                                                    <columnConstraints>
                                                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="84.0" />
@@ -143,11 +143,11 @@
                                              <children>
                                                 <GridPane hgap="5.0" prefHeight="90.0" prefWidth="272.0" vgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <children>
-                                                      <Label text="Level" />
-                                                      <TextField fx:id="fMeterValue2" editable="false" focusTraversable="false" promptText="frequency" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-                                                      <Button fx:id="fMeterRead2" mnemonicParsing="false" onAction="#doFMeterRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <Label text="Gain" />
+                                                      <TextField fx:id="linProbeGain" editable="false" focusTraversable="false" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                                                      <Button fx:id="linProbeRead" mnemonicParsing="false" onAction="#doLinProbeRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                       <Label text="x" GridPane.columnIndex="3" />
-                                                      <ToggleButton fx:id="fMeterPoll2" mnemonicParsing="false" onAction="#doFMeterPoll" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                      <ToggleButton fx:id="linProbeStart" mnemonicParsing="false" onAction="#doLinProbeStart" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                    </children>
                                                    <columnConstraints>
                                                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="84.0" />
@@ -177,29 +177,29 @@
                                                 <GridPane hgap="5.0" prefHeight="120.0" prefWidth="272.0" vgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <children>
                                                       <Label text="Gain" />
-                                                      <TextField fx:id="fMeterValue3" editable="false" focusTraversable="false" promptText="frequency" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-                                                      <Button fx:id="fMeterRead3" mnemonicParsing="false" onAction="#doFMeterRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="compProbeGain" editable="false" focusTraversable="false" text="0" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                                                      <Button fx:id="compProbeRead" mnemonicParsing="false" onAction="#doCompProbeRead" text="Read" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                       <Label text="dB" GridPane.columnIndex="3" />
-                                                      <ToggleButton fx:id="fMeterPoll3" mnemonicParsing="false" onAction="#doFMeterPoll" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                      <ToggleButton fx:id="compProbeStart" mnemonicParsing="false" onAction="#doCompProbeStart" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                       <Label text="Phase" GridPane.columnIndex="4" />
-                                                      <TextField fx:id="fMeterValue31" editable="false" focusTraversable="false" promptText="frequency" text="0" GridPane.columnIndex="5" GridPane.columnSpan="2" />
+                                                      <TextField fx:id="compProbePhase" editable="false" focusTraversable="false" text="0" GridPane.columnIndex="5" GridPane.columnSpan="2" />
                                                       <Label text="°" GridPane.columnIndex="7" />
                                                    </children>
                                                    <columnConstraints>
                                                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="84.0" />
                                                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="148.0" minWidth="10.0" prefWidth="60.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="105.0" minWidth="1.0" prefWidth="102.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="52.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="47.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="105.0" minWidth="1.0" prefWidth="84.0" />
                                                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="38.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="100.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="81.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="65.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="137.0" minWidth="10.0" prefWidth="74.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="87.0" minWidth="10.0" prefWidth="20.0" />
                                                    </columnConstraints>
                                                    <padding>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                    </padding>
                                                    <rowConstraints>
-                                                      <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="37.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                 </GridPane>
@@ -219,7 +219,7 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                <Tab text="Device Info">
+                <Tab fx:id="deviceInfoTab" text="Device Info">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>

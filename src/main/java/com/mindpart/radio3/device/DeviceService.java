@@ -30,7 +30,7 @@ public class DeviceService {
     private FMeterParser fMeterParser = new FMeterParser();
     private LogarithmicProbeParser logarithmicProbeParser = new LogarithmicProbeParser();
     private LinearProbeParser linearProbeParser = new LinearProbeParser();
-    private GainPhaseParser gainPhaseParser = new GainPhaseParser();
+    private CompProbeParser compProbeParser = new CompProbeParser();
 
     public boolean isConnected() {
         return dataLink!=null && dataLink.isConnected();
@@ -66,16 +66,16 @@ public class DeviceService {
         return performRequest(new VfoSetFrequencyRequest(frequency), responseCodeParser) == OK;
     }
 
-    synchronized public Double readLogarithmicProbe() {
+    synchronized public Double readLogProbe() {
         return performRequest(LogarithmicProbeParser.READ_REQUEST, logarithmicProbeParser);
     }
 
-    synchronized public Double readLinearProbe() {
+    synchronized public Double readLinProbe() {
         return performRequest(LinearProbeParser.READ_REQUEST, linearProbeParser);
     }
 
-    synchronized public GainPhase readGainPhaseProbe() {
-        return performRequest(GainPhaseParser.READ_REQUEST, gainPhaseParser);
+    synchronized public GainPhase readCompProbe() {
+        return performRequest(CompProbeParser.READ_REQUEST, compProbeParser);
     }
 
     private Object performRequestRaw(Frame request, FrameParser frameParser) throws SerialPortException, Crc8.Error, SerialPortTimeoutException {

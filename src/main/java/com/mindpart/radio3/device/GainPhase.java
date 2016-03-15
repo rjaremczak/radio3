@@ -7,4 +7,17 @@ package com.mindpart.radio3.device;
 public class GainPhase {
     private double gain;
     private double phase;
+
+    public GainPhase(double gain, double phase) {
+        this.gain = gain;
+        this.phase = phase;
+    }
+
+    public double getGain() {
+        return gain;
+    }
+
+    public double getPhase() {
+        return phase;
+    }
 }

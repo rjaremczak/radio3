@@ -4,6 +4,7 @@ import com.mindpart.radio3.Radio3;
 import com.mindpart.radio3.Status;
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
+import com.mindpart.radio3.device.GainPhase;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,13 +15,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 
 import java.net.URL;
-import java.sql.Time;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Robert Jaremczak
@@ -31,10 +29,14 @@ public class MainController implements Initializable {
     @FXML ChoiceBox<String> deviceSelection;
     @FXML Button deviceSelectionRefresh;
     @FXML Button deviceConnect;
-    @FXML TableView<Property> devicePropertiesTable;
-    @FXML TitledPane deviceInfoPane;
+    @FXML Label deviceInfo;
 
-    @FXML Pane toolsPane;
+    @FXML Tab deviceInfoTab;
+
+    @FXML TableView<Property> devicePropertiesTable;
+    @FXML Button deviceInfoBtn;
+
+    @FXML Tab manualControlTab;
 
     @FXML TitledPane vfoPane;
     @FXML TextField vfoFrequency;
@@ -42,10 +44,20 @@ public class MainController implements Initializable {
 
     @FXML TextField fMeterValue;
     @FXML Button fMeterRead;
-    @FXML ToggleButton fMeterPoll;
+    @FXML ToggleButton fMeterStart;
 
-    @FXML Button deviceInfoBtn;
-    @FXML Label deviceInfo;
+    @FXML TextField logProbeGain;
+    @FXML Button logProbeRead;
+    @FXML ToggleButton logProbeStart;
+
+    @FXML TextField linProbeGain;
+    @FXML Button linProbeRead;
+    @FXML ToggleButton linProbeStart;
+
+    @FXML TextField compProbeGain;
+    @FXML TextField compProbePhase;
+    @FXML Button compProbeRead;
+    @FXML ToggleButton compProbeStart;
 
     private Radio3 radio3;
     private DeviceService deviceService;
@@ -54,6 +66,9 @@ public class MainController implements Initializable {
     private ScheduledExecutorService pollingExecutor = Executors.newSingleThreadScheduledExecutor();
 
     private volatile boolean pollFMeter = false;
+    private volatile boolean pollLinProbe = false;
+    private volatile boolean pollLogProbe = false;
+    private volatile boolean pollCompProbe = false;
 
     public MainController(Radio3 radio3) {
         this.radio3 = radio3;
@@ -84,18 +99,16 @@ public class MainController implements Initializable {
 
     private void refreshOnConnected() {
         disableNodes(deviceSelection, deviceSelectionRefresh);
-        enableNodes(deviceInfo, toolsPane, deviceConnect, deviceInfoBtn);
+        enableNodes(deviceInfo, manualControlTab.getContent(), deviceConnect, deviceInfoBtn);
         deviceConnect.setText("Disconnect");
-        deviceInfoPane.setExpanded(true);
     }
 
     private void refreshOnDisconnected(String devInfo) {
         enableNodes(deviceSelection, deviceSelectionRefresh, deviceConnect);
-        disableNodes(deviceInfo, toolsPane, deviceInfoBtn);
+        disableNodes(deviceInfo, manualControlTab.getContent(), deviceInfoBtn);
         deviceInfo.setText(devInfo);
         deviceConnect.setText("Connect");
         deviceProperties.clear();
-        deviceInfoPane.setExpanded(false);
     }
 
     private void doConnect() {
@@ -151,21 +164,57 @@ public class MainController implements Initializable {
         deviceService.setVfoFrequency(frequency);
     }
 
-    public void doFMeterRead() {
-        Long frequency = deviceService.readFrequency();
-        fMeterValue.setText(frequency==null ? "" : frequency.toString());
+    private String optionalValue(Object value) {
+        return value!=null ? value.toString() : "";
     }
 
-    public void doFMeterPoll() {
-        if(fMeterPoll.isSelected()) {
-            fMeterPoll.setText("Stop");
-            fMeterRead.setDisable(true);
-            pollFMeter = true;
+    public void doFMeterRead() {
+        Long frequency = deviceService.readFrequency();
+        fMeterValue.setText(optionalValue(frequency));
+    }
+
+    private boolean handlePollStart(ToggleButton startBtn, Button readBtn) {
+        if(startBtn.isSelected()) {
+            startBtn.setText("Stop");
+            readBtn.setDisable(true);
+            return true;
         } else {
-            fMeterPoll.setText("Start");
-            fMeterRead.setDisable(false);
-            pollFMeter = false;
+            startBtn.setText("Start");
+            readBtn.setDisable(false);
+            return false;
         }
+    }
+
+    public void doFMeterStart() {
+        pollFMeter = handlePollStart(fMeterStart, fMeterRead);
+    }
+
+    public void doLinProbeRead() {
+        Double gain = deviceService.readLinProbe();
+        linProbeGain.setText(optionalValue(gain));
+    }
+
+    public void doLinProbeStart() {
+        pollLinProbe = handlePollStart(linProbeStart, linProbeRead);
+    }
+
+    public void doLogProbeRead() {
+        Double gain = deviceService.readLogProbe();
+        logProbeGain.setText(optionalValue(gain));
+    }
+
+    public void doLogProbeStart() {
+        pollLogProbe = handlePollStart(logProbeStart, logProbeRead);
+    }
+
+    public void doCompProbeRead() {
+        GainPhase gp = deviceService.readCompProbe();
+        compProbeGain.setText(optionalValue(gp.getGain()));
+        compProbePhase.setText(optionalValue(gp.getPhase()));
+    }
+
+    public void doCompProbeStart() {
+        pollCompProbe = handlePollStart(compProbeStart, compProbeRead);
     }
 
     private void disableHeader(TableView tableView) {
@@ -191,9 +240,10 @@ public class MainController implements Initializable {
         refreshAvailablePorts();
         pollingExecutor = Executors.newSingleThreadScheduledExecutor();
         pollingExecutor.scheduleWithFixedDelay(() -> {
-            if(pollFMeter) {
-                doFMeterRead();
-            }
+            if(pollFMeter) { doFMeterRead(); }
+            if(pollLinProbe) { doLinProbeRead(); }
+            if(pollLogProbe) { doLogProbeRead(); }
+            if(pollCompProbe) { doCompProbeRead(); }
         }, 2, 1, TimeUnit.SECONDS);
     }
 
