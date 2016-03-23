@@ -16,7 +16,7 @@ public class FrameHeaderTest {
         assertTrue(header.isFormatA());
         assertFalse(header.isFormatB());
         assertFalse(header.isFormatC());
-        assertEquals(0, header.getType());
+        assertEquals(0, header.getCommand());
         assertEquals(6, header.getPayloadSize());
     }
 
@@ -27,13 +27,13 @@ public class FrameHeaderTest {
         assertFalse(header.isFormatA());
         assertTrue(header.isFormatB());
         assertFalse(header.isFormatC());
-        assertEquals(0x11, header.getType());
+        assertEquals(0x11, header.getCommand());
         assertEquals(214, header.getPayloadSize());
 
 
         header = new FrameHeader(0xE013);
         header.setSizeBytes(new byte[]{(byte)0});
-        assertEquals(0x13, header.getType());
+        assertEquals(0x13, header.getCommand());
         assertEquals(14, header.getPayloadSize());
     }
 
@@ -44,12 +44,12 @@ public class FrameHeaderTest {
         assertFalse(header.isFormatA());
         assertFalse(header.isFormatB());
         assertTrue(header.isFormatC());
-        assertEquals(0x11, header.getType());
+        assertEquals(0x11, header.getCommand());
         assertEquals(1494, header.getPayloadSize());
 
         header = new FrameHeader(0xF013);
         header.setSizeBytes(new byte[]{(byte)0, (byte)0});
-        assertEquals(0x13, header.getType());
+        assertEquals(0x13, header.getCommand());
         assertEquals(270, header.getPayloadSize());
     }
 }

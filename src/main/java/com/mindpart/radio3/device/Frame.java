@@ -7,20 +7,20 @@ import com.mindpart.utils.Binary;
  * Date: 2016.02.16
  */
 public class Frame {
-    private int type;
+    private FrameCommand command;
     private byte[] payload;
 
-    public Frame(int type) {
-        this(type, null);
+    public Frame(FrameCommand command) {
+        this(command, null);
     }
 
-    public Frame(int type, byte[] payload) {
-        this.type = type;
+    public Frame(FrameCommand command, byte[] payload) {
+        this.command = command;
         this.payload = payload;
     }
 
-    public int getType() {
-        return type;
+    public FrameCommand getCommand() {
+        return command;
     }
 
     public byte[] getPayload() {
@@ -45,7 +45,7 @@ public class Frame {
 
     @Override
     public String toString() {
-        return String.format("%03X, payload size: %d", type, getPayloadSize());
+        return command + ", payload size: "+getPayloadSize();
     }
 
 }

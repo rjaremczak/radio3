@@ -1,14 +1,13 @@
 package com.mindpart.radio3.device;
 
 import com.mindpart.radio3.Status;
-import com.mindpart.utils.Crc8;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
 import org.apache.log4j.Logger;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 import static com.mindpart.radio3.Status.OK;
 import static com.mindpart.radio3.Status.error;
@@ -18,19 +17,49 @@ import static com.mindpart.radio3.Status.error;
  * Date: 2016.02.07
  */
 public class DeviceService {
-    private static final int MAX_ATTEMPTS = 5;
     private static final Logger logger = Logger.getLogger(DeviceService.class);
 
     private DataLink dataLink;
     private Status status = OK;
+    private Map<Class<? extends FrameParser>, FrameParser> parsers = new HashMap<>();
+    private Map<FrameParser, BiConsumer<FrameParser, Frame>> handlers = new HashMap<>();
 
-    private InvalidFrameParser invalidFrameParser = new InvalidFrameParser();
-    private DeviceInfoParser deviceInfoParser = new DeviceInfoParser();
-    private ResponseCodeParser responseCodeParser = new ResponseCodeParser();
-    private FMeterParser fMeterParser = new FMeterParser();
-    private LogarithmicProbeParser logarithmicProbeParser = new LogarithmicProbeParser();
-    private LinearProbeParser linearProbeParser = new LinearProbeParser();
-    private CompProbeParser compProbeParser = new CompProbeParser();
+    public DeviceService() throws InstantiationException, IllegalAccessException {
+        registerParser(DeviceInfoParser.class);
+        registerParser(StatusCodeParser.class);
+        registerParser(FMeterParser.class);
+        registerParser(LogarithmicProbeParser.class);
+        registerParser(LinearProbeParser.class);
+        registerParser(ComplexProbeParser.class);
+        registerParser(VfoReadFrequencyParser.class);
+    }
+
+    private <T extends FrameParser> void registerParser(Class<T> clazz) throws IllegalAccessException, InstantiationException {
+        parsers.put(clazz, clazz.newInstance());
+    }
+
+    public void registerHandler(Class<? extends FrameParser> clazz, BiConsumer<FrameParser, Frame> handler) {
+        FrameParser parser = parsers.get(clazz);
+        if(parser == null) {
+            throw new IllegalArgumentException("parser "+clazz+" not registered");
+        }
+
+        handlers.put(parser, handler);
+    }
+
+    public void frameHandler(Frame frame) {
+        for(Map.Entry<Class<? extends FrameParser>, FrameParser> entry : parsers.entrySet()) {
+            FrameParser parser = entry.getValue();
+            if(parser.recognizes(frame)) {
+                BiConsumer<FrameParser, Frame> handler = handlers.get(parser);
+                if(handler!=null) {
+                    handler.accept(parser, frame);
+                } else {
+                    logger.warn("no handler for "+entry.getKey());
+                }
+            }
+        }
+    }
 
     public boolean isConnected() {
         return dataLink!=null && dataLink.isConnected();
@@ -43,7 +72,7 @@ public class DeviceService {
         } else {
             dataLink = new DataLink(portName);
             try {
-                dataLink.connect();
+                dataLink.connect(this::frameHandler);
                 status = OK;
             } catch (SerialPortException|SerialPortTimeoutException e) {
                 status = error(e);
@@ -54,69 +83,41 @@ public class DeviceService {
         return status;
     }
 
-    public DeviceInfo readDeviceInfo() {
-        return performRequest(DeviceInfoParser.READ_REQUEST, deviceInfoParser);
+    synchronized public void readDeviceInfo() {
+        performRequest(DeviceInfoParser.GET);
     }
 
-    synchronized public Long readFrequency() {
-        return performRequest(FMeterParser.READ_REQUEST, fMeterParser);
+    synchronized public void readFrequency() {
+        performRequest(FMeterParser.SAMPLE);
     }
 
-    synchronized public boolean setVfoFrequency(int frequency) {
-        return performRequest(new VfoSetFrequencyRequest(frequency), responseCodeParser) == OK;
+    synchronized public void changeVfoFrequency(int frequency) {
+        performRequest(new VfoSetFrequency(frequency));
     }
 
-    synchronized public Double readLogProbe() {
-        return performRequest(LogarithmicProbeParser.READ_REQUEST, logarithmicProbeParser);
+    synchronized public void readLogProbe() {
+        performRequest(LogarithmicProbeParser.SAMPLE);
     }
 
-    synchronized public Double readLinProbe() {
-        return performRequest(LinearProbeParser.READ_REQUEST, linearProbeParser);
+    synchronized public void readLinProbe() {
+        performRequest(LinearProbeParser.SAMPLE);
     }
 
-    synchronized public GainPhase readCompProbe() {
-        return performRequest(CompProbeParser.READ_REQUEST, compProbeParser);
+    synchronized public void readCompProbe() {
+        performRequest(ComplexProbeParser.SAMPLE);
     }
 
-    private Object performRequestRaw(Frame request, FrameParser frameParser) throws SerialPortException, Crc8.Error, SerialPortTimeoutException {
-        dataLink.writeFrame(request);
-        logger.debug("request: "+request);
-        Frame response = dataLink.readFrame();
-        logger.debug("response: "+response);
-        if(frameParser.recognizes(response)) {
-            status = OK;
-            return frameParser.parse(response);
-        } else if(invalidFrameParser.recognizes(response)) {
-            status = error(invalidFrameParser.parse(response));
-            return null;
-        } else {
-            status = error("unexpected frame " + response);
-            return null;
+    synchronized public void readVfoFrequency() {
+        performRequest(VfoReadFrequencyParser.SAMPLE);
+    }
+
+    private void performRequest(Frame request) {
+        try {
+            dataLink.writeFrame(request);
+        } catch (Exception e) {
+            status = error(e.getMessage());
+            logger.error(e);
         }
-    }
-
-    private <T> T performRequest(Frame request, FrameParser frameParser) {
-        if(!isConnected()) {
-            status = error("not connected");
-            return null;
-        }
-
-        for(int attempt = 0; attempt<MAX_ATTEMPTS; attempt++) {
-            try {
-                Object result = performRequestRaw(request, frameParser);
-                if(status.isOk() && result!=null) {
-                    return (T)result;
-                }
-                logger.error(status);
-            } catch (Exception e) {
-                String str = "attempt "+(attempt+1)+"/"+MAX_ATTEMPTS+": "+e.getMessage();
-                status = error(str);
-                logger.error(str);
-            } finally {
-                dataLink.flushReadBuffer();
-            }
-        }
-        return null;
     }
 
     synchronized public Status disconnect() {

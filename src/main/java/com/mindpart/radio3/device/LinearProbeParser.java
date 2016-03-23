@@ -2,17 +2,18 @@ package com.mindpart.radio3.device;
 
 import com.mindpart.utils.Binary;
 
+import static com.mindpart.radio3.device.FrameCommand.LINPROBE_SAMPLE;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.03.13
  */
 public class LinearProbeParser implements FrameParser<Double> {
-    static final int READ_TYPE = 0x004;
-    static final Frame READ_REQUEST = new Frame(READ_TYPE);
+    static final Frame SAMPLE = new Frame(LINPROBE_SAMPLE);
 
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getType() == READ_TYPE;
+        return frame.getCommand() == LINPROBE_SAMPLE;
     }
 
     @Override

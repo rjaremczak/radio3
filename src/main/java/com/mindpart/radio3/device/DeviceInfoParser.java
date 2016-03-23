@@ -1,16 +1,17 @@
 package com.mindpart.radio3.device;
 
+import static com.mindpart.radio3.device.FrameCommand.DEVICE_GET_INFO;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.02.13
  */
-class DeviceInfoParser implements FrameParser<DeviceInfo> {
-    static final int READ_TYPE = 0x000;
-    static final Frame READ_REQUEST = new Frame(READ_TYPE);
+public class DeviceInfoParser implements FrameParser<DeviceInfo> {
+    static final Frame GET = new Frame(DEVICE_GET_INFO);
 
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getType() == READ_TYPE;
+        return frame.getCommand() == DEVICE_GET_INFO;
     }
 
     @Override

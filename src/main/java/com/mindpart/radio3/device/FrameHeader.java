@@ -15,8 +15,7 @@ import com.mindpart.utils.Binary;
  First 16 bits is the header which has following structure:
 
  bits 12-15:    frame format
- bits 10-11:    reserved
- bits 0-9:      command - used by application
+ bits 0-11:     command - used by application
 
  Payload can directly follow the header or follow size data, that depends on frame format code:
 
@@ -35,12 +34,12 @@ import com.mindpart.utils.Binary;
 
 class FrameHeader {
     private int format;
-    private int type;
+    private FrameCommand command;
     private int size;
 
     FrameHeader(int header) {
         this.format = (header >> 12) & 0x0f;
-        this.type = header & 0x7ff;
+        this.command = FrameCommand.of(header & 0x7ff);
 
         if(isFormatA()) {
             size = format;
@@ -48,7 +47,7 @@ class FrameHeader {
     }
 
     FrameHeader(Frame frame) {
-        this.type = frame.getType();
+        this.command = frame.getCommand();
         int payloadSize = frame.getPayloadSize();
         if(payloadSize <= 13) {
             format = payloadSize;
@@ -65,7 +64,7 @@ class FrameHeader {
     }
 
     int getHeader() {
-        return ((format & 0x0f) << 12) | type;
+        return ((format & 0x0f) << 12) | command.getCode();
     }
 
     boolean isFormatA() {
@@ -118,7 +117,7 @@ class FrameHeader {
         }
     }
 
-    public int getType() {
-        return type;
+    public FrameCommand getCommand() {
+        return command;
     }
 }

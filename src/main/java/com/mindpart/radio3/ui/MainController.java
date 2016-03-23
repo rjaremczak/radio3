@@ -1,10 +1,9 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.Radio3;
-import com.mindpart.radio3.Status;
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.radio3.device.GainPhase;
+import com.mindpart.radio3.device.StatusCode;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,7 +28,7 @@ public class MainController implements Initializable {
     @FXML ChoiceBox<String> deviceSelection;
     @FXML Button deviceSelectionRefresh;
     @FXML Button deviceConnect;
-    @FXML Label deviceInfo;
+    @FXML Label deviceStatus;
 
     @FXML Tab deviceInfoTab;
 
@@ -59,20 +58,12 @@ public class MainController implements Initializable {
     @FXML Button compProbeRead;
     @FXML ToggleButton compProbeStart;
 
-    private Radio3 radio3;
     private DeviceService deviceService;
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
-    private ScheduledExecutorService pollingExecutor = Executors.newSingleThreadScheduledExecutor();
 
-    private volatile boolean pollFMeter = false;
-    private volatile boolean pollLinProbe = false;
-    private volatile boolean pollLogProbe = false;
-    private volatile boolean pollCompProbe = false;
-
-    public MainController(Radio3 radio3) {
-        this.radio3 = radio3;
-        this.deviceService = radio3.getDeviceService();
+    public MainController(DeviceService deviceService) {
+        this.deviceService = deviceService;
     }
 
     private void disableNodes(Node... nodes) {
@@ -87,7 +78,7 @@ public class MainController implements Initializable {
         }
     }
 
-    public void refreshAvailablePorts() {
+    public void updateAvailablePorts() {
         availablePortNames.setAll(deviceService.availableSerialPorts());
         if(availablePortNames.isEmpty()) {
             disableNodes(deviceSelection, deviceConnect);
@@ -97,16 +88,16 @@ public class MainController implements Initializable {
         }
     }
 
-    private void refreshOnConnected() {
+    private void updateOnConnect() {
         disableNodes(deviceSelection, deviceSelectionRefresh);
-        enableNodes(deviceInfo, manualControlTab.getContent(), deviceConnect, deviceInfoBtn);
+        enableNodes(deviceStatus, manualControlTab.getContent(), deviceConnect, deviceInfoBtn);
         deviceConnect.setText("Disconnect");
     }
 
-    private void refreshOnDisconnected(String devInfo) {
+    private void updateOnDisconnect(String devInfo) {
         enableNodes(deviceSelection, deviceSelectionRefresh, deviceConnect);
-        disableNodes(deviceInfo, manualControlTab.getContent(), deviceInfoBtn);
-        deviceInfo.setText(devInfo);
+        disableNodes(deviceStatus, manualControlTab.getContent(), deviceInfoBtn);
+        deviceStatus.setText(devInfo);
         deviceConnect.setText("Connect");
         deviceProperties.clear();
     }
@@ -118,23 +109,19 @@ public class MainController implements Initializable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if(doDeviceInfoRefresh().isOk()) {
-                refreshOnConnected();
-            } else {
-                deviceService.disconnect();
-                refreshOnDisconnected("device is not responding");
-            }
+            updateOnConnect();
+            deviceService.readDeviceInfo();
+            deviceService.readVfoFrequency();
         } else {
-            deviceInfo.setText(deviceService.getStatus().toString());
+            deviceStatus.setText(deviceService.getStatus().toString());
         }
     }
 
     private void doDisconnect() {
-        pollFMeter = false;
         if(deviceService.disconnect().isOk()) {
-            refreshOnDisconnected("disconnected");
+            updateOnDisconnect("disconnected");
         } else {
-            deviceInfo.setText(deviceService.getStatus().toString());
+            deviceStatus.setText(deviceService.getStatus().toString());
         }
     }
 
@@ -142,26 +129,22 @@ public class MainController implements Initializable {
         if(deviceService.isConnected()) { doDisconnect(); } else { doConnect(); };
     }
 
-    public Status doDeviceInfoRefresh() {
-        DeviceInfo di = deviceService.readDeviceInfo();
-        if(deviceService.getStatus().isOk()) {
-            deviceProperties.setAll(
-                    new Property("Hardware", di.getHardwareVersionStr()),
-                    new Property("Firmware", di.getFirmwareVersionStr()),
-                    new Property("VFO", di.getVfoType().name()),
-                    new Property("Freq. Meter", di.getFrequencyMeterType().name()),
-                    new Property("Timestamp", Long.toString(di.getTimestamp())));
-            deviceInfo.setText("connected, firmware: "+di.getFirmwareVersionStr()+" hardware: "+di.getHardwareVersionStr());
-        } else {
-            deviceInfo.setText("not connected");
-            deviceProperties.clear();
+    public void updateDeviceInfo(DeviceInfo di) {
+        deviceProperties.setAll(
+                new Property("Hardware", di.getHardwareVersionStr()),
+                new Property("Firmware", di.getFirmwareVersionStr()),
+                new Property("VFO", di.getVfoType().name()),
+                new Property("Freq. Meter", di.getFrequencyMeterType().name()),
+                new Property("Timestamp", Long.toString(di.getTimestamp())));
+        deviceStatus.setText("connected, firmware: "+di.getFirmwareVersionStr()+" hardware: "+di.getHardwareVersionStr());
+        if(deviceStatus.isDisable()) {
+            updateOnConnect();
         }
-        return deviceService.getStatus();
     }
 
     public void doVfoSetFrequency() {
         int frequency = Integer.parseInt(vfoFrequency.getText());
-        deviceService.setVfoFrequency(frequency);
+        deviceService.changeVfoFrequency(frequency);
     }
 
     private String optionalValue(Object value) {
@@ -169,8 +152,11 @@ public class MainController implements Initializable {
     }
 
     public void doFMeterRead() {
-        Long frequency = deviceService.readFrequency();
-        fMeterValue.setText(optionalValue(frequency));
+        deviceService.readFrequency();
+    }
+
+    public void updateFMeter(Long frequency) {
+        fMeterValue.setText(frequency.toString());
     }
 
     private boolean handlePollStart(ToggleButton startBtn, Button readBtn) {
@@ -186,35 +172,40 @@ public class MainController implements Initializable {
     }
 
     public void doFMeterStart() {
-        pollFMeter = handlePollStart(fMeterStart, fMeterRead);
     }
 
     public void doLinProbeRead() {
-        Double gain = deviceService.readLinProbe();
-        linProbeGain.setText(optionalValue(gain));
+        deviceService.readLinProbe();
+    }
+
+    public void updateLinearProbe(double gain) {
+        linProbeGain.setText(Double.toString(gain));
     }
 
     public void doLinProbeStart() {
-        pollLinProbe = handlePollStart(linProbeStart, linProbeRead);
     }
 
     public void doLogProbeRead() {
-        Double gain = deviceService.readLogProbe();
-        logProbeGain.setText(optionalValue(gain));
+        deviceService.readLogProbe();
+    }
+
+    public void updateLogarithmicProbe(double gain) {
+        logProbeGain.setText(Double.toString(gain));
     }
 
     public void doLogProbeStart() {
-        pollLogProbe = handlePollStart(logProbeStart, logProbeRead);
     }
 
     public void doCompProbeRead() {
-        GainPhase gp = deviceService.readCompProbe();
+        deviceService.readCompProbe();
+    }
+
+    public void updateComplexProbe(GainPhase gp) {
         compProbeGain.setText(optionalValue(gp.getGain()));
         compProbePhase.setText(optionalValue(gp.getPhase()));
     }
 
     public void doCompProbeStart() {
-        pollCompProbe = handlePollStart(compProbeStart, compProbeRead);
     }
 
     private void disableHeader(TableView tableView) {
@@ -229,22 +220,15 @@ public class MainController implements Initializable {
     }
 
     public void doDeviceInfo() {
-        doDeviceInfoRefresh();
+        deviceService.readDeviceInfo();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         devicePropertiesTable.setItems(deviceProperties);
         deviceSelection.setItems(availablePortNames);
-        refreshOnDisconnected("disconnected");
-        refreshAvailablePorts();
-        pollingExecutor = Executors.newSingleThreadScheduledExecutor();
-        pollingExecutor.scheduleWithFixedDelay(() -> {
-            if(pollFMeter) { doFMeterRead(); }
-            if(pollLinProbe) { doLinProbeRead(); }
-            if(pollLogProbe) { doLogProbeRead(); }
-            if(pollCompProbe) { doCompProbeRead(); }
-        }, 2, 1, TimeUnit.SECONDS);
+        updateOnDisconnect("disconnected");
+        updateAvailablePorts();
     }
 
     public void postDisplayInit() {
@@ -252,5 +236,13 @@ public class MainController implements Initializable {
         devicePropertiesTable.setFixedCellSize(25);
         devicePropertiesTable.prefHeightProperty().bind(devicePropertiesTable.fixedCellSizeProperty().multiply(Bindings.size(devicePropertiesTable.getItems())));
 
+    }
+
+    public void updateStatusCode(StatusCode statusCode) {
+        deviceStatus.setText(statusCode.toString());
+    }
+
+    public void updateVfoFrequency(Long frequency) {
+        vfoFrequency.setText(frequency.toString());
     }
 }

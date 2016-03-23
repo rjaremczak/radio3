@@ -2,17 +2,18 @@ package com.mindpart.radio3.device;
 
 import com.mindpart.utils.Binary;
 
+import static com.mindpart.radio3.device.FrameCommand.LOGPROBE_SAMPLE;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.03.13
  */
 public class LogarithmicProbeParser implements FrameParser<Double> {
-    static final int READ_TYPE = 0x003;
-    static final Frame READ_REQUEST = new Frame(READ_TYPE);
+    static final Frame SAMPLE = new Frame(LOGPROBE_SAMPLE);
 
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getType() == READ_TYPE;
+        return frame.getCommand() == LOGPROBE_SAMPLE;
     }
 
     @Override

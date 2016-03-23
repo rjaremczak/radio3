@@ -7,6 +7,8 @@ import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
 import org.apache.log4j.Logger;
 
+import java.util.function.Consumer;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.02.08
@@ -27,11 +29,20 @@ public class DataLink {
         this.serialPort = new SerialPort(portName);
     }
 
-    public void connect() throws SerialPortException, SerialPortTimeoutException {
+    public void connect(Consumer<Frame> frameParser) throws SerialPortException, SerialPortTimeoutException {
         serialPort.openPort();
         serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY, false, false);
         serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
         flushReadBuffer();
+        serialPort.addEventListener(serialPortEvent -> {
+            try {
+                Frame frame = readFrame();
+                flushReadBuffer();
+                frameParser.accept(frame);
+            } catch (Exception e) {
+                logger.error("exception reading frame", e);
+            }
+        }, SerialPort.MASK_RXCHAR);
     }
 
     public boolean isConnected() {
@@ -40,6 +51,7 @@ public class DataLink {
 
     public void disconnect() {
         try {
+            serialPort.removeEventListener();
             serialPort.closePort();
         } catch (SerialPortException e) {
             logger.error("exception closing port "+serialPort.getPortName(),e);
@@ -62,7 +74,10 @@ public class DataLink {
         if(receivedCrc != crc8.getCrc()) {
             throw new Crc8.Error(receivedCrc, crc8.getCrc());
         }
-        return new Frame(header.getType(), payload);
+        if(serialPort.getInputBufferBytesCount()!=0) {
+            logger.warn("remaining "+serialPort.getInputBufferBytesCount()+" bytes in RX buffer");
+        }
+        return new Frame(header.getCommand(), payload);
     }
 
     public int flushReadBuffer() {

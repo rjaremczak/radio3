@@ -2,17 +2,18 @@ package com.mindpart.radio3.device;
 
 import com.mindpart.utils.Binary;
 
+import static com.mindpart.radio3.device.FrameCommand.CMPPROBE_SAMPLE;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.03.13
  */
-public class CompProbeParser implements FrameParser<GainPhase> {
-    static final int READ_TYPE = 0x005;
-    static final Frame READ_REQUEST = new Frame(READ_TYPE);
+public class ComplexProbeParser implements FrameParser<GainPhase> {
+    static final Frame SAMPLE = new Frame(CMPPROBE_SAMPLE);
 
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getType() == READ_TYPE;
+        return frame.getCommand() == CMPPROBE_SAMPLE;
     }
 
     @Override
