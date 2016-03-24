@@ -95,15 +95,15 @@ public class DeviceService {
         performRequest(new VfoSetFrequency(frequency));
     }
 
-    synchronized public void readLogProbe() {
+    synchronized public void readLogarithmicProbe() {
         performRequest(LogarithmicProbeParser.SAMPLE);
     }
 
-    synchronized public void readLinProbe() {
+    synchronized public void readLinearProbe() {
         performRequest(LinearProbeParser.SAMPLE);
     }
 
-    synchronized public void readCompProbe() {
+    synchronized public void readComplexProbe() {
         performRequest(ComplexProbeParser.SAMPLE);
     }
 
@@ -114,6 +114,7 @@ public class DeviceService {
     private void performRequest(Frame request) {
         try {
             dataLink.writeFrame(request);
+            Thread.sleep(100);
         } catch (Exception e) {
             status = error(e.getMessage());
             logger.error(e);

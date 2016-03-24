@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 public class Main extends Application {
@@ -16,6 +17,11 @@ public class Main extends Application {
 
     private DeviceService deviceService;
     private MainController mainController;
+    private VfoController vfoController;
+    private FMeterController fMeterController;
+    private LogarithmicProbeController logarithmicProbeController;
+    private LinearProbeController linearProbeController;
+    private ComplexProbeController complexProbeController;
 
     private <T extends FrameParser<U>, U> void registerHandler(Class<T> frameParserClass, Consumer<U> handler) {
         deviceService.registerHandler(frameParserClass, (frameParser, frame) -> {
@@ -24,18 +30,29 @@ public class Main extends Application {
         });
     }
 
+    private <T extends FeatureController> void addFeatureBox(T controller, int column, int row) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("featureBox.fxml"));
+        loader.setControllerFactory(clazz -> controller);
+        mainController.manualControlPane.add(loader.load(), column, row);
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception{
         deviceService = new DeviceService();
         mainController = new MainController(deviceService);
+        vfoController = new VfoController(deviceService);
+        fMeterController = new FMeterController(deviceService);
+        logarithmicProbeController = new LogarithmicProbeController(deviceService);
+        linearProbeController = new LinearProbeController(deviceService);
+        complexProbeController = new ComplexProbeController(deviceService);
 
         registerHandler(DeviceInfoParser.class, mainController::updateDeviceInfo);
         registerHandler(StatusCodeParser.class, mainController::updateStatusCode);
-        registerHandler(ComplexProbeParser.class, mainController::updateComplexProbe);
-        registerHandler(LinearProbeParser.class, mainController::updateLinearProbe);
-        registerHandler(LogarithmicProbeParser.class, mainController::updateLogarithmicProbe);
-        registerHandler(FMeterParser.class, mainController::updateFMeter);
-        registerHandler(VfoReadFrequencyParser.class, mainController::updateVfoFrequency);
+        registerHandler(ComplexProbeParser.class, complexProbeController::setGainPhase);
+        registerHandler(LinearProbeParser.class, linearProbeController::setGain);
+        registerHandler(LogarithmicProbeParser.class, logarithmicProbeController::setGain);
+        registerHandler(FMeterParser.class, fMeterController::setFrequency);
+        registerHandler(VfoReadFrequencyParser.class, vfoController::setFrequency);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);
@@ -44,6 +61,12 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
         mainController.postDisplayInit();
+
+        addFeatureBox(vfoController, 0, 0);
+        addFeatureBox(fMeterController, 1, 0);
+        addFeatureBox(logarithmicProbeController, 0, 1);
+        addFeatureBox(linearProbeController, 1, 1);
+        addFeatureBox(complexProbeController, 0, 2);
     }
 
     @Override

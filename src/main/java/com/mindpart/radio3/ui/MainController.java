@@ -11,13 +11,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Robert Jaremczak
@@ -36,27 +34,7 @@ public class MainController implements Initializable {
     @FXML Button deviceInfoBtn;
 
     @FXML Tab manualControlTab;
-
-    @FXML TitledPane vfoPane;
-    @FXML TextField vfoFrequency;
-    @FXML Button vfoSetFrequency;
-
-    @FXML TextField fMeterValue;
-    @FXML Button fMeterRead;
-    @FXML ToggleButton fMeterStart;
-
-    @FXML TextField logProbeGain;
-    @FXML Button logProbeRead;
-    @FXML ToggleButton logProbeStart;
-
-    @FXML TextField linProbeGain;
-    @FXML Button linProbeRead;
-    @FXML ToggleButton linProbeStart;
-
-    @FXML TextField compProbeGain;
-    @FXML TextField compProbePhase;
-    @FXML Button compProbeRead;
-    @FXML ToggleButton compProbeStart;
+    @FXML GridPane manualControlPane;
 
     private DeviceService deviceService;
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
@@ -142,72 +120,6 @@ public class MainController implements Initializable {
         }
     }
 
-    public void doVfoSetFrequency() {
-        int frequency = Integer.parseInt(vfoFrequency.getText());
-        deviceService.changeVfoFrequency(frequency);
-    }
-
-    private String optionalValue(Object value) {
-        return value!=null ? value.toString() : "";
-    }
-
-    public void doFMeterRead() {
-        deviceService.readFrequency();
-    }
-
-    public void updateFMeter(Long frequency) {
-        fMeterValue.setText(frequency.toString());
-    }
-
-    private boolean handlePollStart(ToggleButton startBtn, Button readBtn) {
-        if(startBtn.isSelected()) {
-            startBtn.setText("Stop");
-            readBtn.setDisable(true);
-            return true;
-        } else {
-            startBtn.setText("Start");
-            readBtn.setDisable(false);
-            return false;
-        }
-    }
-
-    public void doFMeterStart() {
-    }
-
-    public void doLinProbeRead() {
-        deviceService.readLinProbe();
-    }
-
-    public void updateLinearProbe(double gain) {
-        linProbeGain.setText(Double.toString(gain));
-    }
-
-    public void doLinProbeStart() {
-    }
-
-    public void doLogProbeRead() {
-        deviceService.readLogProbe();
-    }
-
-    public void updateLogarithmicProbe(double gain) {
-        logProbeGain.setText(Double.toString(gain));
-    }
-
-    public void doLogProbeStart() {
-    }
-
-    public void doCompProbeRead() {
-        deviceService.readCompProbe();
-    }
-
-    public void updateComplexProbe(GainPhase gp) {
-        compProbeGain.setText(optionalValue(gp.getGain()));
-        compProbePhase.setText(optionalValue(gp.getPhase()));
-    }
-
-    public void doCompProbeStart() {
-    }
-
     private void disableHeader(TableView tableView) {
         Pane header = (Pane) tableView.lookup("TableHeaderRow");
         if(header!=null && header.isVisible()) {
@@ -240,9 +152,5 @@ public class MainController implements Initializable {
 
     public void updateStatusCode(StatusCode statusCode) {
         deviceStatus.setText(statusCode.toString());
-    }
-
-    public void updateVfoFrequency(Long frequency) {
-        vfoFrequency.setText(frequency.toString());
     }
 }
