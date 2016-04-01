@@ -3,6 +3,7 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.radio3.device.GainPhase;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -32,6 +33,7 @@ public class ComplexProbeController extends ProbeController {
         phaseUnitLabel = new Label("°");
 
         phaseValueField = new TextField();
+        phaseValueField.setAlignment(valueField.getAlignment());
 
         gridPane.getChildren().remove(buttonBox);
         gridPane.add(phaseNameLabel, 0, 1);
