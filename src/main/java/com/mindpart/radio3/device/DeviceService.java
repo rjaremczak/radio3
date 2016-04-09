@@ -1,6 +1,7 @@
 package com.mindpart.radio3.device;
 
 import com.mindpart.radio3.Status;
+import com.mindpart.radio3.ui.ComplexProbeController;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
@@ -32,6 +33,7 @@ public class DeviceService {
         registerParser(LinearProbeParser.class);
         registerParser(ComplexProbeParser.class);
         registerParser(VfoReadFrequencyParser.class);
+        registerParser(ProbesParser.class);
     }
 
     private <T extends FrameParser> void registerParser(Class<T> clazz) throws IllegalAccessException, InstantiationException {
@@ -54,6 +56,7 @@ public class DeviceService {
                 BiConsumer<FrameParser, Frame> handler = handlers.get(parser);
                 if(handler!=null) {
                     handler.accept(parser, frame);
+                    return;
                 } else {
                     logger.warn("no handler for "+entry.getKey());
                 }
@@ -83,33 +86,71 @@ public class DeviceService {
         return status;
     }
 
-    synchronized public void readDeviceInfo() {
+    synchronized public void getDeviceInfo() {
         performRequest(DeviceInfoParser.GET);
     }
 
-    synchronized public void readFrequency() {
-        performRequest(FMeterParser.SAMPLE);
+    synchronized public void getVfoFrequency() {
+        performRequest(VfoReadFrequencyParser.SAMPLE);
     }
 
-    synchronized public void changeVfoFrequency(int frequency) {
+    synchronized public void setVfoFrequency(int frequency) {
         performRequest(new VfoSetFrequency(frequency));
     }
 
-    synchronized public void readLogarithmicProbe() {
-        performRequest(LogarithmicProbeParser.SAMPLE);
+    synchronized public void sampleFMeter() {
+        performRequest(FMeterParser.SAMPLE);
     }
 
-    synchronized public void readLinearProbe() {
+    synchronized public void startFMeterSampling() {
+        performRequest(FMeterParser.START_SAMPLING);
+    }
+
+    synchronized public void stopFMeterSampling() {
+        performRequest(FMeterParser.STOP_SAMPLING);
+    }
+
+    synchronized public void sampleLinearProbe() {
         performRequest(LinearProbeParser.SAMPLE);
     }
 
-    synchronized public void readComplexProbe() {
+    synchronized public void startLinearProbeSampling() {
+        performRequest(LinearProbeParser.START_SAMPLING);
+    }
+
+    synchronized public void stopLinearProbeSampling() {
+        performRequest(LinearProbeParser.STOP_SAMPLING);
+    }
+
+    synchronized public void sampleComplexProbe() {
         performRequest(ComplexProbeParser.SAMPLE);
     }
 
-    synchronized public void readVfoFrequency() {
-        performRequest(VfoReadFrequencyParser.SAMPLE);
+    synchronized public void startComplexProbeSampling() {
+        performRequest(ComplexProbeParser.START_SAMPLING);
     }
+
+    synchronized public void stopComplexProbeSampling() {
+        performRequest(ComplexProbeParser.STOP_SAMPLING);
+    }
+
+    synchronized public void sampleLogarithmicProbe() {
+        performRequest(LogarithmicProbeParser.SAMPLE);
+    }
+
+    synchronized public void startLogarithmicProbeSampling() {
+        performRequest(LogarithmicProbeParser.START_SAMPLING);
+    }
+
+    synchronized public void stopLogarithmicProbeSampling() {
+        performRequest(LogarithmicProbeParser.STOP_SAMPLING);
+    }
+
+    synchronized public void sampleProbes() { performRequest(ProbesParser.SAMPLE);}
+
+    synchronized public void startProbesSampling() { performRequest(ProbesParser.START_SAMPLING);}
+
+    synchronized public void stopProbesSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
 
     private void performRequest(Frame request) {
         try {

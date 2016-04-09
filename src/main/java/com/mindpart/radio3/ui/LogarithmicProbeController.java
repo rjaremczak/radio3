@@ -16,12 +16,12 @@ public class LogarithmicProbeController extends ProbeController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.readLogarithmicProbe();
+        deviceService.sampleLogarithmicProbe();
     }
 
     @Override
     public void initialize() {
-        setUp("Logarithmic Probe", "Gain", "dB");
+        setUp("Logarithmic Probe", "Gain", "dB", deviceService::startLogarithmicProbeSampling, deviceService::stopLogarithmicProbeSampling);
     }
 
     public void setGain(double gain) {

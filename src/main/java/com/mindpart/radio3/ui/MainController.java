@@ -2,7 +2,7 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
-import com.mindpart.radio3.device.GainPhase;
+import com.mindpart.radio3.device.Probes;
 import com.mindpart.radio3.device.StatusCode;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -35,6 +35,8 @@ public class MainController implements Initializable {
 
     @FXML Tab manualControlTab;
     @FXML GridPane manualControlPane;
+    @FXML ToggleButton continuousSamplingOfAllProbesBtn;
+    @FXML Button sampleAllProbesBtn;
 
     private DeviceService deviceService;
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
@@ -88,8 +90,8 @@ public class MainController implements Initializable {
                 e.printStackTrace();
             }
             updateOnConnect();
-            deviceService.readDeviceInfo();
-            deviceService.readVfoFrequency();
+            deviceService.getDeviceInfo();
+            deviceService.getVfoFrequency();
         } else {
             deviceStatus.setText(deviceService.getStatus().toString());
         }
@@ -132,7 +134,7 @@ public class MainController implements Initializable {
     }
 
     public void doDeviceInfo() {
-        deviceService.readDeviceInfo();
+        deviceService.getDeviceInfo();
     }
 
     @Override
@@ -152,5 +154,20 @@ public class MainController implements Initializable {
 
     public void updateStatusCode(StatusCode statusCode) {
         deviceStatus.setText(statusCode.toString());
+    }
+
+    public void doSampleAllProbes() {
+        deviceService.sampleProbes();
+    }
+
+    public void doContinuousSamplingOfAllProbes() {
+        if(continuousSamplingOfAllProbesBtn.isSelected()) {
+            //mainButton.setDisable(true);
+            deviceService.startProbesSampling();
+
+        } else {
+            deviceService.stopProbesSampling();
+            //mainButton.setDisable(false);
+        }
     }
 }

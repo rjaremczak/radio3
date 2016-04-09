@@ -16,12 +16,12 @@ public class LinearProbeController extends ProbeController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.readLinearProbe();
+        deviceService.sampleLinearProbe();
     }
 
     @Override
     public void initialize() {
-        setUp("Linear Probe", "Gain", "x");
+        setUp("Linear Probe", "Gain", "x", deviceService::startLinearProbeSampling, deviceService::stopLinearProbeSampling);
     }
 
     public void setGain(double gain) {

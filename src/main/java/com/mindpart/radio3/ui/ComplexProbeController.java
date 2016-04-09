@@ -1,9 +1,8 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.device.DeviceService;
-import com.mindpart.radio3.device.GainPhase;
+import com.mindpart.radio3.device.Complex;
 import javafx.event.ActionEvent;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -23,12 +22,12 @@ public class ComplexProbeController extends ProbeController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.readComplexProbe();
+        deviceService.sampleComplexProbe();
     }
 
     @Override
     public void initialize() {
-        setUp("Complex Probe", "Gain", "dB");
+        setUp("Complex Probe", "Gain", "dB", deviceService::startComplexProbeSampling, deviceService::stopComplexProbeSampling);
         phaseNameLabel = new Label("Phase");
         phaseUnitLabel = new Label("°");
 
@@ -42,8 +41,8 @@ public class ComplexProbeController extends ProbeController {
         gridPane.add(buttonBox, 1, 2, Integer.MAX_VALUE, 1);
     }
 
-    public void setGainPhase(GainPhase gainPhase) {
-        valueField.setText(Double.toString(gainPhase.getGain()));
-        phaseValueField.setText(Double.toString(gainPhase.getPhase()));
+    public void setComplex(Complex complex) {
+        valueField.setText(Double.toString(complex.getValue()));
+        phaseValueField.setText(Double.toString(complex.getPhase()));
     }
 }

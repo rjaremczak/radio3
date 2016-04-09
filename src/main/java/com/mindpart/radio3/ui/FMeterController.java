@@ -16,12 +16,12 @@ public class FMeterController extends ProbeController {
 
     @Override
     public void initialize() {
-        setUp("F-Meter", "Frequency", "Hz");
+        setUp("F-Meter", "Frequency", "Hz", deviceService::startFMeterSampling, deviceService::stopFMeterSampling);
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.readFrequency();
+        deviceService.sampleFMeter();
     }
 
     public void setFrequency(Long frequency) {

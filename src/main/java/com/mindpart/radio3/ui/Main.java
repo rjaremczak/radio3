@@ -48,11 +48,12 @@ public class Main extends Application {
 
         registerHandler(DeviceInfoParser.class, mainController::updateDeviceInfo);
         registerHandler(StatusCodeParser.class, mainController::updateStatusCode);
-        registerHandler(ComplexProbeParser.class, complexProbeController::setGainPhase);
+        registerHandler(ComplexProbeParser.class, complexProbeController::setComplex);
         registerHandler(LinearProbeParser.class, linearProbeController::setGain);
         registerHandler(LogarithmicProbeParser.class, logarithmicProbeController::setGain);
         registerHandler(FMeterParser.class, fMeterController::setFrequency);
         registerHandler(VfoReadFrequencyParser.class, vfoController::setFrequency);
+        registerHandler(ProbesParser.class, this::updateAllProbes);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);
@@ -77,6 +78,14 @@ public class Main extends Application {
         }
         logger.info("stopped");
     }
+
+    public void updateAllProbes(Probes probes) {
+        logarithmicProbeController.setGain(probes.getLogarithmic());
+        linearProbeController.setGain(probes.getLinear());
+        complexProbeController.setComplex(probes.getComplex());
+        fMeterController.setFrequency(probes.getFmeter());
+    }
+
 
     public static void main(String[] args) {
         launch(args);
