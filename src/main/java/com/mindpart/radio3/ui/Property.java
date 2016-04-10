@@ -30,4 +30,16 @@ public class Property {
     public void setValue(String value) {
         this.value.set(value);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        Property property = (Property) o;
+        return name.equals(property.name);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

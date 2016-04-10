@@ -7,6 +7,7 @@ package com.mindpart.radio3.device;
 public enum FrameCommand {
     DEVICE_RESET(0x000),
     DEVICE_GET_INFO(0x001),
+    DEVICE_GET_STATE(0x002),
 
     VFO_GET_FREQ(0x008),
     VFO_SET_FREQ(0x009),

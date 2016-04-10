@@ -89,7 +89,7 @@
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
                                     </TableView>
-                                    <Button fx:id="deviceInfoBtn" mnemonicParsing="false" onAction="#doDeviceInfo" text="Get Info" />
+                                    <Button fx:id="deviceInfoBtn" mnemonicParsing="false" onAction="#doDeviceInfo" text="Get Info &amp; State" />
                                  </children>
                                  <padding>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

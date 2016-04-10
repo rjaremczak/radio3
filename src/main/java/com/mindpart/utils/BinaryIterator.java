@@ -17,6 +17,10 @@ public class BinaryIterator {
         return Binary.toUInt8(buffer, index++);
     }
 
+    public boolean nextBool() {
+        return nextUInt8() != 0;
+    }
+
     public int nextUInt16() {
         int val = Binary.toUInt16(buffer, index);
         index += 2;
@@ -24,7 +28,9 @@ public class BinaryIterator {
     }
 
     public long nextUInt32() {
-        return Binary.toUInt32(buffer, index+=4);
+        long val = Binary.toUInt32(buffer, index);
+        index += 4;
+        return val;
     }
 
     public String nextString(int length) {

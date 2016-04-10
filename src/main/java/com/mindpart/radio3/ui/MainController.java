@@ -2,6 +2,7 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
+import com.mindpart.radio3.device.DeviceState;
 import com.mindpart.radio3.device.StatusCode;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -14,7 +15,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Robert Jaremczak
@@ -39,6 +41,7 @@ public class MainController implements Initializable {
 
     private Radio3 radio3;
     private DeviceService deviceService;
+    private Map<String,String> devicePropertiesMap = new LinkedHashMap<>();
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
 
@@ -81,6 +84,7 @@ public class MainController implements Initializable {
         deviceStatus.setText(devInfo);
         deviceConnect.setText("Connect");
         deviceProperties.clear();
+        devicePropertiesMap.clear();
     }
 
     private void doConnect() {
@@ -91,8 +95,9 @@ public class MainController implements Initializable {
                 e.printStackTrace();
             }
             updateOnConnect();
-            deviceService.deviceInfo();
-            deviceService.vfoGetFrequency();
+            deviceService.getDeviceInfo();
+            deviceService.getDeviceState();
+            deviceService.getVfoFrequency();
         } else {
             deviceStatus.setText(deviceService.getStatus().toString());
         }
@@ -110,15 +115,30 @@ public class MainController implements Initializable {
         if(deviceService.isConnected()) { doDisconnect(); } else { doConnect(); };
     }
 
+    private void updateDeviceProperties() {
+        deviceProperties.setAll(devicePropertiesMap.entrySet().stream().map( e -> new Property(e.getKey(), e.getValue())).collect(Collectors.toList()));
+    }
+
     public void updateDeviceInfo(DeviceInfo di) {
-        deviceProperties.setAll(
-                new Property("Device", di.getName()+" "+di.getVersionStr()),
-                new Property("VFO", di.getVfoName()+" (freq: "+di.getVfoMinFrequency()+" - "+di.getVfoMaxFrequency()+" Hz)"),
-                new Property("FMeter", di.getfMeterName()+" (freq: "+di.getfMeterMinFrequency()+" - "+di.getVfoMaxFrequency()+" Hz)"));
+        devicePropertiesMap.put("Device", di.getName()+" "+di.getVersionStr());
+        devicePropertiesMap.put("VFO", di.getVfoName()+" (freq: "+di.getVfoMinFrequency()+" - "+di.getVfoMaxFrequency()+" Hz)");
+        devicePropertiesMap.put("FMeter", di.getfMeterName()+" (freq: "+di.getfMeterMinFrequency()+" - "+di.getVfoMaxFrequency()+" Hz)");
+        updateDeviceProperties();
         deviceStatus.setText("connected to "+di.getName()+" "+di.getVersionStr());
         if(deviceStatus.isDisable()) {
             updateOnConnect();
         }
+    }
+
+    public void updateDeviceState(DeviceState ds) {
+        if(continuousSamplingOfAllProbesBtn.isSelected() != ds.isProbesSampling()) {
+            continuousSamplingOfAllProbesBtn.setSelected(ds.isProbesSampling());
+            doContinuousSamplingOfAllProbes();
+        }
+        devicePropertiesMap.put("Continuous sampling", Boolean.toString(ds.isProbesSampling()));
+        devicePropertiesMap.put("Sampling period", ds.getSamplingPeriodMs()+" ms");
+        devicePropertiesMap.put("Time since reset", ds.getTimeMs()+" ms");
+        updateDeviceProperties();
     }
 
     private void disableHeader(TableView tableView) {
@@ -133,7 +153,8 @@ public class MainController implements Initializable {
     }
 
     public void doDeviceInfo() {
-        deviceService.deviceInfo();
+        deviceService.getDeviceInfo();
+        deviceService.getDeviceState();
     }
 
     @Override

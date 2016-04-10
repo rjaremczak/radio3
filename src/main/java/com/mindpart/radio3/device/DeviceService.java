@@ -27,6 +27,7 @@ public class DeviceService {
 
     public DeviceService() throws InstantiationException, IllegalAccessException {
         registerParser(DeviceInfoParser.class);
+        registerParser(DeviceStateParser.class);
         registerParser(StatusCodeParser.class);
         registerParser(FMeterParser.class);
         registerParser(LogarithmicProbeParser.class);
@@ -86,15 +87,17 @@ public class DeviceService {
         return status;
     }
 
-    synchronized public void deviceInfo() {
+    synchronized public void getDeviceInfo() {
         performRequest(DeviceInfoParser.GET);
     }
 
-    synchronized public void vfoGetFrequency() {
+    synchronized public void getDeviceState() { performRequest(DeviceStateParser.GET); }
+
+    synchronized public void getVfoFrequency() {
         performRequest(VfoReadFrequencyParser.SAMPLE);
     }
 
-    synchronized public void vfoSetFrequency(int frequency) {
+    synchronized public void setVfoFrequency(int frequency) {
         performRequest(new VfoSetFrequency(frequency));
     }
 

@@ -23,7 +23,7 @@ public class VfoController extends FeatureController {
     @Override
     public void onMainButton(ActionEvent actionEvent) {
         int frequency = Integer.parseInt(valueField.getText());
-        deviceService.vfoSetFrequency(frequency);
+        deviceService.setVfoFrequency(frequency);
     }
 
     public void setFrequency(Long frequency) {
