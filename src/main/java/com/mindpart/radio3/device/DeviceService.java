@@ -101,27 +101,27 @@ public class DeviceService {
         performRequest(new VfoSetFrequency(frequency));
     }
 
-    synchronized public void fMeterGet() {
+    synchronized public void getFMeter() {
         performRequest(FMeterParser.SAMPLE);
     }
 
-    synchronized public void linearProbeGet() {
+    synchronized public void getLinearProbe() {
         performRequest(LinearProbeParser.SAMPLE);
     }
 
-    synchronized public void complexProbeGet() {
+    synchronized public void getComplexProbe() {
         performRequest(ComplexProbeParser.SAMPLE);
     }
 
-    synchronized public void logarithmicProbeGet() {
+    synchronized public void getLogarithmicProbe() {
         performRequest(LogarithmicProbeParser.SAMPLE);
     }
 
-    synchronized public void probesGet() { performRequest(ProbesParser.SAMPLE);}
+    synchronized public void getProbes() { performRequest(ProbesParser.SAMPLE);}
 
-    synchronized public void probesStartSampling() { performRequest(ProbesParser.START_SAMPLING);}
+    synchronized public void startProbesSampling() { performRequest(ProbesParser.START_SAMPLING);}
 
-    synchronized public void probesStopSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
+    synchronized public void stopProbesSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
 
     private void performRequest(Frame request) {
         try {

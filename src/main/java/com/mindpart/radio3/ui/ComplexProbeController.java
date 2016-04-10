@@ -22,7 +22,7 @@ public class ComplexProbeController extends FeatureController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.complexProbeGet();
+        deviceService.getComplexProbe();
     }
 
     @Override

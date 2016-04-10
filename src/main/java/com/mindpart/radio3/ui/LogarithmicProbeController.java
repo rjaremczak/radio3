@@ -16,7 +16,7 @@ public class LogarithmicProbeController extends FeatureController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.logarithmicProbeGet();
+        deviceService.getLogarithmicProbe();
     }
 
     @Override

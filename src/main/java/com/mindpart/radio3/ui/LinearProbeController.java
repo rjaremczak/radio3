@@ -16,7 +16,7 @@ public class LinearProbeController extends FeatureController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.linearProbeGet();
+        deviceService.getLinearProbe();
     }
 
     @Override

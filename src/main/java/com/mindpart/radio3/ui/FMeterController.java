@@ -21,7 +21,7 @@ public class FMeterController extends FeatureController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.fMeterGet();
+        deviceService.getFMeter();
     }
 
     public void setFrequency(Long frequency) {

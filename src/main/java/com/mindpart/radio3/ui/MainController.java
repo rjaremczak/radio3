@@ -177,17 +177,17 @@ public class MainController implements Initializable {
     }
 
     public void doSampleAllProbes() {
-        deviceService.probesGet();
+        deviceService.getProbes();
     }
 
     public void doContinuousSamplingOfAllProbes() {
         if(continuousSamplingOfAllProbesBtn.isSelected()) {
             sampleAllProbesBtn.setDisable(true);
-            deviceService.probesStartSampling();
+            deviceService.startProbesSampling();
             radio3.disableGetOnAllProbes(true);
 
         } else {
-            deviceService.probesStopSampling();
+            deviceService.stopProbesSampling();
             sampleAllProbesBtn.setDisable(false);
             radio3.disableGetOnAllProbes(false);
         }
