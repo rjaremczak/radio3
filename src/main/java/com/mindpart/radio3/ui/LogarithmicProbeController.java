@@ -7,7 +7,7 @@ import javafx.event.ActionEvent;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class LogarithmicProbeController extends ProbeController {
+public class LogarithmicProbeController extends FeatureController {
     private DeviceService deviceService;
 
     public LogarithmicProbeController(DeviceService deviceService) {
@@ -16,12 +16,12 @@ public class LogarithmicProbeController extends ProbeController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.sampleLogarithmicProbe();
+        deviceService.logarithmicProbeGet();
     }
 
     @Override
     public void initialize() {
-        setUp("Logarithmic Probe", "Gain", "dB", deviceService::startLogarithmicProbeSampling, deviceService::stopLogarithmicProbeSampling);
+        setUpAsProbe("Logarithmic Probe", "Gain", "dB");
     }
 
     public void setGain(double gain) {

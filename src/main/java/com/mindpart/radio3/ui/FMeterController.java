@@ -7,7 +7,7 @@ import javafx.event.ActionEvent;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class FMeterController extends ProbeController {
+public class FMeterController extends FeatureController {
     private DeviceService deviceService;
 
     public FMeterController(DeviceService deviceService) {
@@ -16,12 +16,12 @@ public class FMeterController extends ProbeController {
 
     @Override
     public void initialize() {
-        setUp("F-Meter", "Frequency", "Hz", deviceService::startFMeterSampling, deviceService::stopFMeterSampling);
+        setUpAsProbe("F-Meter", "Frequency", "Hz");
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.sampleFMeter();
+        deviceService.fMeterGet();
     }
 
     public void setFrequency(Long frequency) {

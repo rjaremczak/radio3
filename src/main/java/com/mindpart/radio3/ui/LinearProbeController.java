@@ -7,7 +7,7 @@ import javafx.event.ActionEvent;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class LinearProbeController extends ProbeController {
+public class LinearProbeController extends FeatureController {
     private DeviceService deviceService;
 
     public LinearProbeController(DeviceService deviceService) {
@@ -16,12 +16,12 @@ public class LinearProbeController extends ProbeController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.sampleLinearProbe();
+        deviceService.linearProbeGet();
     }
 
     @Override
     public void initialize() {
-        setUp("Linear Probe", "Gain", "x", deviceService::startLinearProbeSampling, deviceService::stopLinearProbeSampling);
+        setUpAsProbe("Linear Probe", "Gain", "x");
     }
 
     public void setGain(double gain) {

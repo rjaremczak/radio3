@@ -45,6 +45,10 @@ public abstract class FeatureController implements Initializable {
         initialize();
     }
 
+    protected void setUpAsProbe(String title, String name, String unit) {
+        setUp(title, name, false, unit, "Get");
+    }
+
     protected void setUp(String title, String name, boolean editable, String unit, String mainButtonText) {
         pane.setText(title);
         nameLabel.setText(name);

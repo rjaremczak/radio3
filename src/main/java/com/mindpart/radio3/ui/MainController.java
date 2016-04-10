@@ -2,7 +2,6 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
-import com.mindpart.radio3.device.Probes;
 import com.mindpart.radio3.device.StatusCode;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -90,8 +89,8 @@ public class MainController implements Initializable {
                 e.printStackTrace();
             }
             updateOnConnect();
-            deviceService.getDeviceInfo();
-            deviceService.getVfoFrequency();
+            deviceService.deviceInfo();
+            deviceService.vfoGetFrequency();
         } else {
             deviceStatus.setText(deviceService.getStatus().toString());
         }
@@ -134,7 +133,7 @@ public class MainController implements Initializable {
     }
 
     public void doDeviceInfo() {
-        deviceService.getDeviceInfo();
+        deviceService.deviceInfo();
     }
 
     @Override
@@ -157,17 +156,17 @@ public class MainController implements Initializable {
     }
 
     public void doSampleAllProbes() {
-        deviceService.sampleProbes();
+        deviceService.probesGet();
     }
 
     public void doContinuousSamplingOfAllProbes() {
         if(continuousSamplingOfAllProbesBtn.isSelected()) {
-            //mainButton.setDisable(true);
-            deviceService.startProbesSampling();
+            sampleAllProbesBtn.setDisable(true);
+            deviceService.probesStartSampling();
 
         } else {
-            deviceService.stopProbesSampling();
-            //mainButton.setDisable(false);
+            deviceService.probesStopSampling();
+            sampleAllProbesBtn.setDisable(false);
         }
     }
 }

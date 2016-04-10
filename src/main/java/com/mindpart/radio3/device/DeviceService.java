@@ -86,71 +86,39 @@ public class DeviceService {
         return status;
     }
 
-    synchronized public void getDeviceInfo() {
+    synchronized public void deviceInfo() {
         performRequest(DeviceInfoParser.GET);
     }
 
-    synchronized public void getVfoFrequency() {
+    synchronized public void vfoGetFrequency() {
         performRequest(VfoReadFrequencyParser.SAMPLE);
     }
 
-    synchronized public void setVfoFrequency(int frequency) {
+    synchronized public void vfoSetFrequency(int frequency) {
         performRequest(new VfoSetFrequency(frequency));
     }
 
-    synchronized public void sampleFMeter() {
+    synchronized public void fMeterGet() {
         performRequest(FMeterParser.SAMPLE);
     }
 
-    synchronized public void startFMeterSampling() {
-        performRequest(FMeterParser.START_SAMPLING);
-    }
-
-    synchronized public void stopFMeterSampling() {
-        performRequest(FMeterParser.STOP_SAMPLING);
-    }
-
-    synchronized public void sampleLinearProbe() {
+    synchronized public void linearProbeGet() {
         performRequest(LinearProbeParser.SAMPLE);
     }
 
-    synchronized public void startLinearProbeSampling() {
-        performRequest(LinearProbeParser.START_SAMPLING);
-    }
-
-    synchronized public void stopLinearProbeSampling() {
-        performRequest(LinearProbeParser.STOP_SAMPLING);
-    }
-
-    synchronized public void sampleComplexProbe() {
+    synchronized public void complexProbeGet() {
         performRequest(ComplexProbeParser.SAMPLE);
     }
 
-    synchronized public void startComplexProbeSampling() {
-        performRequest(ComplexProbeParser.START_SAMPLING);
-    }
-
-    synchronized public void stopComplexProbeSampling() {
-        performRequest(ComplexProbeParser.STOP_SAMPLING);
-    }
-
-    synchronized public void sampleLogarithmicProbe() {
+    synchronized public void logarithmicProbeGet() {
         performRequest(LogarithmicProbeParser.SAMPLE);
     }
 
-    synchronized public void startLogarithmicProbeSampling() {
-        performRequest(LogarithmicProbeParser.START_SAMPLING);
-    }
+    synchronized public void probesGet() { performRequest(ProbesParser.SAMPLE);}
 
-    synchronized public void stopLogarithmicProbeSampling() {
-        performRequest(LogarithmicProbeParser.STOP_SAMPLING);
-    }
+    synchronized public void probesStartSampling() { performRequest(ProbesParser.START_SAMPLING);}
 
-    synchronized public void sampleProbes() { performRequest(ProbesParser.SAMPLE);}
-
-    synchronized public void startProbesSampling() { performRequest(ProbesParser.START_SAMPLING);}
-
-    synchronized public void stopProbesSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
+    synchronized public void probesStopSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
 
     private void performRequest(Frame request) {
         try {

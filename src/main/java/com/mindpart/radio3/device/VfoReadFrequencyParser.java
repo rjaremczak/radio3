@@ -2,7 +2,6 @@ package com.mindpart.radio3.device;
 
 import com.mindpart.utils.Binary;
 
-import static com.mindpart.radio3.device.FrameCommand.FMETER_SAMPLE;
 import static com.mindpart.radio3.device.FrameCommand.VFO_GET_FREQ;
 
 /**
