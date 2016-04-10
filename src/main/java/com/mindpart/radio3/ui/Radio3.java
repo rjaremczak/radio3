@@ -12,8 +12,8 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-public class Main extends Application {
-    private static Logger logger = Logger.getLogger(Main.class);
+public class Radio3 extends Application {
+    private static Logger logger = Logger.getLogger(Radio3.class);
 
     private DeviceService deviceService;
     private MainController mainController;
@@ -39,7 +39,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         deviceService = new DeviceService();
-        mainController = new MainController(deviceService);
+        mainController = new MainController(this);
         vfoController = new VfoController(deviceService);
         fMeterController = new FMeterController(deviceService);
         logarithmicProbeController = new LogarithmicProbeController(deviceService);
@@ -86,6 +86,16 @@ public class Main extends Application {
         fMeterController.setFrequency(probes.getFmeter());
     }
 
+    public DeviceService getDeviceService() {
+        return deviceService;
+    }
+
+    protected void disableGetOnAllProbes(boolean disable) {
+        logarithmicProbeController.disableMainButton(disable);
+        linearProbeController.disableMainButton(disable);
+        complexProbeController.disableMainButton(disable);
+        fMeterController.disableMainButton(disable);
+    }
 
     public static void main(String[] args) {
         launch(args);

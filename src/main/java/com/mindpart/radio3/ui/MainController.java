@@ -37,12 +37,14 @@ public class MainController implements Initializable {
     @FXML ToggleButton continuousSamplingOfAllProbesBtn;
     @FXML Button sampleAllProbesBtn;
 
+    private Radio3 radio3;
     private DeviceService deviceService;
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
 
-    public MainController(DeviceService deviceService) {
-        this.deviceService = deviceService;
+    public MainController(Radio3 radio3) {
+        this.radio3 = radio3;
+        this.deviceService = radio3.getDeviceService();
     }
 
     private void disableNodes(Node... nodes) {
@@ -163,10 +165,12 @@ public class MainController implements Initializable {
         if(continuousSamplingOfAllProbesBtn.isSelected()) {
             sampleAllProbesBtn.setDisable(true);
             deviceService.probesStartSampling();
+            radio3.disableGetOnAllProbes(true);
 
         } else {
             deviceService.probesStopSampling();
             sampleAllProbesBtn.setDisable(false);
+            radio3.disableGetOnAllProbes(false);
         }
     }
 }

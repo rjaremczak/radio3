@@ -62,6 +62,8 @@ public abstract class FeatureController implements Initializable {
         pane.setDisable(disable);
     }
 
+    public void disableMainButton(boolean disable) { mainButton.setDisable(disable); }
+
     public void setValue(String str) {
         valueField.setText(str);
     }
