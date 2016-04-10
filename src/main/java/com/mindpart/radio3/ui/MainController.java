@@ -112,12 +112,10 @@ public class MainController implements Initializable {
 
     public void updateDeviceInfo(DeviceInfo di) {
         deviceProperties.setAll(
-                new Property("Hardware", di.getHardwareVersionStr()),
-                new Property("Firmware", di.getFirmwareVersionStr()),
-                new Property("VFO", di.getVfoType().name()),
-                new Property("Freq. Meter", di.getFrequencyMeterType().name()),
-                new Property("Timestamp", Long.toString(di.getTimestamp())));
-        deviceStatus.setText("connected, firmware: "+di.getFirmwareVersionStr()+" hardware: "+di.getHardwareVersionStr());
+                new Property("Device", di.getName()+" "+di.getVersionStr()),
+                new Property("VFO", di.getVfoName()+" (freq: "+di.getVfoMinFrequency()+" - "+di.getVfoMaxFrequency()+" Hz)"),
+                new Property("FMeter", di.getfMeterName()+" (freq: "+di.getfMeterMinFrequency()+" - "+di.getVfoMaxFrequency()+" Hz)"));
+        deviceStatus.setText("connected to "+di.getName()+" "+di.getVersionStr());
         if(deviceStatus.isDisable()) {
             updateOnConnect();
         }

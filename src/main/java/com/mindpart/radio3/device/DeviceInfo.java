@@ -7,44 +7,61 @@ import com.mindpart.utils.Binary;
  * Date: 2016.02.13
  */
 public class DeviceInfo {
-    public enum VfoType { NONE, AD9850}
-    public enum FrequencyMeterType { NONE, STM32}
+    private String name;
+    private int version;
+    private String vfoName;
+    private long vfoMinFrequency;
+    private long vfoMaxFrequency;
+    private String fMeterName;
+    private long fMeterMinFrequency;
+    private long fMeterMaxFrequency;
 
-    private long timestamp;
-    private int firmwareVersion;
-    private int hardwareVersion;
-    private VfoType vfoType;
-    private FrequencyMeterType frequencyMeterType;
-
-    public DeviceInfo(long timestamp, int firmwareVersion, int hardwareVersion, int ddsCode, int frequencyMeterCode) {
-        this.timestamp = timestamp;
-        this.firmwareVersion = firmwareVersion;
-        this.hardwareVersion = hardwareVersion;
-        this.vfoType = VfoType.values()[ddsCode];
-        this.frequencyMeterType = FrequencyMeterType.values()[frequencyMeterCode];
+    public DeviceInfo(String name, int version,
+                      String vfoName, long vfoMinFrequency, long vfoMaxFrequency,
+                      String fMeterName, long fMeterMinFrequency, long fMeterMaxFrequency) {
+        this.name = name;
+        this.version = version;
+        this.vfoName = vfoName;
+        this.vfoMinFrequency = vfoMinFrequency;
+        this.vfoMaxFrequency = vfoMaxFrequency;
+        this.fMeterName = fMeterName;
+        this.fMeterMinFrequency = fMeterMinFrequency;
+        this.fMeterMaxFrequency = fMeterMaxFrequency;
     }
 
     private String formatVersion(int version) {
         return String.format("%X.%02X", Binary.toUInt8high(version), Binary.toUInt8low(version));
     }
 
-    public String getFirmwareVersionStr() {
-        return formatVersion(firmwareVersion);
+    public String getName() {
+        return name;
     }
 
-    public String getHardwareVersionStr() {
-        return formatVersion(hardwareVersion);
+    public String getVersionStr() {
+        return formatVersion(version);
     }
 
-    public VfoType getVfoType() {
-        return vfoType;
+    public String getVfoName() {
+        return vfoName;
     }
 
-    public FrequencyMeterType getFrequencyMeterType() {
-        return frequencyMeterType;
+    public long getVfoMinFrequency() {
+        return vfoMinFrequency;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public long getVfoMaxFrequency() {
+        return vfoMaxFrequency;
+    }
+
+    public String getfMeterName() {
+        return fMeterName;
+    }
+
+    public long getfMeterMinFrequency() {
+        return fMeterMinFrequency;
+    }
+
+    public long getfMeterMaxFrequency() {
+        return fMeterMaxFrequency;
     }
 }

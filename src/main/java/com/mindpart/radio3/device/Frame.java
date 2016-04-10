@@ -1,6 +1,7 @@
 package com.mindpart.radio3.device;
 
 import com.mindpart.utils.Binary;
+import com.mindpart.utils.BinaryIterator;
 
 /**
  * Created by Robert Jaremczak
@@ -31,21 +32,12 @@ public class Frame {
         return payload != null ? payload.length : 0;
     }
 
-    public int getUInt8(int offset) {
-        return Binary.toUInt8(payload, offset);
-    }
-
-    public int getUInt16(int offset) {
-        return Binary.toUInt16(payload, offset);
-    }
-
-    public long getUInt32(int offset) {
-        return Binary.toUInt32(payload, offset);
-    }
-
     @Override
     public String toString() {
         return command + ", payload size: "+getPayloadSize();
     }
 
+    public BinaryIterator binaryIterator() {
+        return new BinaryIterator(payload);
+    }
 }

@@ -19,6 +19,6 @@ public class StatusCodeParser implements FrameParser<StatusCode> {
 
     @Override
     public StatusCode parse(Frame frame) {
-        return frame.getPayloadSize() == 0 ? new StatusCode(frame.getCommand()) : new StatusCode(frame.getCommand(), frame.getUInt8(0));
+        return frame.getPayloadSize() == 0 ? new StatusCode(frame.getCommand()) : new StatusCode(frame.getCommand(), frame.binaryIterator().nextUInt8());
     }
 }

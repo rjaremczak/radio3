@@ -1,5 +1,7 @@
 package com.mindpart.radio3.device;
 
+import com.mindpart.utils.BinaryIterator;
+
 import static com.mindpart.radio3.device.FrameCommand.DEVICE_GET_INFO;
 
 /**
@@ -16,11 +18,10 @@ public class DeviceInfoParser implements FrameParser<DeviceInfo> {
 
     @Override
     public DeviceInfo parse(Frame frame) {
+        BinaryIterator bi = frame.binaryIterator();
         return new DeviceInfo(
-                frame.getUInt32(0),
-                frame.getUInt16(4),
-                frame.getUInt16(6),
-                frame.getUInt8(8),
-                frame.getUInt8(9));
+                bi.nextString(16), bi.nextUInt16(),
+                bi.nextString(16), bi.nextUInt16()*1000000, bi.nextUInt16()*1000000,
+                bi.nextString(16), bi.nextUInt16()*1000000, bi.nextUInt16()*1000000);
     }
 }
