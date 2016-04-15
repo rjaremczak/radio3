@@ -16,6 +16,10 @@ public class Binary {
         return (val >> 8) & 0xff;
     }
 
+    public static int toUInt8(byte[] bytes) {
+        return toUInt8(bytes, 0);
+    }
+
     public static int toUInt8(byte[] bytes, int offset) {
         return bytes[offset] & 0xff;
     }
@@ -49,5 +53,21 @@ public class Binary {
                 (byte) ((val >> 16) & 0xff),
                 (byte) ((val >> 24) & 0xff)
         };
+    }
+
+    public static void storeUInt32(byte[] bytes, int offset, long val) {
+        bytes[offset++] = (byte) (val & 0xff);
+        bytes[offset++] = (byte) ((val >> 8) & 0xff);
+        bytes[offset++] = (byte) ((val >> 16) & 0xff);
+        bytes[offset] = (byte) ((val >> 24) & 0xff);
+    }
+
+    public static void storeUInt16(byte[] bytes, int offset, int val) {
+        bytes[offset++] = (byte) (val & 0xff);
+        bytes[offset] = (byte) ((val >> 8) & 0xff);
+    }
+
+    public static void storeUInt8(byte[] bytes, int offset, int val) {
+        bytes[offset] = (byte) (val & 0xff);
     }
 }

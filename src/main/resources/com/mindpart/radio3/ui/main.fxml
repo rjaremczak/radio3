@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import java.lang.*?>
 <?import java.net.*?>
 <?import java.util.*?>
@@ -99,6 +100,7 @@
                         </AnchorPane>
                   </content>
                 </Tab>
+                  <Tab fx:id="analyserTab" text="Analyser" />
               </tabs>
             </TabPane>
          </children>

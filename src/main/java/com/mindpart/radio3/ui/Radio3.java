@@ -22,6 +22,7 @@ public class Radio3 extends Application {
     private LogarithmicProbeController logarithmicProbeController;
     private LinearProbeController linearProbeController;
     private ComplexProbeController complexProbeController;
+    private AnalyserController analyserController;
 
     private <T extends FrameParser<U>, U> void registerHandler(Class<T> frameParserClass, Consumer<U> handler) {
         deviceService.registerHandler(frameParserClass, (frameParser, frame) -> {
@@ -45,6 +46,7 @@ public class Radio3 extends Application {
         logarithmicProbeController = new LogarithmicProbeController(deviceService);
         linearProbeController = new LinearProbeController(deviceService);
         complexProbeController = new ComplexProbeController(deviceService);
+        analyserController = new AnalyserController();
 
         registerHandler(DeviceInfoParser.class, mainController::updateDeviceInfo);
         registerHandler(DeviceStateParser.class, mainController::updateDeviceState);
@@ -55,6 +57,7 @@ public class Radio3 extends Application {
         registerHandler(FMeterParser.class, fMeterController::setFrequency);
         registerHandler(VfoReadFrequencyParser.class, vfoController::setFrequency);
         registerHandler(ProbesParser.class, this::updateAllProbes);
+        registerHandler(AnalyserStatusParser.class, analyserController::updateStatus);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);
@@ -63,6 +66,10 @@ public class Radio3 extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
         mainController.postDisplayInit();
+
+        loader = new FXMLLoader(getClass().getResource("analyserPane.fxml"));
+        loader.setControllerFactory(clazz -> analyserController);
+        mainController.analyserTab.setContent(loader.load());
 
         addFeatureBox(vfoController, 0, 0);
         addFeatureBox(fMeterController, 1, 0);

@@ -19,26 +19,13 @@ import java.util.ResourceBundle;
  */
 public abstract class FeatureController implements Initializable {
 
-    @FXML
-    protected TitledPane pane;
-
-    @FXML
-    protected Label nameLabel;
-
-    @FXML
-    protected TextField valueField;
-
-    @FXML
-    protected Label unitLabel;
-
-    @FXML
-    protected HBox buttonBox;
-
-    @FXML
-    protected Button mainButton;
-
-    @FXML
-    protected GridPane gridPane;
+    @FXML protected TitledPane pane;
+    @FXML protected Label nameLabel;
+    @FXML protected TextField valueField;
+    @FXML protected Label unitLabel;
+    @FXML protected HBox buttonBox;
+    @FXML protected Button mainButton;
+    @FXML protected GridPane gridPane;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

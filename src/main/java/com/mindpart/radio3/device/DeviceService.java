@@ -1,7 +1,8 @@
 package com.mindpart.radio3.device;
 
 import com.mindpart.radio3.Status;
-import com.mindpart.radio3.ui.ComplexProbeController;
+import com.mindpart.utils.Binary;
+import com.mindpart.utils.BinaryBuilder;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
@@ -35,6 +36,7 @@ public class DeviceService {
         registerParser(ComplexProbeParser.class);
         registerParser(VfoReadFrequencyParser.class);
         registerParser(ProbesParser.class);
+        registerParser(AnalyserStatusParser.class);
     }
 
     private <T extends FrameParser> void registerParser(Class<T> clazz) throws IllegalAccessException, InstantiationException {
@@ -98,7 +100,7 @@ public class DeviceService {
     }
 
     synchronized public void setVfoFrequency(int frequency) {
-        performRequest(new VfoSetFrequency(frequency));
+        performRequest(new Frame(FrameCommand.VFO_SET_FREQ, Binary.fromUInt32(frequency)));
     }
 
     synchronized public void getFMeter() {
@@ -122,6 +124,15 @@ public class DeviceService {
     synchronized public void startProbesSampling() { performRequest(ProbesParser.START_SAMPLING);}
 
     synchronized public void stopProbesSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
+
+    synchronized public void startAnalyser(long startFrequency, long stepSize, int numSteps, int stepWaitMs) {
+        BinaryBuilder builder = new BinaryBuilder(12);
+        builder.addUInt32(startFrequency);
+        builder.addUInt32(stepSize);
+        builder.addUInt16(numSteps);
+        builder.addUInt16(stepWaitMs);
+        performRequest(new Frame(FrameCommand.ANALYSER_START, builder.getBytes()));
+    }
 
     private void performRequest(Frame request) {
         try {
