@@ -18,7 +18,6 @@ import java.util.ResourceBundle;
  * Date: 2016.03.24
  */
 public abstract class FeatureController implements Initializable {
-
     @FXML protected TitledPane pane;
     @FXML protected Label nameLabel;
     @FXML protected TextField valueField;

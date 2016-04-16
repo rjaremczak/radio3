@@ -125,10 +125,10 @@ public class DeviceService {
 
     synchronized public void stopProbesSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
 
-    synchronized public void startAnalyser(long startFrequency, long stepSize, int numSteps, int stepWaitMs) {
+    synchronized public void startAnalyser(long freqStart, long freqStep, int numSteps, int stepWaitMs) {
         BinaryBuilder builder = new BinaryBuilder(12);
-        builder.addUInt32(startFrequency);
-        builder.addUInt32(stepSize);
+        builder.addUInt32(freqStart);
+        builder.addUInt32(freqStep);
         builder.addUInt16(numSteps);
         builder.addUInt16(stepWaitMs);
         performRequest(new Frame(FrameCommand.ANALYSER_START, builder.getBytes()));

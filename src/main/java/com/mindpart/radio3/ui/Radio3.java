@@ -46,7 +46,7 @@ public class Radio3 extends Application {
         logarithmicProbeController = new LogarithmicProbeController(deviceService);
         linearProbeController = new LinearProbeController(deviceService);
         complexProbeController = new ComplexProbeController(deviceService);
-        analyserController = new AnalyserController();
+        analyserController = new AnalyserController(this);
 
         registerHandler(DeviceInfoParser.class, mainController::updateDeviceInfo);
         registerHandler(DeviceStateParser.class, mainController::updateDeviceState);
