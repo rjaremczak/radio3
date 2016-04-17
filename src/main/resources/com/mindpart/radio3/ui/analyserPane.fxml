@@ -15,7 +15,7 @@
                   <Button fx:id="presetsButton" mnemonicParsing="false" onAction="#onPresets" text="Presets" />
                   <TextField fx:id="startFrequency" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onStartFrequency" prefHeight="27.0" prefWidth="80.0" promptText="start freq." />
                   <TextField fx:id="endFrequency" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onEndFrequency" prefHeight="27.0" prefWidth="80.0" promptText="end freq." />
-                  <TextField fx:id="frequencyStep" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onFrequencyStep" prefHeight="27.0" prefWidth="80.0" promptText="step" />
+                  <TextField fx:id="numSteps" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onNumSteps" prefHeight="27.0" prefWidth="80.0" promptText="num. steps" />
                   <Button fx:id="startButton" mnemonicParsing="false" onAction="#doStart" text="Start" />
                   <Label fx:id="statusLabel" text="Label">
                      <HBox.margin>

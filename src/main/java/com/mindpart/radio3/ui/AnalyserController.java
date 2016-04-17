@@ -25,7 +25,7 @@ public class AnalyserController implements Initializable {
     @FXML Button presetsButton;
     @FXML TextField startFrequency;
     @FXML TextField endFrequency;
-    @FXML TextField frequencyStep;
+    @FXML TextField numSteps;
     @FXML Button startButton;
     @FXML Label statusLabel;
     @FXML VBox analyserVBox;
@@ -49,9 +49,9 @@ public class AnalyserController implements Initializable {
     public void doStart() {
         long fStart = Long.parseLong(startFrequency.getText());
         long fEnd = Long.parseLong(endFrequency.getText());
-        long fStep = Long.parseLong(frequencyStep.getText());
-        int numSteps = (int) (((fStart - fEnd) / fStep) + 1);
-        deviceService.startAnalyser(fStart, fStep, numSteps, 10);
+        int steps = Integer.parseInt(numSteps.getText());
+        int fStep = (int)((fEnd - fStart) / steps);
+        deviceService.startAnalyser(fStart, fStep, steps, 10);
         statusLabel.setText("started");
     }
 
@@ -82,13 +82,13 @@ public class AnalyserController implements Initializable {
 
     }
 
-    public void onFrequencyStep() {
+    public void onNumSteps() {
 
     }
 
     public void onPresets() {
         startFrequency.setText("3500000");
         endFrequency.setText("3800000");
-        frequencyStep.setText("10000");
+        numSteps.setText("1000");
     }
 }
