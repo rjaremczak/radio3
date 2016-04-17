@@ -1,13 +1,18 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserStatus;
 import com.mindpart.radio3.device.DeviceService;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -23,8 +28,10 @@ public class AnalyserController implements Initializable {
     @FXML TextField frequencyStep;
     @FXML Button startButton;
     @FXML Label statusLabel;
-    @FXML LineChart<Number, Number> lineChart;
+    @FXML VBox analyserVBox;
+    @FXML LineChart<Double, Double> lineChart;
 
+    private ObservableList<XYChart.Series<Double, Double>> lineChartData;
     private DeviceService deviceService;
 
     public AnalyserController(Radio3 radio3) {
@@ -34,6 +41,8 @@ public class AnalyserController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         statusLabel.setText("initialized");
+        lineChartData = FXCollections.observableArrayList();
+        lineChart.setData(lineChartData);
         onPresets();
     }
 
@@ -48,6 +57,21 @@ public class AnalyserController implements Initializable {
 
     public void updateStatus(AnalyserStatus status) {
         statusLabel.setText(status.getState().name());
+
+        lineChartData.clear();
+        XYChart.Series<Double, Double> series = new XYChart.Series<>();
+        series.setName("sweep range from "+startFrequency.getText()+" Hz to "+endFrequency.getText()+" Hz");
+
+        ObservableList<XYChart.Data<Double, Double>> data = series.getData();
+
+        data.add(new XYChart.Data(30000000L, 0.123));
+        data.add(new XYChart.Data(35000000L, 0.223));
+
+        lineChartData.add(series);
+    }
+
+    public void updateData(AnalyserData analyserData) {
+
     }
 
     public void onStartFrequency() {

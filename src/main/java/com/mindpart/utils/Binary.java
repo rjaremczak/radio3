@@ -16,6 +16,14 @@ public class Binary {
         return (val >> 8) & 0xff;
     }
 
+    public static long toUInt16low(long val) {
+        return val & 0xffff;
+    }
+
+    public static long toUInt16high(long val) {
+        return (val >> 16) & 0xffff;
+    }
+
     public static int toUInt8(byte[] bytes) {
         return toUInt8(bytes, 0);
     }
