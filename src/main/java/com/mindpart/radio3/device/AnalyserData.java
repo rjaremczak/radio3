@@ -8,15 +8,15 @@ public class AnalyserData {
     private long freqStart;
     private long freqStep;
     private int numSteps;
-    private int numGraphs;
-    private int graphData[][];
+    private int numSeries;
+    private int data[][];
 
-    public AnalyserData(long freqStart, long freqStep, int numSteps, int numGraphs) {
+    public AnalyserData(long freqStart, long freqStep, int numSteps, int numSeries) {
         this.freqStart = freqStart;
         this.freqStep = freqStep;
         this.numSteps = numSteps;
-        this.numGraphs = numGraphs;
-        this.graphData = new int[numGraphs][];
+        this.numSeries = numSeries;
+        this.data = new int[numSeries][numSteps];
     }
 
     public long getFreqStart() {
@@ -31,11 +31,11 @@ public class AnalyserData {
         return numSteps;
     }
 
-    public int getNumGraphs() {
-        return numGraphs;
+    public int getNumSeries() {
+        return numSeries;
     }
 
-    public int[] getGraphData(int graph) {
-        return graphData[graph];
+    public int[][] getData() {
+        return data;
     }
 }

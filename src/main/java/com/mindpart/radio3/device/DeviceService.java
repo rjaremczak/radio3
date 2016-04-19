@@ -36,7 +36,8 @@ public class DeviceService {
         registerParser(ComplexProbeParser.class);
         registerParser(VfoReadFrequencyParser.class);
         registerParser(ProbesParser.class);
-        registerParser(AnalyserStatusParser.class);
+        registerParser(AnalyserStateParser.class);
+        registerParser(AnalyserDataParser.class);
     }
 
     private <T extends FrameParser> void registerParser(Class<T> clazz) throws IllegalAccessException, InstantiationException {
@@ -131,7 +132,7 @@ public class DeviceService {
         builder.addUInt32(freqStep);
         builder.addUInt16(numSteps);
         builder.addUInt16(stepWaitMs);
-        performRequest(new Frame(FrameCommand.ANALYSER_START, builder.getBytes()));
+        performRequest(new Frame(FrameCommand.ANALYSER_REQUEST, builder.getBytes()));
     }
 
     private void performRequest(Frame request) {

@@ -19,7 +19,7 @@ public class DataLink {
 
     private SerialPort serialPort;
 
-    private static final int TIMEOUT_MS = 200;
+    private static final int TIMEOUT_MS = 1000;
     private static final int BAUD_RATE = SerialPort.BAUDRATE_115200;
     private static final int DATA_BITS = SerialPort.DATABITS_8;
     private static final int STOP_BITS = SerialPort.STOPBITS_1;

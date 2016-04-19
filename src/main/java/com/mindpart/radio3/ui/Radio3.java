@@ -57,7 +57,8 @@ public class Radio3 extends Application {
         registerHandler(FMeterParser.class, fMeterController::setFrequency);
         registerHandler(VfoReadFrequencyParser.class, vfoController::setFrequency);
         registerHandler(ProbesParser.class, this::updateAllProbes);
-        registerHandler(AnalyserStatusParser.class, analyserController::updateStatus);
+        registerHandler(AnalyserStateParser.class, analyserController::updateStatus);
+        registerHandler(AnalyserDataParser.class, analyserController::updateData);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);

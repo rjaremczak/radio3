@@ -13,9 +13,29 @@
             <HBox spacing="5.0">
                <children>
                   <Button fx:id="presetsButton" mnemonicParsing="false" onAction="#onPresets" text="Presets" />
-                  <TextField fx:id="startFrequency" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onStartFrequency" prefHeight="27.0" prefWidth="80.0" promptText="start freq." />
-                  <TextField fx:id="endFrequency" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onEndFrequency" prefHeight="27.0" prefWidth="80.0" promptText="end freq." />
-                  <TextField fx:id="numSteps" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onNumSteps" prefHeight="27.0" prefWidth="80.0" promptText="num. steps" />
+                  <Label text="from">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="startFrequency" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onStartFrequency" prefHeight="27.0" prefWidth="80.0" promptText="frequency" />
+                  <Label text="MHz to">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="endFrequency" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onEndFrequency" prefHeight="27.0" prefWidth="80.0" promptText="frequency" />
+                  <Label text="MHz in">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="numSteps" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onNumSteps" prefHeight="27.0" prefWidth="64.0" promptText="number" />
+                  <Label text="steps">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                  </Label>
                   <Button fx:id="startButton" mnemonicParsing="false" onAction="#doStart" text="Start" />
                   <Label fx:id="statusLabel" text="Label">
                      <HBox.margin>
@@ -28,8 +48,8 @@
                </padding>
             </HBox>
             <LineChart fx:id="lineChart" VBox.vgrow="ALWAYS">
-               <xAxis><NumberAxis label="Frequency [kHz]" /></xAxis>
-               <yAxis><NumberAxis label="Gain [dBm]" /></yAxis>
+               <xAxis><NumberAxis fx:id="chartAxisX" label="Frequency [MHz]" /></xAxis>
+               <yAxis><NumberAxis fx:id="chartAxisY" label="Gain [dBm]" /></yAxis>
             </LineChart>
          </children>
          <padding>
