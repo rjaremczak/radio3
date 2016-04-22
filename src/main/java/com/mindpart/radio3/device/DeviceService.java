@@ -27,9 +27,10 @@ public class DeviceService {
     private Map<FrameParser, BiConsumer<FrameParser, Frame>> handlers = new HashMap<>();
 
     public DeviceService() throws InstantiationException, IllegalAccessException {
+        registerParser(LogMessageParser.class);
         registerParser(DeviceInfoParser.class);
         registerParser(DeviceStateParser.class);
-        registerParser(StatusCodeParser.class);
+        registerParser(ErrorCodeParser.class);
         registerParser(FMeterParser.class);
         registerParser(LogarithmicProbeParser.class);
         registerParser(LinearProbeParser.class);
@@ -141,7 +142,7 @@ public class DeviceService {
             Thread.sleep(100);
         } catch (Exception e) {
             status = error(e.getMessage());
-            logger.error(e);
+            logger.error(e,e);
         }
     }
 

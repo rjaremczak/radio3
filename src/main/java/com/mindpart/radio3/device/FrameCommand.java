@@ -34,8 +34,8 @@ public enum FrameCommand {
     ANALYSER_STATE(0x042),
     ANALYSER_DATA(0x043),
 
-    STATUS_INVALID_FRAME(0x03fe),
-    STATUS_OK(0x03ff);
+    ERROR_INVALID_FRAME(0x03fe),
+    LOG_MESSAGE(0x03ff);
 
     private int code;
 

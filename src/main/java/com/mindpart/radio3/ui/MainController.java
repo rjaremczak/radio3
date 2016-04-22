@@ -3,7 +3,7 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.radio3.device.DeviceState;
-import com.mindpart.radio3.device.StatusCode;
+import com.mindpart.radio3.device.ErrorCode;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,7 +27,7 @@ public class MainController implements Initializable {
     @FXML ChoiceBox<String> deviceSelection;
     @FXML Button deviceSelectionRefresh;
     @FXML Button deviceConnect;
-    @FXML Label deviceStatus;
+    @FXML Label deviceConnectionStatus;
 
     @FXML Tab deviceInfoTab;
 
@@ -75,14 +75,14 @@ public class MainController implements Initializable {
 
     private void updateOnConnect() {
         disableNodes(deviceSelection, deviceSelectionRefresh);
-        enableNodes(deviceStatus, manualControlTab.getContent(), deviceConnect, deviceInfoBtn);
+        enableNodes(deviceConnectionStatus, manualControlTab.getContent(), deviceConnect, deviceInfoBtn);
         deviceConnect.setText("Disconnect");
     }
 
     private void updateOnDisconnect(String devInfo) {
         enableNodes(deviceSelection, deviceSelectionRefresh, deviceConnect);
-        disableNodes(deviceStatus, manualControlTab.getContent(), deviceInfoBtn);
-        deviceStatus.setText(devInfo);
+        disableNodes(deviceConnectionStatus, manualControlTab.getContent(), deviceInfoBtn);
+        deviceConnectionStatus.setText(devInfo);
         deviceConnect.setText("Connect");
         deviceProperties.clear();
         devicePropertiesMap.clear();
@@ -100,7 +100,7 @@ public class MainController implements Initializable {
             deviceService.getDeviceState();
             deviceService.getVfoFrequency();
         } else {
-            deviceStatus.setText(deviceService.getStatus().toString());
+            deviceConnectionStatus.setText(deviceService.getStatus().toString());
         }
     }
 
@@ -108,7 +108,7 @@ public class MainController implements Initializable {
         if(deviceService.disconnect().isOk()) {
             updateOnDisconnect("disconnected");
         } else {
-            deviceStatus.setText(deviceService.getStatus().toString());
+            deviceConnectionStatus.setText(deviceService.getStatus().toString());
         }
     }
 
@@ -121,12 +121,13 @@ public class MainController implements Initializable {
     }
 
     public void updateDeviceInfo(DeviceInfo di) {
-        devicePropertiesMap.put("Device", di.getName()+" "+di.getVersionStr());
+        devicePropertiesMap.put("Device", di.getName());
+        devicePropertiesMap.put("Build Id", di.getBuildId());
         devicePropertiesMap.put("VFO", di.getVfoName()+" (freq: "+di.getVfoMinFrequency()+" - "+di.getVfoMaxFrequency()+" Hz)");
-        devicePropertiesMap.put("FMeter", di.getfMeterName()+" (freq: "+di.getfMeterMinFrequency()+" - "+di.getVfoMaxFrequency()+" Hz)");
+        devicePropertiesMap.put("FMeter", di.getfMeterName()+" (freq: "+di.getfMeterMinFrequency()+" - "+di.getfMeterMaxFrequency()+" Hz)");
         updateDeviceProperties();
-        deviceStatus.setText("connected to "+di.getName()+" "+di.getVersionStr());
-        if(deviceStatus.isDisable()) {
+        deviceConnectionStatus.setText("connected to "+di.getName());
+        if(deviceConnectionStatus.isDisable()) {
             updateOnConnect();
         }
     }
@@ -173,8 +174,13 @@ public class MainController implements Initializable {
 
     }
 
-    public void updateStatusCode(StatusCode statusCode) {
-        deviceStatus.setText(statusCode.toString());
+    public void handleErrorCode(ErrorCode errorCode) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Device Error");
+        alert.setHeaderText("Code: "+errorCode.getFrameCommand());
+        if(errorCode.hasAuxCode()) {
+            alert.setContentText("auxiliary code: "+errorCode.getAuxCode());
+        }
     }
 
     public void doSampleAllProbes() {

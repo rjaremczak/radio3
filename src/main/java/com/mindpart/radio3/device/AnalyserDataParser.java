@@ -18,7 +18,7 @@ public class AnalyserDataParser implements FrameParser<AnalyserData> {
         BinaryIterator bi = frame.binaryIterator();
         AnalyserData ad = new AnalyserData(bi.nextUInt32(), bi.nextUInt32(), bi.nextUInt16(), bi.nextUInt16());
         int data[][] = ad.getData();
-        for(int step=0; step<ad.getNumSteps(); step++) {
+        for(int step=0; step<=ad.getNumSteps(); step++) {
             for(int series=0; series<ad.getNumSeries(); series++) {
                 data[series][step] = bi.nextUInt16();
             }

@@ -48,9 +48,10 @@ public class Radio3 extends Application {
         complexProbeController = new ComplexProbeController(deviceService);
         analyserController = new AnalyserController(this);
 
+        registerHandler(LogMessageParser.class, this::dumpDeviceLog);
         registerHandler(DeviceInfoParser.class, mainController::updateDeviceInfo);
         registerHandler(DeviceStateParser.class, mainController::updateDeviceState);
-        registerHandler(StatusCodeParser.class, mainController::updateStatusCode);
+        registerHandler(ErrorCodeParser.class, mainController::handleErrorCode);
         registerHandler(ComplexProbeParser.class, complexProbeController::setComplex);
         registerHandler(LinearProbeParser.class, linearProbeController::setGain);
         registerHandler(LogarithmicProbeParser.class, logarithmicProbeController::setGain);
@@ -104,6 +105,10 @@ public class Radio3 extends Application {
         linearProbeController.disableMainButton(disable);
         complexProbeController.disableMainButton(disable);
         fMeterController.disableMainButton(disable);
+    }
+
+    private void dumpDeviceLog(LogMessage logMessage) {
+        logger.info("DEVICE: "+ logMessage.getMessage());
     }
 
     public static void main(String[] args) {

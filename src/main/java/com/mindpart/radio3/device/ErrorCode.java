@@ -4,16 +4,16 @@ package com.mindpart.radio3.device;
  * Created by Robert Jaremczak
  * Date: 2016.03.23
  */
-public class StatusCode {
+public class ErrorCode {
     private FrameCommand frameCommand;
     private int auxCode;
 
-    public StatusCode(FrameCommand frameCommand, int auxCode) {
+    public ErrorCode(FrameCommand frameCommand, int auxCode) {
         this.frameCommand = frameCommand;
         this.auxCode = auxCode;
     }
 
-    public StatusCode(FrameCommand frameCommand) {
+    public ErrorCode(FrameCommand frameCommand) {
         this(frameCommand, -1);
     }
 

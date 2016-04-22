@@ -18,7 +18,7 @@
                 <Button fx:id="deviceSelectionRefresh" mnemonicParsing="false" onAction="#updateAvailablePorts" text="Refresh" />
                 <ChoiceBox fx:id="deviceSelection" minWidth="212.0" prefHeight="27.0" prefWidth="212.0" />
                 <Button fx:id="deviceConnect" mnemonicParsing="false" onAction="#doConnectDisconnect" text="Connect" />
-            <Label fx:id="deviceStatus" text="Label" />
+            <Label fx:id="deviceConnectionStatus" text="Label" />
             </items>
         </ToolBar>
           <AnchorPane VBox.vgrow="ALWAYS">

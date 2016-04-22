@@ -8,7 +8,7 @@ import com.mindpart.utils.Binary;
  */
 public class DeviceInfo {
     private String name;
-    private long version;
+    private String buildId;
     private String vfoName;
     private long vfoMinFrequency;
     private long vfoMaxFrequency;
@@ -16,11 +16,11 @@ public class DeviceInfo {
     private long fMeterMinFrequency;
     private long fMeterMaxFrequency;
 
-    public DeviceInfo(String name, long version,
+    public DeviceInfo(String name, String buildId,
                       String vfoName, long vfoMinFrequency, long vfoMaxFrequency,
                       String fMeterName, long fMeterMinFrequency, long fMeterMaxFrequency) {
         this.name = name;
-        this.version = version;
+        this.buildId = buildId;
         this.vfoName = vfoName;
         this.vfoMinFrequency = vfoMinFrequency;
         this.vfoMaxFrequency = vfoMaxFrequency;
@@ -29,16 +29,12 @@ public class DeviceInfo {
         this.fMeterMaxFrequency = fMeterMaxFrequency;
     }
 
-    private String formatVersion(long version) {
-        return String.format("%X.%02X", Binary.toUInt16high(version), Binary.toUInt16low(version));
-    }
-
     public String getName() {
         return name;
     }
 
-    public String getVersionStr() {
-        return formatVersion(version);
+    public String getBuildId() {
+        return buildId;
     }
 
     public String getVfoName() {

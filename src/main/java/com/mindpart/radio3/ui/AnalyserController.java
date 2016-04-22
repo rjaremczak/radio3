@@ -48,6 +48,7 @@ public class AnalyserController implements Initializable {
         statusLabel.setText("initialized");
         lineChartData = FXCollections.observableArrayList();
         lineChart.setData(lineChartData);
+        lineChart.setCreateSymbols(false);
         onPresets();
     }
 
@@ -89,8 +90,9 @@ public class AnalyserController implements Initializable {
             chartSeries.setName("from "+freqStartMHz+" to "+freqEndMHz+" MHz in "+ad.getNumSteps()+" steps");
             ObservableList<XYChart.Data<Double,Double>> data = chartSeries.getData();
             long freq = ad.getFreqStart();
-            for(int step=0; step<ad.getNumSteps(); step++) {
-                data.add(new XYChart.Data(((double)freq)/MHZ, samples[series][step]));
+            for(int step=0; step<=ad.getNumSteps(); step++) {
+                XYChart.Data item = new XYChart.Data(((double)freq)/MHZ, samples[series][step]);
+                data.add(item);
                 freq += ad.getFreqStep();
             }
             lineChartData.add(chartSeries);

@@ -16,7 +16,7 @@ public class AnalyserData {
         this.freqStep = freqStep;
         this.numSteps = numSteps;
         this.numSeries = numSeries;
-        this.data = new int[numSeries][numSteps];
+        this.data = new int[numSeries][numSteps+1];
     }
 
     public long getFreqStart() {

@@ -34,7 +34,11 @@ public class BinaryIterator {
     }
 
     public String nextString(int length) {
-        String str = new String(buffer, index, length);
+        int zlength;
+        for(zlength=0; zlength<length; zlength++) {
+            if(buffer[index + zlength] == (byte)0) { break; }
+        }
+        String str = new String(buffer, index, zlength);
         index += length;
         return str;
     }
