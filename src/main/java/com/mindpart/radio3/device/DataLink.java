@@ -7,6 +7,7 @@ import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
 import org.apache.log4j.Logger;
 
+import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 
 /**
@@ -58,19 +59,31 @@ public class DataLink {
         }
     }
 
+    private byte[] readBytes(int num) throws SerialPortException, SerialPortTimeoutException {
+        ByteBuffer buf = ByteBuffer.allocate(num);
+        int remaining = num;
+        while(remaining > 0) {
+            int size = Math.min(remaining, serialPort.getInputBufferBytesCount());
+            byte[] received = serialPort.readBytes(size, TIMEOUT_MS);
+            buf.put(received);
+            remaining -= received.length;
+        }
+        return buf.array();
+    }
+
     public Frame readFrame() throws SerialPortException, SerialPortTimeoutException, Crc8.Error {
         Crc8 crc8 = new Crc8();
-        byte[] headerBytes = serialPort.readBytes(2, TIMEOUT_MS);
+        byte[] headerBytes = readBytes(2);
         crc8.addBuf(headerBytes);
         FrameHeader header = new FrameHeader(Binary.toUInt16(headerBytes));
         if(header.getSizeBytesCount()>0) {
-            byte[] sizeBytes = serialPort.readBytes(Math.max(2, header.getSizeBytesCount()), TIMEOUT_MS);
+            byte[] sizeBytes = readBytes(Math.max(2, header.getSizeBytesCount()));
             header.setSizeBytes(sizeBytes);
             crc8.addBuf(sizeBytes);
         }
-        byte[] payload = serialPort.readBytes(header.getPayloadSize(), TIMEOUT_MS);
+        byte[] payload = readBytes(header.getPayloadSize());
         crc8.addBuf(payload);
-        int receivedCrc = serialPort.readBytes(1, TIMEOUT_MS)[0] & 0xff;
+        int receivedCrc = readBytes(1)[0] & 0xff;
         if(receivedCrc != crc8.getCrc()) {
             throw new Crc8.Error(receivedCrc, crc8.getCrc());
         }
@@ -84,7 +97,7 @@ public class DataLink {
         try {
             int remaining = serialPort.getInputBufferBytesCount();
             if(remaining>0) {
-                serialPort.readBytes(remaining, TIMEOUT_MS);
+                readBytes(remaining);
                 logger.debug("flushed "+remaining+" bytes from read buffer");
             }
             return remaining;
@@ -100,7 +113,7 @@ public class DataLink {
     }
 
     private int readWord() throws SerialPortException, SerialPortTimeoutException {
-        return Binary.toUInt16(serialPort.readBytes(2, TIMEOUT_MS));
+        return Binary.toUInt16(readBytes(2));
     }
 
     public void writeFrame(Frame frame) throws SerialPortException {
