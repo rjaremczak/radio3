@@ -74,15 +74,15 @@ public class DataLink {
     public Frame readFrame() throws SerialPortException, SerialPortTimeoutException, Crc8.Error {
         Crc8 crc8 = new Crc8();
         byte[] headerBytes = readBytes(2);
-        crc8.addBuf(headerBytes);
+        crc8.addBytes(headerBytes);
         FrameHeader header = new FrameHeader(Binary.toUInt16(headerBytes));
         if(header.getSizeBytesCount()>0) {
             byte[] sizeBytes = readBytes(Math.max(2, header.getSizeBytesCount()));
             header.setSizeBytes(sizeBytes);
-            crc8.addBuf(sizeBytes);
+            crc8.addBytes(sizeBytes);
         }
         byte[] payload = readBytes(header.getPayloadSize());
-        crc8.addBuf(payload);
+        crc8.addBytes(payload);
         int receivedCrc = readBytes(1)[0] & 0xff;
         if(receivedCrc != crc8.getCrc()) {
             throw new Crc8.Error(receivedCrc, crc8.getCrc());
@@ -95,12 +95,13 @@ public class DataLink {
 
     public int flushReadBuffer() {
         try {
+            int flushed = 0;
             int remaining = serialPort.getInputBufferBytesCount();
-            if(remaining>0) {
-                readBytes(remaining);
-                logger.debug("flushed "+remaining+" bytes from read buffer");
+            while(remaining > 0) {
+                flushed += serialPort.readBytes(remaining).length;
             }
-            return remaining;
+            logger.debug("flushed "+flushed+" bytes from read buffer");
+            return flushed;
         } catch (Exception e) {
             logger.error("error flushing read buffer", e);
         }
@@ -112,10 +113,6 @@ public class DataLink {
         serialPort.writeByte((byte)Binary.toUInt8high(word));
     }
 
-    private int readWord() throws SerialPortException, SerialPortTimeoutException {
-        return Binary.toUInt16(readBytes(2));
-    }
-
     public void writeFrame(Frame frame) throws SerialPortException {
         serialPort.purgePort(SerialPort.PURGE_TXCLEAR|SerialPort.PURGE_RXCLEAR);
         FrameHeader header = new FrameHeader(frame);
@@ -124,11 +121,11 @@ public class DataLink {
         crc8.addWord(header.getHeader());
         if(header.getSizeBytesCount()>0) {
             serialPort.writeBytes(header.getSizeBytes());
-            crc8.addBuf(header.getSizeBytes());
+            crc8.addBytes(header.getSizeBytes());
         }
         if(frame.getPayloadSize()>0) {
             serialPort.writeBytes(frame.getPayload());
-            crc8.addBuf(frame.getPayload());
+            crc8.addBytes(frame.getPayload());
         }
         serialPort.writeByte((byte)(crc8.getCrc() & 0xff));
     }

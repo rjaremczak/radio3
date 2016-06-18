@@ -11,7 +11,7 @@ public final class Crc8 {
         crc = 0;
     }
 
-    public void addBuf(byte[] buf) {
+    public void addBytes(byte[] buf) {
         for(byte data : buf) { addByte(data); }
     }
 

@@ -121,12 +121,12 @@ public class MainController implements Initializable {
     }
 
     public void updateDeviceInfo(DeviceInfo di) {
-        devicePropertiesMap.put("Device", di.getName());
-        devicePropertiesMap.put("Build Id", di.getBuildId());
-        devicePropertiesMap.put("VFO", di.getVfoName()+" (freq: "+di.getVfoMinFrequency()+" - "+di.getVfoMaxFrequency()+" Hz)");
-        devicePropertiesMap.put("FMeter", di.getfMeterName()+" (freq: "+di.getfMeterMinFrequency()+" - "+di.getfMeterMaxFrequency()+" Hz)");
+        devicePropertiesMap.put("Device", di.name);
+        devicePropertiesMap.put("Build Id", di.buildId);
+        devicePropertiesMap.put("VFO", di.vfoName+" (freq: "+di.vfoMinFrequency+" - "+di.vfoMaxFrequency+" Hz)");
+        devicePropertiesMap.put("FMeter", di.fMeterName+" (freq: "+di.fMeterMinFrequency+" - "+di.fMeterMaxFrequency+" Hz)");
         updateDeviceProperties();
-        deviceConnectionStatus.setText("connected to "+di.getName());
+        deviceConnectionStatus.setText("connected to "+di.name);
         if(deviceConnectionStatus.isDisable()) {
             updateOnConnect();
         }

@@ -19,9 +19,15 @@ public class DeviceInfoParser implements FrameParser<DeviceInfo> {
     @Override
     public DeviceInfo parse(Frame frame) {
         BinaryIterator bi = frame.binaryIterator();
-        return new DeviceInfo(
-                bi.nextString(16), bi.nextString(32),
-                bi.nextString(16), bi.nextUInt32(), bi.nextUInt32(),
-                bi.nextString(16), bi.nextUInt32(), bi.nextUInt32());
+        DeviceInfo di = new DeviceInfo();
+        di.name = bi.nextString(16);
+        di.buildId = bi.nextString(32);
+        di.vfoName = bi.nextString(16);
+        di.vfoMinFrequency = bi.nextUInt32();
+        di.vfoMaxFrequency = bi.nextUInt32();
+        di.fMeterName = bi.nextString(16);
+        di.fMeterMinFrequency = bi.nextUInt32();
+        di.fMeterMaxFrequency = bi.nextUInt32();
+        return di;
     }
 }
