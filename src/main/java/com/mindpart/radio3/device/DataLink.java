@@ -100,7 +100,7 @@ public class DataLink {
             while(remaining > 0) {
                 flushed += serialPort.readBytes(remaining).length;
             }
-            logger.debug("flushed "+flushed+" bytes from read buffer");
+            if(logger.isDebugEnabled() && flushed>0) { logger.debug("flushed "+flushed+" bytes from read buffer"); }
             return flushed;
         } catch (Exception e) {
             logger.error("error flushing read buffer", e);

@@ -1,6 +1,5 @@
 package com.mindpart.radio3.device;
 
-import com.mindpart.utils.Binary;
 import com.mindpart.utils.BinaryIterator;
 
 /**

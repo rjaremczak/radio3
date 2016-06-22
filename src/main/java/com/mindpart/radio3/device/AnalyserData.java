@@ -5,18 +5,33 @@ package com.mindpart.radio3.device;
  * Date: 2016.04.16
  */
 public class AnalyserData {
+    public enum Mode {
+        LOG_PROBE(1), LIN_PROBE(1), COMPLEX_PROBE(2), COMPLEX_LOG_PROBE(3);
+
+        private int numSeries;
+
+
+        Mode(int numSeries) {
+            this.numSeries = numSeries;
+        }
+
+        public int getNumSeries() {
+            return numSeries;
+        }
+    }
+
     private long freqStart;
     private long freqStep;
     private int numSteps;
-    private int numSeries;
+    private Mode mode;
     private int data[][];
 
-    public AnalyserData(long freqStart, long freqStep, int numSteps, int numSeries) {
+    public AnalyserData(long freqStart, long freqStep, int numSteps, Mode mode) {
         this.freqStart = freqStart;
         this.freqStep = freqStep;
         this.numSteps = numSteps;
-        this.numSeries = numSeries;
-        this.data = new int[numSeries][numSteps+1];
+        this.mode = mode;
+        this.data = new int[mode.getNumSeries()][numSteps+1];
     }
 
     public long getFreqStart() {
@@ -32,7 +47,11 @@ public class AnalyserData {
     }
 
     public int getNumSeries() {
-        return numSeries;
+        return mode.getNumSeries();
+    }
+
+    public Mode getMode() {
+        return mode;
     }
 
     public int[][] getData() {

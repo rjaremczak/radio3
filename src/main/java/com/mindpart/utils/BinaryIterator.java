@@ -27,6 +27,12 @@ public class BinaryIterator {
         return val;
     }
 
+    public int nextInt16() {
+        int val = Binary.toInt16(buffer, index);
+        index += 2;
+        return val;
+    }
+
     public long nextUInt32() {
         long val = Binary.toUInt32(buffer, index);
         index += 4;

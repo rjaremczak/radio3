@@ -5,12 +5,29 @@ package com.mindpart.radio3.device;
  * Date: 2016.02.13
  */
 public class DeviceInfo {
+    public class Vfo {
+        public String name;
+        public long minFrequency;
+        public long maxFrequency;
+    }
+
+    public class FMeter {
+        public String name;
+        public long minFrequency;
+        public long maxFrequency;
+    }
+
+    public class LogProbe {
+        public String name;
+        public long minValue;
+        public long maxValue;
+        public long minDBm;
+        public long maxDBm;
+    }
+
     public String name;
     public String buildId;
-    public String vfoName;
-    public long vfoMinFrequency;
-    public long vfoMaxFrequency;
-    public String fMeterName;
-    public long fMeterMinFrequency;
-    public long fMeterMaxFrequency;
+    public Vfo vfo = new Vfo();
+    public FMeter fMeter = new FMeter();
+    public LogProbe logProbe = new LogProbe();
 }

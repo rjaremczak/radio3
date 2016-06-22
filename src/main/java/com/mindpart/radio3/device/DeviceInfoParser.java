@@ -22,12 +22,17 @@ public class DeviceInfoParser implements FrameParser<DeviceInfo> {
         DeviceInfo di = new DeviceInfo();
         di.name = bi.nextString(16);
         di.buildId = bi.nextString(32);
-        di.vfoName = bi.nextString(16);
-        di.vfoMinFrequency = bi.nextUInt32();
-        di.vfoMaxFrequency = bi.nextUInt32();
-        di.fMeterName = bi.nextString(16);
-        di.fMeterMinFrequency = bi.nextUInt32();
-        di.fMeterMaxFrequency = bi.nextUInt32();
+        di.vfo.name = bi.nextString(16);
+        di.vfo.minFrequency = bi.nextUInt32();
+        di.vfo.maxFrequency = bi.nextUInt32();
+        di.fMeter.name = bi.nextString(16);
+        di.fMeter.minFrequency = bi.nextUInt32();
+        di.fMeter.maxFrequency = bi.nextUInt32();
+        di.logProbe.name = bi.nextString(16);
+        di.logProbe.minValue = bi.nextUInt16();
+        di.logProbe.maxValue = bi.nextUInt16();
+        di.logProbe.minDBm = bi.nextInt16();
+        di.logProbe.maxDBm = bi.nextInt16();
         return di;
     }
 }

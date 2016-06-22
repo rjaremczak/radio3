@@ -36,6 +36,10 @@ public class Binary {
         return (bytes[0] & 0xff) + ((bytes[1] << 8) & 0xff00);
     }
 
+    public static short toInt16(byte[] bytes, int offset) {
+        return (short) ((bytes[offset] & 0xff) + ((bytes[offset+1] << 8) & 0xff00));
+    }
+
     public static int toUInt16(byte[] bytes, int offset) {
         return (bytes[offset] & 0xff) + ((bytes[offset+1] << 8) & 0xff00);
     }

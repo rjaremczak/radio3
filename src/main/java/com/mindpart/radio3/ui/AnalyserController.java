@@ -114,7 +114,7 @@ public class AnalyserController implements Initializable {
 
     public void onPresets() {
         startFrequency.setText("1.8");
-        endFrequency.setText("30.0");
+        endFrequency.setText("60.0");
         numSteps.setText("500");
     }
 }
