@@ -11,6 +11,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -29,6 +30,7 @@ public class AnalyserController implements Initializable {
     @FXML TextField startFrequency;
     @FXML TextField endFrequency;
     @FXML TextField numSteps;
+    @FXML ChoiceBox<AnalyserData.Mode> inputProbe;
     @FXML Button startButton;
     @FXML Label statusLabel;
     @FXML VBox analyserVBox;
@@ -45,6 +47,7 @@ public class AnalyserController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        inputProbe.getItems().addAll(AnalyserData.Mode.values());
         statusLabel.setText("initialized");
         lineChartData = FXCollections.observableArrayList();
         lineChart.setData(lineChartData);

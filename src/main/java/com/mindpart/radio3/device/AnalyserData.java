@@ -6,17 +6,22 @@ package com.mindpart.radio3.device;
  */
 public class AnalyserData {
     public enum Mode {
-        LOG_PROBE(1), LIN_PROBE(1), COMPLEX_PROBE(2), COMPLEX_LOG_PROBE(3);
+        LOG_PROBE("Logarithmic",1), LIN_PROBE("Linear",1), COMPLEX_PROBE("Complex", 2), COMPLEX_LOG_PROBE("Complex + Log.", 3);
 
         private int numSeries;
+        private String name;
 
-
-        Mode(int numSeries) {
+        Mode(String name, int numSeries) {
+            this.name = name;
             this.numSeries = numSeries;
         }
 
         public int getNumSeries() {
             return numSeries;
+        }
+
+        public String toString() {
+            return name;
         }
     }
 
