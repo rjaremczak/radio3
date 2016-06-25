@@ -40,7 +40,7 @@
                   <TextField fx:id="numSteps" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onNumSteps" prefHeight="27.0" prefWidth="64.0" promptText="number" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                   <Button fx:id="presetsButton" mnemonicParsing="false" onAction="#onPresets" prefHeight="27.0" prefWidth="161.0" text="HF + 50MHz" GridPane.rowIndex="1" />
                   <Label text="input probe" GridPane.columnIndex="4" />
-                  <ChoiceBox fx:id="inputProbe" prefHeight="27.0" prefWidth="194.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                  <ChoiceBox fx:id="sourceProbe" prefHeight="27.0" prefWidth="194.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
                   <Label fx:id="statusLabel" text="Label" GridPane.columnIndex="6" GridPane.rowIndex="1" />
                   <Button fx:id="startButton" mnemonicParsing="false" onAction="#doStart" text="Start" GridPane.columnIndex="5" GridPane.rowIndex="1" />
                   <Label text="presets" />

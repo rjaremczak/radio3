@@ -30,7 +30,7 @@ public class AnalyserController implements Initializable {
     @FXML TextField startFrequency;
     @FXML TextField endFrequency;
     @FXML TextField numSteps;
-    @FXML ChoiceBox<AnalyserData.Mode> inputProbe;
+    @FXML ChoiceBox<AnalyserData.Source> sourceProbe;
     @FXML Button startButton;
     @FXML Label statusLabel;
     @FXML VBox analyserVBox;
@@ -47,7 +47,8 @@ public class AnalyserController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        inputProbe.getItems().addAll(AnalyserData.Mode.values());
+        initInputProbeList();
+
         statusLabel.setText("initialized");
         lineChartData = FXCollections.observableArrayList();
         lineChart.setData(lineChartData);
@@ -55,12 +56,17 @@ public class AnalyserController implements Initializable {
         onPresets();
     }
 
+    private void initInputProbeList() {
+        sourceProbe.getItems().addAll(AnalyserData.Source.values());
+        sourceProbe.getSelectionModel().selectFirst();
+    }
+
     public void doStart() {
         long fStart = (long)(Double.parseDouble(startFrequency.getText()) * MHZ);
         long fEnd = (long)(Double.parseDouble(endFrequency.getText()) * MHZ);
         int steps = Integer.parseInt(numSteps.getText());
         int fStep = (int)((fEnd - fStart) / steps);
-        deviceService.startAnalyser(fStart, fStep, steps, 10);
+        deviceService.startAnalyser(fStart, fStep, steps, 10, sourceProbe.getValue());
         statusLabel.setText("started");
     }
 

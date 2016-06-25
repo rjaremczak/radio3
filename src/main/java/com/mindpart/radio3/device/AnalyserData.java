@@ -5,13 +5,13 @@ package com.mindpart.radio3.device;
  * Date: 2016.04.16
  */
 public class AnalyserData {
-    public enum Mode {
+    public enum Source {
         LOG_PROBE("Logarithmic",1), LIN_PROBE("Linear",1), COMPLEX_PROBE("Complex", 2), COMPLEX_LOG_PROBE("Complex + Log.", 3);
 
         private int numSeries;
         private String name;
 
-        Mode(String name, int numSeries) {
+        Source(String name, int numSeries) {
             this.name = name;
             this.numSeries = numSeries;
         }
@@ -28,15 +28,15 @@ public class AnalyserData {
     private long freqStart;
     private long freqStep;
     private int numSteps;
-    private Mode mode;
+    private Source source;
     private int data[][];
 
-    public AnalyserData(long freqStart, long freqStep, int numSteps, Mode mode) {
+    public AnalyserData(long freqStart, long freqStep, int numSteps, Source source) {
         this.freqStart = freqStart;
         this.freqStep = freqStep;
         this.numSteps = numSteps;
-        this.mode = mode;
-        this.data = new int[mode.getNumSeries()][numSteps+1];
+        this.source = source;
+        this.data = new int[source.getNumSeries()][numSteps+1];
     }
 
     public long getFreqStart() {
@@ -52,11 +52,11 @@ public class AnalyserData {
     }
 
     public int getNumSeries() {
-        return mode.getNumSeries();
+        return source.getNumSeries();
     }
 
-    public Mode getMode() {
-        return mode;
+    public Source getSource() {
+        return source;
     }
 
     public int[][] getData() {
