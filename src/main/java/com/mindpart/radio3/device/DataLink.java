@@ -30,16 +30,19 @@ public class DataLink {
         this.serialPort = new SerialPort(portName);
     }
 
-    public void connect(Consumer<Frame> frameParser) throws SerialPortException, SerialPortTimeoutException {
+    public void connect() throws SerialPortException, SerialPortTimeoutException {
         serialPort.openPort();
         serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY, false, false);
         serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
         flushReadBuffer();
+    }
+
+    public void attachFrameListener(Consumer<Frame> frameHandler) throws SerialPortException {
         serialPort.addEventListener(serialPortEvent -> {
             try {
                 Frame frame = readFrame();
                 flushReadBuffer();
-                frameParser.accept(frame);
+                frameHandler.accept(frame);
             } catch (Exception e) {
                 logger.error("exception reading frame", e);
             }

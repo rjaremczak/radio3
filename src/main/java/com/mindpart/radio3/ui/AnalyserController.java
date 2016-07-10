@@ -96,7 +96,7 @@ public class AnalyserController implements Initializable {
         chartAxisX.setTickUnit(autoTickUnit(freqSpanMHz));
         for(int series=0; series<ad.getNumSeries(); series++) {
             XYChart.Series<Double,Double> chartSeries = new XYChart.Series<>();
-            chartSeries.setName("from "+freqStartMHz+" to "+freqEndMHz+" MHz in "+ad.getNumSteps()+" steps");
+            chartSeries.setName(ad.getSource().getSeriesTitle(series));
             ObservableList<XYChart.Data<Double,Double>> data = chartSeries.getData();
             long freq = ad.getFreqStart();
             for(int step=0; step<=ad.getNumSteps(); step++) {

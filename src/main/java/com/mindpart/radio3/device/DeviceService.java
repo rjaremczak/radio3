@@ -8,7 +8,10 @@ import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
 import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static com.mindpart.radio3.Status.OK;
@@ -23,50 +26,21 @@ public class DeviceService {
 
     private DataLink dataLink;
     private Status status = OK;
-    private Map<Class<? extends FrameParser>, FrameParser> parsers = new HashMap<>();
-    private Map<FrameParser, BiConsumer<FrameParser, Frame>> handlers = new HashMap<>();
+    private Map<FrameParser, BiConsumer<FrameParser, Frame>> bindings = new HashMap<>();
 
-    public DeviceService() throws InstantiationException, IllegalAccessException {
-        registerParser(LogMessageParser.class);
-        registerParser(DeviceInfoParser.class);
-        registerParser(DeviceStateParser.class);
-        registerParser(ErrorCodeParser.class);
-        registerParser(FMeterParser.class);
-        registerParser(LogarithmicProbeParser.class);
-        registerParser(LinearProbeParser.class);
-        registerParser(ComplexProbeParser.class);
-        registerParser(VfoReadFrequencyParser.class);
-        registerParser(ProbesParser.class);
-        registerParser(AnalyserStateParser.class);
-        registerParser(AnalyserDataParser.class);
-    }
-
-    private <T extends FrameParser> void registerParser(Class<T> clazz) throws IllegalAccessException, InstantiationException {
-        parsers.put(clazz, clazz.newInstance());
-    }
-
-    public void registerHandler(Class<? extends FrameParser> clazz, BiConsumer<FrameParser, Frame> handler) {
-        FrameParser parser = parsers.get(clazz);
-        if(parser == null) {
-            throw new IllegalArgumentException("parser "+clazz+" not registered");
-        }
-
-        handlers.put(parser, handler);
+    public <T extends FrameParser<U>, U> void registerBinding(T parser, BiConsumer<FrameParser, Frame> handler) {
+        bindings.put(parser, handler);
     }
 
     public void frameHandler(Frame frame) {
-        for(Map.Entry<Class<? extends FrameParser>, FrameParser> entry : parsers.entrySet()) {
-            FrameParser parser = entry.getValue();
+        for(Map.Entry<FrameParser, BiConsumer<FrameParser, Frame>> binding : bindings.entrySet()) {
+            FrameParser parser = binding.getKey();
             if(parser.recognizes(frame)) {
-                BiConsumer<FrameParser, Frame> handler = handlers.get(parser);
-                if(handler!=null) {
-                    handler.accept(parser, frame);
-                    return;
-                } else {
-                    logger.warn("no handler for "+entry.getKey());
-                }
+                binding.getValue().accept(parser, frame);
+                return;
             }
         }
+        logger.warn("no binding for frame "+frame);
     }
 
     public boolean isConnected() {
@@ -80,7 +54,8 @@ public class DeviceService {
         } else {
             dataLink = new DataLink(portName);
             try {
-                dataLink.connect(this::frameHandler);
+                dataLink.connect();
+                dataLink.attachFrameListener(this::frameHandler);
                 status = OK;
             } catch (SerialPortException|SerialPortTimeoutException e) {
                 status = error(e);

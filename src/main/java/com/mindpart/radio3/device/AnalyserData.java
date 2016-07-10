@@ -6,22 +6,34 @@ package com.mindpart.radio3.device;
  */
 public class AnalyserData {
     public enum Source {
-        LOG_PROBE("Logarithmic",1), LIN_PROBE("Linear",1), COMPLEX_PROBE("Complex", 2), COMPLEX_LOG_PROBE("Complex + Log.", 3);
+        LOG_PROBE("Logarithmic",1, "Power [dBm]"),
+        LIN_PROBE("Linear",1, "Power [mW]"),
+        COMPLEX_PROBE("Complex", 2, "Gain [dB]", "Phase [°]"),
+        COMPLEX_LOG_PROBE("Complex + Log.", 3, "Gain [dB]", "Phase [°]", "Power [dBm]");
 
         private int numSeries;
-        private String name;
+        private String title;
+        private String seriesTitle[];
 
-        Source(String name, int numSeries) {
-            this.name = name;
+        Source(String title, int numSeries, String... seriesTitles) {
+            this.title = title;
             this.numSeries = numSeries;
+            this.seriesTitle = seriesTitles;
+            if(seriesTitles==null || seriesTitles.length < numSeries) {
+                throw new IllegalArgumentException("series titles must be specified");
+            }
         }
 
         public int getNumSeries() {
             return numSeries;
         }
 
+        public String getSeriesTitle(int series) {
+            return seriesTitle[series];
+        }
+
         public String toString() {
-            return name;
+            return title;
         }
     }
 

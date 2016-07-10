@@ -24,8 +24,8 @@ public class Radio3 extends Application {
     private ComplexProbeController complexProbeController;
     private AnalyserController analyserController;
 
-    private <T extends FrameParser<U>, U> void registerHandler(Class<T> frameParserClass, Consumer<U> handler) {
-        deviceService.registerHandler(frameParserClass, (frameParser, frame) -> {
+    private <T extends FrameParser<U>, U> void bind(T parser, Consumer<U> handler) {
+        deviceService.registerBinding(parser, (frameParser, frame) -> {
             U response = ((T)frameParser).parse(frame);
             Platform.runLater(() -> handler.accept(response));
         });
@@ -48,18 +48,18 @@ public class Radio3 extends Application {
         complexProbeController = new ComplexProbeController(deviceService);
         analyserController = new AnalyserController(this);
 
-        registerHandler(LogMessageParser.class, this::dumpDeviceLog);
-        registerHandler(DeviceInfoParser.class, mainController::updateDeviceInfo);
-        registerHandler(DeviceStateParser.class, mainController::updateDeviceState);
-        registerHandler(ErrorCodeParser.class, mainController::handleErrorCode);
-        registerHandler(ComplexProbeParser.class, complexProbeController::setComplex);
-        registerHandler(LinearProbeParser.class, linearProbeController::setGain);
-        registerHandler(LogarithmicProbeParser.class, logarithmicProbeController::setGain);
-        registerHandler(FMeterParser.class, fMeterController::setFrequency);
-        registerHandler(VfoReadFrequencyParser.class, vfoController::setFrequency);
-        registerHandler(ProbesParser.class, this::updateAllProbes);
-        registerHandler(AnalyserStateParser.class, analyserController::updateStatus);
-        registerHandler(AnalyserDataParser.class, analyserController::updateData);
+        bind(new LogMessageParser(), this::dumpDeviceLog);
+        bind(new DeviceInfoParser(), mainController::updateDeviceInfo);
+        bind(new DeviceStateParser(), mainController::updateDeviceState);
+        bind(new ErrorCodeParser(), mainController::handleErrorCode);
+        bind(new ComplexProbeParser(), complexProbeController::setComplex);
+        bind(new LinearProbeParser(), linearProbeController::setGain);
+        bind(new LogarithmicProbeParser(), logarithmicProbeController::setGain);
+        bind(new FMeterParser(), fMeterController::setFrequency);
+        bind(new VfoReadFrequencyParser(), vfoController::setFrequency);
+        bind(new ProbesParser(), this::updateAllProbes);
+        bind(new AnalyserStateParser(), analyserController::updateStatus);
+        bind(new AnalyserDataParser(), analyserController::updateData);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);
