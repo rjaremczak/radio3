@@ -37,7 +37,8 @@ public class MainController implements Initializable {
     @FXML Button deviceInfoBtn;
 
     @FXML Tab manualControlTab;
-    @FXML Tab analyserTab;
+    @FXML Tab sweepTab;
+    @FXML Tab vnaTab;
     @FXML GridPane manualControlPane;
     @FXML ToggleButton continuousSamplingOfAllProbesBtn;
     @FXML Button sampleAllProbesBtn;

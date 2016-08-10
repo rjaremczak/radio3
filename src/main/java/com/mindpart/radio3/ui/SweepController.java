@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
  * Created by Robert Jaremczak
  * Date: 2016.04.15
  */
-public class AnalyserController implements Initializable {
+public class SweepController implements Initializable {
     private static final long MHZ = 1000000;
 
     @FXML Button presetsButton;
@@ -33,7 +33,7 @@ public class AnalyserController implements Initializable {
     @FXML ChoiceBox<AnalyserData.Source> sourceProbe;
     @FXML Button startButton;
     @FXML Label statusLabel;
-    @FXML VBox analyserVBox;
+    @FXML VBox vBox;
     @FXML LineChart<Double, Double> lineChart;
     @FXML NumberAxis chartAxisX;
     @FXML NumberAxis chartAxisY;
@@ -41,7 +41,7 @@ public class AnalyserController implements Initializable {
     private ObservableList<XYChart.Series<Double, Double>> lineChartData;
     private DeviceService deviceService;
 
-    public AnalyserController(Radio3 radio3) {
+    public SweepController(Radio3 radio3) {
         this.deviceService = radio3.getDeviceService();
     }
 
@@ -57,7 +57,9 @@ public class AnalyserController implements Initializable {
     }
 
     private void initInputProbeList() {
-        sourceProbe.getItems().addAll(AnalyserData.Source.values());
+        sourceProbe.getItems().add(AnalyserData.Source.LOG_PROBE);
+        sourceProbe.getItems().add(AnalyserData.Source.LIN_PROBE);
+        sourceProbe.getItems().add(AnalyserData.Source.VNA);
         sourceProbe.getSelectionModel().selectFirst();
     }
 
@@ -70,7 +72,7 @@ public class AnalyserController implements Initializable {
         statusLabel.setText("started");
     }
 
-    public void updateStatus(AnalyserState state) {
+    public void updateState(AnalyserState state) {
         statusLabel.setText(state.toString());
     }
 
@@ -124,6 +126,6 @@ public class AnalyserController implements Initializable {
     public void onPresets() {
         startFrequency.setText("1.8");
         endFrequency.setText("60.0");
-        numSteps.setText("500");
+        numSteps.setText("1000");
     }
 }

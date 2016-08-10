@@ -22,7 +22,11 @@ public class Radio3 extends Application {
     private LogarithmicProbeController logarithmicProbeController;
     private LinearProbeController linearProbeController;
     private ComplexProbeController complexProbeController;
-    private AnalyserController analyserController;
+    private SweepController sweepController;
+    private VnaController vnaController;
+
+    private Consumer<AnalyserData> analyserDataHandler;
+    private Consumer<AnalyserState> analyserStateHandler;
 
     private <T extends FrameParser<U>, U> void bind(T parser, Consumer<U> handler) {
         deviceService.registerBinding(parser, (frameParser, frame) -> {
@@ -46,7 +50,12 @@ public class Radio3 extends Application {
         logarithmicProbeController = new LogarithmicProbeController(deviceService);
         linearProbeController = new LinearProbeController(deviceService);
         complexProbeController = new ComplexProbeController(deviceService);
-        analyserController = new AnalyserController(this);
+        sweepController = new SweepController(this);
+        vnaController = new VnaController(this);
+
+        // should be dynamically updated by currently active controller
+        analyserDataHandler = sweepController::updateData;
+        analyserStateHandler = sweepController::updateState;
 
         bind(new LogMessageParser(), this::dumpDeviceLog);
         bind(new DeviceInfoParser(), mainController::updateDeviceInfo);
@@ -58,8 +67,8 @@ public class Radio3 extends Application {
         bind(new FMeterParser(), fMeterController::setFrequency);
         bind(new VfoReadFrequencyParser(), vfoController::setFrequency);
         bind(new ProbesParser(), this::updateAllProbes);
-        bind(new AnalyserStateParser(), analyserController::updateStatus);
-        bind(new AnalyserDataParser(), analyserController::updateData);
+        bind(new AnalyserStateParser(), analyserStateHandler);
+        bind(new AnalyserDataParser(), analyserDataHandler);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);
@@ -69,9 +78,13 @@ public class Radio3 extends Application {
         primaryStage.show();
         mainController.postDisplayInit();
 
-        loader = new FXMLLoader(getClass().getResource("analyserPane.fxml"));
-        loader.setControllerFactory(clazz -> analyserController);
-        mainController.analyserTab.setContent(loader.load());
+        loader = new FXMLLoader(getClass().getResource("sweepPane.fxml"));
+        loader.setControllerFactory(clazz -> sweepController);
+        mainController.sweepTab.setContent(loader.load());
+
+        loader = new FXMLLoader(getClass().getResource("vnaPane.fxml"));
+        loader.setControllerFactory(clazz -> vnaController);
+        mainController.vnaTab.setContent(loader.load());
 
         addFeatureBox(vfoController, 0, 0);
         addFeatureBox(fMeterController, 1, 0);

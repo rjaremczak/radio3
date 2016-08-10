@@ -8,8 +8,7 @@ public class AnalyserData {
     public enum Source {
         LOG_PROBE("Logarithmic",1, "Power [dBm]"),
         LIN_PROBE("Linear",1, "Power [mW]"),
-        COMPLEX_PROBE("Complex", 2, "Gain [dB]", "Phase [°]"),
-        COMPLEX_LOG_PROBE("Complex + Log.", 3, "Gain [dB]", "Phase [°]", "Power [dBm]");
+        VNA("VNA", 2, "SWR", "Phase [°]");
 
         private int numSeries;
         private String title;
