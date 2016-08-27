@@ -11,9 +11,10 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane minHeight="300.0" minWidth="650.0" prefHeight="300.0" prefWidth="914.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepController">
+<AnchorPane minHeight="300.0" minWidth="650.0" prefHeight="300.0" prefWidth="914.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.VnaController">
    <children>
       <VBox fx:id="vBox" layoutX="211.0" layoutY="50.0" prefHeight="200.0" prefWidth="738.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -46,10 +47,35 @@
                   <Label text="presets" />
                </children>
             </GridPane>
-            <LineChart fx:id="lineChart" VBox.vgrow="ALWAYS">
-               <xAxis><NumberAxis fx:id="chartAxisX" label="Frequency [MHz]" /></xAxis>
-               <yAxis><NumberAxis fx:id="chartAxisY" label="Power [dBm]" /></yAxis>
-            </LineChart>
+            <StackPane fx:id="chartsPane" VBox.vgrow="ALWAYS">
+               <children>
+                  <LineChart fx:id="gainChart">
+                     <xAxis>
+                        <NumberAxis fx:id="frequencyAxis" label="Frequency [MHz]" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis fx:id="gainAxis" label="Power [dBm]" />
+                     </yAxis>
+                     <padding>
+                        <Insets right="50.0" top="5.0" />
+                     </padding>
+                  </LineChart>
+                  <LineChart fx:id="phaseChart" stylesheets="@vna.css">
+                     <xAxis>
+                        <NumberAxis fx:id="frequencyChart" label="Frequency [MHz]" opacity="0.0" />
+                     </xAxis>
+                     <yAxis>
+                        <NumberAxis fx:id="phaseAxis" label="Phase [deg]" side="RIGHT" />
+                     </yAxis>
+                     <StackPane.margin>
+                        <Insets />
+                     </StackPane.margin>
+                     <padding>
+                        <Insets left="50.0" top="5.0" />
+                     </padding>
+                  </LineChart>
+               </children>
+            </StackPane>
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -33,12 +34,16 @@ public class VnaController implements Initializable {
     @FXML Button startButton;
     @FXML Label statusLabel;
     @FXML VBox vBox;
-    @FXML LineChart<Double, Double> lineChart;
-    @FXML NumberAxis chartAxisX;
-    @FXML NumberAxis chartAxisY;
+    @FXML StackPane chartsPane;
+    @FXML LineChart<Double, Double> gainChart;
+    @FXML NumberAxis frequencyAxis;
+    @FXML NumberAxis gainAxis;
+    @FXML LineChart<Double, Double> phaseChart;
+    @FXML NumberAxis phaseAxis;
     @FXML ChoiceBox<String> calibrationProfile;
 
-    private ObservableList<XYChart.Series<Double, Double>> lineChartData;
+    private ObservableList<XYChart.Series<Double, Double>> gainChartData;
+    private ObservableList<XYChart.Series<Double, Double>> phaseChartData;
     private DeviceService deviceService;
 
     public VnaController(Radio3 radio3) {
@@ -50,9 +55,24 @@ public class VnaController implements Initializable {
         initCalibrationProfiles();
 
         statusLabel.setText("initialized");
-        lineChartData = FXCollections.observableArrayList();
-        lineChart.setData(lineChartData);
-        lineChart.setCreateSymbols(false);
+        gainChartData = FXCollections.observableArrayList();
+        gainChart.setData(gainChartData);
+        gainChart.setCreateSymbols(false);
+
+        phaseChartData = FXCollections.observableArrayList();
+        phaseChart.setData(phaseChartData);
+        phaseChart.setCreateSymbols(false);
+
+        phaseChart.setLegendVisible(false);
+        phaseChart.setAnimated(false);
+        phaseChart.setAlternativeRowFillVisible(false);
+        phaseChart.setAlternativeColumnFillVisible(false);
+        phaseChart.setHorizontalGridLinesVisible(false);
+        phaseChart.setVerticalGridLinesVisible(false);
+        phaseChart.getXAxis().setOpacity(0);
+
+        phaseChart.getStylesheets().addAll(getClass().getResource("vna.css").toExternalForm());
+
         onPresets();
     }
 
@@ -88,11 +108,11 @@ public class VnaController implements Initializable {
         double freqEndMHz = ((double)freqEnd)/MHZ;
         double freqSpanMHz = freqEndMHz - freqStartMHz;
         int samples[][] = ad.getData();
-        lineChartData.clear();
-        chartAxisX.setAutoRanging(false);
-        chartAxisX.setLowerBound(freqStartMHz);
-        chartAxisX.setUpperBound(freqEndMHz);
-        chartAxisX.setTickUnit(autoTickUnit(freqSpanMHz));
+        gainChartData.clear();
+        frequencyAxis.setAutoRanging(false);
+        frequencyAxis.setLowerBound(freqStartMHz);
+        frequencyAxis.setUpperBound(freqEndMHz);
+        frequencyAxis.setTickUnit(autoTickUnit(freqSpanMHz));
         for(int series=0; series<ad.getNumSeries(); series++) {
             XYChart.Series<Double,Double> chartSeries = new XYChart.Series<>();
             chartSeries.setName(ad.getSource().getSeriesTitle(series));
@@ -103,9 +123,9 @@ public class VnaController implements Initializable {
                 data.add(item);
                 freq += ad.getFreqStep();
             }
-            lineChartData.add(chartSeries);
+            gainChartData.add(chartSeries);
         }
-        chartAxisY.setAutoRanging(true);
+        gainAxis.setAutoRanging(true);
     }
 
     public void onStartFrequency() {
