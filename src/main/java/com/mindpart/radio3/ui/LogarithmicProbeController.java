@@ -21,7 +21,7 @@ public class LogarithmicProbeController extends FeatureController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("Logarithmic Probe", "Gain", "dB");
+        setUpAsProbe("Logarithmic Probe", "Power", "dBm");
     }
 
     public void setGain(double gain) {

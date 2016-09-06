@@ -25,9 +25,14 @@ public class DeviceInfo {
         public long maxDBm;
     }
 
+    public class Vna {
+        public String name;
+    }
+
     public String name;
     public String buildId;
     public Vfo vfo = new Vfo();
     public FMeter fMeter = new FMeter();
     public LogProbe logProbe = new LogProbe();
+    public Vna vna = new Vna();
 }

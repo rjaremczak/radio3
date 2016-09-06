@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static com.mindpart.radio3.Status.OK;
 import static com.mindpart.radio3.Status.error;
@@ -27,6 +28,8 @@ public class DeviceService {
     private DataLink dataLink;
     private Status status = OK;
     private Map<FrameParser, BiConsumer<FrameParser, Frame>> bindings = new HashMap<>();
+    private Consumer<AnalyserData> analyserDataHandler;
+    private Consumer<AnalyserState> analyserStateHandler;
 
     public <T extends FrameParser<U>, U> void registerBinding(T parser, BiConsumer<FrameParser, Frame> handler) {
         bindings.put(parser, handler);
@@ -47,7 +50,7 @@ public class DeviceService {
         return dataLink!=null && dataLink.isConnected();
     }
 
-    synchronized public Status connect(String portName) {
+    public Status connect(String portName) {
         logger.debug("connect to "+portName);
         if(isConnected()) {
             status = error("already connected");
@@ -66,43 +69,48 @@ public class DeviceService {
         return status;
     }
 
-    synchronized public void getDeviceInfo() {
+    public void getDeviceInfo() {
         performRequest(DeviceInfoParser.GET);
     }
 
-    synchronized public void getDeviceState() { performRequest(DeviceStateParser.GET); }
+    public void getDeviceState() { performRequest(DeviceStateParser.GET); }
 
-    synchronized public void getVfoFrequency() {
+    public void getVfoFrequency() {
         performRequest(VfoReadFrequencyParser.SAMPLE);
     }
 
-    synchronized public void setVfoFrequency(int frequency) {
+    public void setVfoFrequency(int frequency) {
         performRequest(new Frame(FrameCommand.VFO_SET_FREQ, Binary.fromUInt32(frequency)));
     }
 
-    synchronized public void getFMeter() {
+    public void getFMeter() {
         performRequest(FMeterParser.SAMPLE);
     }
 
-    synchronized public void getLinearProbe() {
+    public void getLinearProbe() {
         performRequest(LinearProbeParser.SAMPLE);
     }
 
-    synchronized public void getComplexProbe() {
+    public void getComplexProbe() {
         performRequest(ComplexProbeParser.SAMPLE);
     }
 
-    synchronized public void getLogarithmicProbe() {
+    public void getLogarithmicProbe() {
         performRequest(LogarithmicProbeParser.SAMPLE);
     }
 
-    synchronized public void getProbes() { performRequest(ProbesParser.SAMPLE);}
+    public void getProbes() { performRequest(ProbesParser.SAMPLE);}
 
-    synchronized public void startProbesSampling() { performRequest(ProbesParser.START_SAMPLING);}
+    public void startProbesSampling() { performRequest(ProbesParser.START_SAMPLING);}
 
-    synchronized public void stopProbesSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
+    public void stopProbesSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
 
-    synchronized public void startAnalyser(long freqStart, long freqStep, int numSteps, int stepWaitMs, AnalyserData.Source source) {
+    public void startAnalyser(long freqStart, long freqStep, int numSteps, int stepWaitMs,
+                              AnalyserData.Source source,
+                              Consumer<AnalyserData> analyserDataHandler,
+                              Consumer<AnalyserState> analyserStateHandler) {
+        this.analyserDataHandler = analyserDataHandler;
+        this.analyserStateHandler = analyserStateHandler;
         BinaryBuilder builder = new BinaryBuilder(14);
         builder.addUInt32(freqStart);
         builder.addUInt32(freqStep);
@@ -122,7 +130,7 @@ public class DeviceService {
         }
     }
 
-    synchronized public Status disconnect() {
+    public Status disconnect() {
         logger.debug("disconnect");
         if(!isConnected()) {
             status = error("not connected");
@@ -135,11 +143,19 @@ public class DeviceService {
         return status;
     }
 
-    synchronized public List<String> availableSerialPorts() {
+    public List<String> availableSerialPorts() {
         return Arrays.asList(SerialPortList.getPortNames());
     }
 
     public Status getStatus() {
         return status;
+    }
+
+    public void handleAnalyserData(AnalyserData analyserData) {
+        analyserDataHandler.accept(analyserData);
+    }
+
+    public void handleAnalyserState(AnalyserState analyserState) {
+        analyserStateHandler.accept(analyserState);
     }
 }

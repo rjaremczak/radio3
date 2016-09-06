@@ -10,13 +10,13 @@ import javafx.scene.control.TextField;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class ComplexProbeController extends FeatureController {
+public class VnaProbeController extends FeatureController {
     private DeviceService deviceService;
     private Label phaseNameLabel;
     private TextField phaseValueField;
     private Label phaseUnitLabel;
 
-    public ComplexProbeController(DeviceService deviceService) {
+    public VnaProbeController(DeviceService deviceService) {
         this.deviceService = deviceService;
     }
 
@@ -27,7 +27,7 @@ public class ComplexProbeController extends FeatureController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("Complex Probe", "Gain", "dB");
+        setUpAsProbe("VNA Probe", "Gain", "dB");
         phaseNameLabel = new Label("Phase");
         phaseUnitLabel = new Label("°");
 

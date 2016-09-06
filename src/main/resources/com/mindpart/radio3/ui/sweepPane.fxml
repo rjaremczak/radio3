@@ -46,7 +46,7 @@
                   <Label text="presets" />
                </children>
             </GridPane>
-            <LineChart fx:id="lineChart" VBox.vgrow="ALWAYS">
+            <LineChart fx:id="lineChart" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
                <xAxis><NumberAxis fx:id="chartAxisX" label="Frequency [MHz]" /></xAxis>
                <yAxis><NumberAxis fx:id="chartAxisY" label="Power [dBm]" /></yAxis>
             </LineChart>

@@ -21,12 +21,9 @@ public class Radio3 extends Application {
     private FMeterController fMeterController;
     private LogarithmicProbeController logarithmicProbeController;
     private LinearProbeController linearProbeController;
-    private ComplexProbeController complexProbeController;
+    private VnaProbeController vnaProbeController;
     private SweepController sweepController;
     private VnaController vnaController;
-
-    private Consumer<AnalyserData> analyserDataHandler;
-    private Consumer<AnalyserState> analyserStateHandler;
 
     private <T extends FrameParser<U>, U> void bind(T parser, Consumer<U> handler) {
         deviceService.registerBinding(parser, (frameParser, frame) -> {
@@ -49,31 +46,27 @@ public class Radio3 extends Application {
         fMeterController = new FMeterController(deviceService);
         logarithmicProbeController = new LogarithmicProbeController(deviceService);
         linearProbeController = new LinearProbeController(deviceService);
-        complexProbeController = new ComplexProbeController(deviceService);
+        vnaProbeController = new VnaProbeController(deviceService);
         sweepController = new SweepController(this);
         vnaController = new VnaController(this);
-
-        // should be dynamically updated by currently active controller
-        analyserDataHandler = sweepController::updateData;
-        analyserStateHandler = sweepController::updateState;
 
         bind(new LogMessageParser(), this::dumpDeviceLog);
         bind(new DeviceInfoParser(), mainController::updateDeviceInfo);
         bind(new DeviceStateParser(), mainController::updateDeviceState);
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
-        bind(new ComplexProbeParser(), complexProbeController::setComplex);
+        bind(new ComplexProbeParser(), vnaProbeController::setComplex);
         bind(new LinearProbeParser(), linearProbeController::setGain);
         bind(new LogarithmicProbeParser(), logarithmicProbeController::setGain);
         bind(new FMeterParser(), fMeterController::setFrequency);
         bind(new VfoReadFrequencyParser(), vfoController::setFrequency);
         bind(new ProbesParser(), this::updateAllProbes);
-        bind(new AnalyserStateParser(), analyserStateHandler);
-        bind(new AnalyserDataParser(), analyserDataHandler);
+        bind(new AnalyserStateParser(), deviceService::handleAnalyserState);
+        bind(new AnalyserDataParser(), deviceService::handleAnalyserData);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);
         Parent root = loader.load();
-        primaryStage.setTitle("Radio 3");
+        primaryStage.setTitle("Radio 3 by SQ6DGT");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
         mainController.postDisplayInit();
@@ -90,7 +83,7 @@ public class Radio3 extends Application {
         addFeatureBox(fMeterController, 1, 0);
         addFeatureBox(logarithmicProbeController, 0, 1);
         addFeatureBox(linearProbeController, 1, 1);
-        addFeatureBox(complexProbeController, 0, 2);
+        addFeatureBox(vnaProbeController, 0, 2);
     }
 
     @Override
@@ -105,7 +98,7 @@ public class Radio3 extends Application {
     public void updateAllProbes(Probes probes) {
         logarithmicProbeController.setGain(probes.getLogarithmic());
         linearProbeController.setGain(probes.getLinear());
-        complexProbeController.setComplex(probes.getComplex());
+        vnaProbeController.setComplex(probes.getComplex());
         fMeterController.setFrequency(probes.getFmeter());
     }
 
@@ -116,7 +109,7 @@ public class Radio3 extends Application {
     protected void disableGetOnAllProbes(boolean disable) {
         logarithmicProbeController.disableMainButton(disable);
         linearProbeController.disableMainButton(disable);
-        complexProbeController.disableMainButton(disable);
+        vnaProbeController.disableMainButton(disable);
         fMeterController.disableMainButton(disable);
     }
 

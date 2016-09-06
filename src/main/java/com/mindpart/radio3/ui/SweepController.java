@@ -61,7 +61,6 @@ public class SweepController implements Initializable {
     private void initInputProbeList() {
         sourceProbe.getItems().add(AnalyserData.Source.LOG_PROBE);
         sourceProbe.getItems().add(AnalyserData.Source.LIN_PROBE);
-        sourceProbe.getItems().add(AnalyserData.Source.VNA);
         sourceProbe.getSelectionModel().selectFirst();
     }
 
@@ -70,7 +69,7 @@ public class SweepController implements Initializable {
         long fEnd = (long)(Double.parseDouble(endFrequency.getText()) * MHZ);
         int steps = Integer.parseInt(numSteps.getText());
         int fStep = (int)((fEnd - fStart) / steps);
-        deviceService.startAnalyser(fStart, fStep, steps, 10, sourceProbe.getValue());
+        deviceService.startAnalyser(fStart, fStep, steps, 10, sourceProbe.getValue(), this::updateData, this::updateState);
         statusLabel.setText("started");
     }
 

@@ -129,6 +129,7 @@ public class MainController implements Initializable {
         devicePropertiesMap.put("VFO", di.vfo.name+" (freq: "+di.vfo.minFrequency+" to "+di.vfo.maxFrequency+" Hz)");
         devicePropertiesMap.put("FMeter", di.fMeter.name+" (freq: "+di.fMeter.minFrequency+" to "+di.fMeter.maxFrequency+" Hz)");
         devicePropertiesMap.put("Logarithmic probe", di.logProbe.name+" (power: "+di.logProbe.minDBm+" to "+di.logProbe.maxDBm+" dBm)");
+        devicePropertiesMap.put("VNA", di.vna.name);
         updateDeviceProperties();
         deviceConnectionStatus.setText("connected to "+di.name);
         if(deviceConnectionStatus.isDisable()) {

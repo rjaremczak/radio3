@@ -21,7 +21,7 @@ public class LinearProbeController extends FeatureController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("Linear Probe", "Gain", "x");
+        setUpAsProbe("Linear Probe", "Power", "mW");
     }
 
     public void setGain(double gain) {

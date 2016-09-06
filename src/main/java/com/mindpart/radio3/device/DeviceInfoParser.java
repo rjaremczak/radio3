@@ -33,6 +33,7 @@ public class DeviceInfoParser implements FrameParser<DeviceInfo> {
         di.logProbe.maxValue = bi.nextUInt16();
         di.logProbe.minDBm = bi.nextInt16();
         di.logProbe.maxDBm = bi.nextInt16();
+        di.vna.name = bi.nextString(16);
         return di;
     }
 }
