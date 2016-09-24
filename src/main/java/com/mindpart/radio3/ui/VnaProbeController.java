@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.device.DeviceService;
+import com.mindpart.radio3.ComplexProbe;
 import com.mindpart.radio3.device.Complex;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
@@ -11,18 +11,18 @@ import javafx.scene.control.TextField;
  * Date: 2016.03.24
  */
 public class VnaProbeController extends FeatureController {
-    private DeviceService deviceService;
     private Label phaseNameLabel;
     private TextField phaseValueField;
     private Label phaseUnitLabel;
+    private ComplexProbe complexProbe;
 
-    public VnaProbeController(DeviceService deviceService) {
-        this.deviceService = deviceService;
+    public VnaProbeController(ComplexProbe complexProbe) {
+        this.complexProbe = complexProbe;
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.getComplexProbe();
+        complexProbe.requestData();
     }
 
     @Override

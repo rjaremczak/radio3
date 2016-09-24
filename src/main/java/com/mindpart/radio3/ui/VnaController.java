@@ -1,8 +1,9 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.AnalyserModule;
+import com.mindpart.radio3.device.AdcConverter;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
-import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.utils.Range;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,10 +42,11 @@ public class VnaController implements Initializable {
 
     private ObservableList<XYChart.Series<Number, Number>> gainChartData;
     private ObservableList<XYChart.Series<Number, Number>> phaseChartData;
-    private DeviceService deviceService;
+    private AdcConverter adcConverter = AdcConverter.getDefault();
+    private AnalyserModule analyserModule;
 
-    public VnaController(Radio3 radio3) {
-        this.deviceService = radio3.getDeviceService();
+    public VnaController(AnalyserModule analyserModule) {
+        this.analyserModule = analyserModule;
     }
 
     @Override
@@ -72,7 +74,7 @@ public class VnaController implements Initializable {
         long fEnd = (long)(Double.parseDouble(endFrequency.getText()) * MHZ);
         int steps = Integer.parseInt(numSteps.getText());
         int fStep = (int)((fEnd - fStart) / steps);
-        deviceService.startAnalyser(fStart, fStep, steps, 10, AnalyserData.Source.VNA, this::updateData, this::updateState);
+        analyserModule.startAnalyser(fStart, fStep, steps, AnalyserData.Source.VNA, this::updateData, this::updateState);
         statusLabel.setText("started");
     }
 
@@ -121,12 +123,8 @@ public class VnaController implements Initializable {
         axis.setTickUnit(autoTickUnit(freqSpanMHz));
     }
 
-    private double adcToVoltage(int adcValue) {
-        return ((3.277)*((double)adcValue))/4035.0;
-    }
-
     private double calculateSWR(int adcValue) {
-        double v = adcToVoltage(adcValue);
+        double v = adcConverter.convert(adcValue);
         double dB = -30.0 + (v - 0.03)/0.03;
         double ratio = 1/Math.pow(10,dB/20);
         double swr = (1+ratio)/(1-ratio);
@@ -134,7 +132,7 @@ public class VnaController implements Initializable {
     }
 
     private double calculatePhaseAngle(int adcValue) {
-        double v = adcToVoltage(adcValue);
+        double v = adcConverter.convert(adcValue);
         double phaseDiff = (v - 0.03)/0.01;
         return phaseDiff;
     }

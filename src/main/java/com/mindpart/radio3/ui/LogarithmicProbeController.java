@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.LogarithmicProbe;
 import com.mindpart.radio3.device.DeviceService;
 import javafx.event.ActionEvent;
 
@@ -8,15 +9,15 @@ import javafx.event.ActionEvent;
  * Date: 2016.03.24
  */
 public class LogarithmicProbeController extends FeatureController {
-    private DeviceService deviceService;
+    private LogarithmicProbe logarithmicProbe;
 
-    public LogarithmicProbeController(DeviceService deviceService) {
-        this.deviceService = deviceService;
+    public LogarithmicProbeController(LogarithmicProbe logarithmicProbe) {
+        this.logarithmicProbe = logarithmicProbe;
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.getLogarithmicProbe();
+        logarithmicProbe.requestData();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.LinearProbe;
 import com.mindpart.radio3.device.DeviceService;
 import javafx.event.ActionEvent;
 
@@ -8,15 +9,15 @@ import javafx.event.ActionEvent;
  * Date: 2016.03.24
  */
 public class LinearProbeController extends FeatureController {
-    private DeviceService deviceService;
+    private LinearProbe linearProbe;
 
-    public LinearProbeController(DeviceService deviceService) {
-        this.deviceService = deviceService;
+    public LinearProbeController(LinearProbe linearProbe) {
+        this.linearProbe = linearProbe;
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.getLinearProbe();
+        linearProbe.requestData();
     }
 
     @Override

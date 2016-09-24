@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.device.DeviceService;
+import com.mindpart.radio3.FMeterUnit;
 import javafx.event.ActionEvent;
 
 /**
@@ -8,10 +8,10 @@ import javafx.event.ActionEvent;
  * Date: 2016.03.24
  */
 public class FMeterController extends FeatureController {
-    private DeviceService deviceService;
+    private FMeterUnit fMeterUnit;
 
-    public FMeterController(DeviceService deviceService) {
-        this.deviceService = deviceService;
+    public FMeterController(FMeterUnit fMeterUnit) {
+        this.fMeterUnit = fMeterUnit;
     }
 
     @Override
@@ -21,7 +21,7 @@ public class FMeterController extends FeatureController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        deviceService.getFMeter();
+        fMeterUnit.requestData();
     }
 
     public void setFrequency(Long frequency) {

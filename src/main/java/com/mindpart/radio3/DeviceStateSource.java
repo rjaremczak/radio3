@@ -1,13 +1,20 @@
-package com.mindpart.radio3.device;
+package com.mindpart.radio3;
 
+import com.mindpart.radio3.device.*;
 import com.mindpart.utils.BinaryIterator;
 
 /**
  * Created by Robert Jaremczak
  * Date: 2016.04.10
  */
-public class DeviceStateParser implements FrameParser<DeviceState> {
+public class DeviceStateSource implements FrameParser<DeviceState> {
     static final Frame GET = new Frame(FrameCommand.DEVICE_GET_STATE);
+
+    private DeviceService deviceService;
+
+    public DeviceStateSource(DeviceService deviceService) {
+        this.deviceService = deviceService;
+    }
 
     @Override
     public boolean recognizes(Frame frame) {
@@ -19,5 +26,9 @@ public class DeviceStateParser implements FrameParser<DeviceState> {
         BinaryIterator bi = frame.binaryIterator();
         bi.nextUInt8();
         return new DeviceState(bi.nextBool(), bi.nextUInt16(), bi.nextUInt32());
+    }
+
+    public void requestData() {
+        deviceService.performRequest(DeviceStateSource.GET);
     }
 }

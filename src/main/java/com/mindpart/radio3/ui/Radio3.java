@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.*;
 import com.mindpart.radio3.device.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -10,10 +11,20 @@ import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class Radio3 extends Application {
     private static Logger logger = Logger.getLogger(Radio3.class);
+
+    private LogarithmicProbe logarithmicProbe;
+    private LinearProbe linearProbe;
+    private ComplexProbe complexProbe;
+    private VfoModule vfoModule;
+    private DeviceInfoSource deviceInfoSource;
+    private DeviceStateSource deviceStateSource;
+    private AnalyserModule analyserModule;
+    private FMeterUnit fMeterUnit;
 
     private DeviceService deviceService;
     private MainController mainController;
@@ -41,27 +52,44 @@ public class Radio3 extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         deviceService = new DeviceService();
-        mainController = new MainController(this);
         vfoController = new VfoController(deviceService);
-        fMeterController = new FMeterController(deviceService);
-        logarithmicProbeController = new LogarithmicProbeController(deviceService);
-        linearProbeController = new LinearProbeController(deviceService);
-        vnaProbeController = new VnaProbeController(deviceService);
-        sweepController = new SweepController(this);
-        vnaController = new VnaController(this);
+
+        fMeterUnit = new FMeterUnit(deviceService);
+        fMeterController = new FMeterController(fMeterUnit);
+        bind(fMeterUnit, fMeterController::setFrequency);
+
+        logarithmicProbe = new LogarithmicProbe(deviceService);
+        logarithmicProbeController = new LogarithmicProbeController(logarithmicProbe);
+        bind(logarithmicProbe, logarithmicProbeController::setGain);
+
+        linearProbe = new LinearProbe(deviceService);
+        linearProbeController = new LinearProbeController(linearProbe);
+        bind(linearProbe, linearProbeController::setGain);
+
+        complexProbe = new ComplexProbe(deviceService);
+        vnaProbeController = new VnaProbeController(complexProbe);
+        bind(complexProbe, vnaProbeController::setComplex);
+
+        analyserModule = new AnalyserModule(deviceService);
+        vnaController = new VnaController(analyserModule);
+        sweepController = new SweepController(analyserModule);
+        bind(analyserModule, deviceService::handleAnalyserData);
+
+        vfoModule = new VfoModule(deviceService);
+        bind(vfoModule, vfoController::setFrequency);
+
+        mainController = new MainController(this);
+
+        deviceInfoSource = new DeviceInfoSource(deviceService);
+        bind(deviceInfoSource, mainController::updateDeviceInfo);
+
+        deviceStateSource = new DeviceStateSource(deviceService);
+        bind(deviceStateSource, mainController::updateDeviceState);
 
         bind(new LogMessageParser(), this::dumpDeviceLog);
-        bind(new DeviceInfoParser(), mainController::updateDeviceInfo);
-        bind(new DeviceStateParser(), mainController::updateDeviceState);
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
-        bind(new ComplexProbeParser(), vnaProbeController::setComplex);
-        bind(new LinearProbeParser(), linearProbeController::setGain);
-        bind(new LogarithmicProbeParser(), logarithmicProbeController::setGain);
-        bind(new FMeterParser(), fMeterController::setFrequency);
-        bind(new VfoReadFrequencyParser(), vfoController::setFrequency);
         bind(new ProbesParser(), this::updateAllProbes);
         bind(new AnalyserStateParser(), deviceService::handleAnalyserState);
-        bind(new AnalyserDataParser(), deviceService::handleAnalyserData);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);
@@ -102,10 +130,6 @@ public class Radio3 extends Application {
         fMeterController.setFrequency(probes.getFmeter());
     }
 
-    public DeviceService getDeviceService() {
-        return deviceService;
-    }
-
     protected void disableGetOnAllProbes(boolean disable) {
         logarithmicProbeController.disableMainButton(disable);
         linearProbeController.disableMainButton(disable);
@@ -113,11 +137,69 @@ public class Radio3 extends Application {
         fMeterController.disableMainButton(disable);
     }
 
+    public String getDeviceStatus() {
+        return deviceService.getStatus().toString();
+    }
+
+    public LogarithmicProbe getLogarithmicProbe() {
+        return logarithmicProbe;
+    }
+
+    public LinearProbe getLinearProbe() {
+        return linearProbe;
+    }
+
+    public ComplexProbe getComplexProbe() {
+        return complexProbe;
+    }
+
+    public VfoModule getVfoModule() {
+        return vfoModule;
+    }
+
+    public DeviceInfoSource getDeviceInfoSource() {
+        return deviceInfoSource;
+    }
+
+    public DeviceStateSource getDeviceStateSource() {
+        return deviceStateSource;
+    }
+
+
     private void dumpDeviceLog(LogMessage logMessage) {
         logger.info("DEVICE: "+ logMessage.getMessage());
     }
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public List<String> availableSerialPorts() {
+        return deviceService.availableSerialPorts();
+    }
+
+    public Status connect(String portName) {
+        return deviceService.connect(portName);
+    }
+
+    public Status disconnect() {
+        return deviceService.disconnect();
+    }
+
+    public boolean isConnected() {
+        return deviceService.isConnected();
+    }
+
+    public void getProbes() {
+        deviceService.getProbes();
+    }
+
+    public void startProbesSampling() {
+        deviceService.startProbesSampling();
+    }
+
+
+    public void stopProbesSampling() {
+        deviceService.stopProbesSampling();
     }
 }

@@ -1,5 +1,9 @@
-package com.mindpart.radio3.device;
+package com.mindpart.radio3;
 
+import com.mindpart.radio3.device.DeviceInfo;
+import com.mindpart.radio3.device.DeviceService;
+import com.mindpart.radio3.device.Frame;
+import com.mindpart.radio3.device.FrameParser;
 import com.mindpart.utils.BinaryIterator;
 
 import static com.mindpart.radio3.device.FrameCommand.DEVICE_GET_INFO;
@@ -8,8 +12,14 @@ import static com.mindpart.radio3.device.FrameCommand.DEVICE_GET_INFO;
  * Created by Robert Jaremczak
  * Date: 2016.02.13
  */
-public class DeviceInfoParser implements FrameParser<DeviceInfo> {
+public class DeviceInfoSource implements FrameParser<DeviceInfo> {
     static final Frame GET = new Frame(DEVICE_GET_INFO);
+
+    private DeviceService deviceService;
+
+    public DeviceInfoSource(DeviceService deviceService) {
+        this.deviceService = deviceService;
+    }
 
     @Override
     public boolean recognizes(Frame frame) {
@@ -35,5 +45,9 @@ public class DeviceInfoParser implements FrameParser<DeviceInfo> {
         di.logProbe.maxDBm = bi.nextInt16();
         di.vna.name = bi.nextString(16);
         return di;
+    }
+
+    public void requestData() {
+        deviceService.performRequest(DeviceInfoSource.GET);
     }
 }

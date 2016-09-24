@@ -1,5 +1,8 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.DeviceInfoSource;
+import com.mindpart.radio3.DeviceStateSource;
+import com.mindpart.radio3.VfoModule;
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.radio3.device.DeviceState;
@@ -44,14 +47,12 @@ public class MainController implements Initializable {
     @FXML Button sampleAllProbesBtn;
 
     private Radio3 radio3;
-    private DeviceService deviceService;
     private Map<String,String> devicePropertiesMap = new LinkedHashMap<>();
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
 
     public MainController(Radio3 radio3) {
         this.radio3 = radio3;
-        this.deviceService = radio3.getDeviceService();
     }
 
     private void disableNodes(Node... nodes) {
@@ -67,7 +68,7 @@ public class MainController implements Initializable {
     }
 
     public void updateAvailablePorts() {
-        availablePortNames.setAll(deviceService.availableSerialPorts());
+        availablePortNames.setAll(radio3.availableSerialPorts());
         if(availablePortNames.isEmpty()) {
             disableNodes(deviceSelection, deviceConnect);
         } else {
@@ -92,31 +93,31 @@ public class MainController implements Initializable {
     }
 
     private void doConnect() {
-        if(deviceService.connect(deviceSelection.getValue()).isOk()) {
+        if(radio3.connect(deviceSelection.getValue()).isOk()) {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             updateOnConnect();
-            deviceService.getDeviceInfo();
-            deviceService.getDeviceState();
-            deviceService.getVfoFrequency();
+            radio3.getDeviceInfoSource().requestData();
+            radio3.getDeviceStateSource().requestData();
+            radio3.getVfoModule().requestData();
         } else {
-            deviceConnectionStatus.setText(deviceService.getStatus().toString());
+            deviceConnectionStatus.setText(radio3.getDeviceStatus());
         }
     }
 
     private void doDisconnect() {
-        if(deviceService.disconnect().isOk()) {
+        if(radio3.disconnect().isOk()) {
             updateOnDisconnect("disconnected");
         } else {
-            deviceConnectionStatus.setText(deviceService.getStatus().toString());
+            deviceConnectionStatus.setText(radio3.getDeviceStatus());
         }
     }
 
     public void doConnectDisconnect() {
-        if(deviceService.isConnected()) { doDisconnect(); } else { doConnect(); };
+        if(radio3.isConnected()) { doDisconnect(); } else { doConnect(); };
     }
 
     private void updateDeviceProperties() {
@@ -160,8 +161,8 @@ public class MainController implements Initializable {
     }
 
     public void doDeviceInfo() {
-        deviceService.getDeviceInfo();
-        deviceService.getDeviceState();
+        radio3.getDeviceInfoSource().requestData();
+        radio3.getDeviceStateSource().requestData();
     }
 
     @Override
@@ -189,17 +190,17 @@ public class MainController implements Initializable {
     }
 
     public void doSampleAllProbes() {
-        deviceService.getProbes();
+        radio3.getProbes();
     }
 
     public void doContinuousSamplingOfAllProbes() {
         if(continuousSamplingOfAllProbesBtn.isSelected()) {
             sampleAllProbesBtn.setDisable(true);
-            deviceService.startProbesSampling();
+            radio3.startProbesSampling();
             radio3.disableGetOnAllProbes(true);
 
         } else {
-            deviceService.stopProbesSampling();
+            radio3.stopProbesSampling();
             sampleAllProbesBtn.setDisable(false);
             radio3.disableGetOnAllProbes(false);
         }

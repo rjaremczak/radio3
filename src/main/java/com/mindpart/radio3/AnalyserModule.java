@@ -1,12 +1,20 @@
-package com.mindpart.radio3.device;
+package com.mindpart.radio3;
 
+import com.mindpart.radio3.device.*;
 import com.mindpart.utils.BinaryIterator;
+
+import java.util.function.Consumer;
 
 /**
  * Created by Robert Jaremczak
  * Date: 2016.04.19
  */
-public class AnalyserDataParser implements FrameParser<AnalyserData> {
+public class AnalyserModule implements FrameParser<AnalyserData> {
+    private DeviceService deviceService;
+
+    public AnalyserModule(DeviceService deviceService) {
+        this.deviceService = deviceService;
+    }
 
     @Override
     public boolean recognizes(Frame frame) {
@@ -24,5 +32,9 @@ public class AnalyserDataParser implements FrameParser<AnalyserData> {
             }
         }
         return ad;
+    }
+
+    public void startAnalyser(long fStart, int fStep, int steps, AnalyserData.Source source,  Consumer<AnalyserData> dataHandler, Consumer<AnalyserState> stateHandler) {
+        deviceService.startAnalyser(fStart, fStep, steps, 10, source, dataHandler, stateHandler);
     }
 }

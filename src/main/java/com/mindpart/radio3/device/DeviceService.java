@@ -69,34 +69,8 @@ public class DeviceService {
         return status;
     }
 
-    public void getDeviceInfo() {
-        performRequest(DeviceInfoParser.GET);
-    }
-
-    public void getDeviceState() { performRequest(DeviceStateParser.GET); }
-
-    public void getVfoFrequency() {
-        performRequest(VfoReadFrequencyParser.SAMPLE);
-    }
-
     public void setVfoFrequency(int frequency) {
         performRequest(new Frame(FrameCommand.VFO_SET_FREQ, Binary.fromUInt32(frequency)));
-    }
-
-    public void getFMeter() {
-        performRequest(FMeterParser.SAMPLE);
-    }
-
-    public void getLinearProbe() {
-        performRequest(LinearProbeParser.SAMPLE);
-    }
-
-    public void getComplexProbe() {
-        performRequest(ComplexProbeParser.SAMPLE);
-    }
-
-    public void getLogarithmicProbe() {
-        performRequest(LogarithmicProbeParser.SAMPLE);
     }
 
     public void getProbes() { performRequest(ProbesParser.SAMPLE);}
@@ -120,7 +94,7 @@ public class DeviceService {
         performRequest(new Frame(FrameCommand.ANALYSER_REQUEST, builder.getBytes()));
     }
 
-    private void performRequest(Frame request) {
+    public void performRequest(Frame request) {
         try {
             dataLink.writeFrame(request);
             Thread.sleep(100);

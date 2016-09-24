@@ -1,8 +1,8 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.AnalyserModule;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
-import com.mindpart.radio3.device.DeviceService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,8 +14,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
@@ -41,10 +39,10 @@ public class SweepController implements Initializable {
     @FXML NumberAxis chartAxisY;
 
     private ObservableList<XYChart.Series<Double, Double>> lineChartData;
-    private DeviceService deviceService;
+    private AnalyserModule analyserModule;
 
-    public SweepController(Radio3 radio3) {
-        this.deviceService = radio3.getDeviceService();
+    public SweepController(AnalyserModule analyserModule) {
+        this.analyserModule = analyserModule;
     }
 
     @Override
@@ -69,7 +67,7 @@ public class SweepController implements Initializable {
         long fEnd = (long)(Double.parseDouble(endFrequency.getText()) * MHZ);
         int steps = Integer.parseInt(numSteps.getText());
         int fStep = (int)((fEnd - fStart) / steps);
-        deviceService.startAnalyser(fStart, fStep, steps, 10, sourceProbe.getValue(), this::updateData, this::updateState);
+        analyserModule.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateData, this::updateState);
         statusLabel.setText("started");
     }
 
