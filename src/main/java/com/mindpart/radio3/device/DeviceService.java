@@ -1,5 +1,6 @@
 package com.mindpart.radio3.device;
 
+import com.mindpart.radio3.MultipleProbes;
 import com.mindpart.radio3.Status;
 import com.mindpart.utils.Binary;
 import com.mindpart.utils.BinaryBuilder;
@@ -72,12 +73,6 @@ public class DeviceService {
     public void setVfoFrequency(int frequency) {
         performRequest(new Frame(FrameCommand.VFO_SET_FREQ, Binary.fromUInt32(frequency)));
     }
-
-    public void getProbes() { performRequest(ProbesParser.SAMPLE);}
-
-    public void startProbesSampling() { performRequest(ProbesParser.START_SAMPLING);}
-
-    public void stopProbesSampling() { performRequest(ProbesParser.STOP_SAMPLING);}
 
     public void startAnalyser(long freqStart, long freqStep, int numSteps, int stepWaitMs,
                               AnalyserData.Source source,

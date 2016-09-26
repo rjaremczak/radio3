@@ -9,10 +9,10 @@ import java.util.function.Consumer;
  * Created by Robert Jaremczak
  * Date: 2016.04.19
  */
-public class AnalyserUnit implements FrameParser<AnalyserData> {
+public class Sweeper implements FrameParser<AnalyserData> {
     private DeviceService deviceService;
 
-    public AnalyserUnit(DeviceService deviceService) {
+    public Sweeper(DeviceService deviceService) {
         this.deviceService = deviceService;
     }
 

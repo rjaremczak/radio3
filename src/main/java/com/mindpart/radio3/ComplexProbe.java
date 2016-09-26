@@ -25,12 +25,14 @@ public class ComplexProbe implements FrameParser<Complex> {
         return frame.getCommand() == CMPPROBE_GET;
     }
 
+    Complex fromAdc(int gain, int phase) {
+        return new Complex(adcConverter.convert(gain), adcConverter.convert(phase));
+    }
+
     @Override
     public Complex parse(Frame frame) {
         byte[] payload = frame.getPayload();
-        double gain = adcConverter.convert(Binary.toUInt16(payload, 0));
-        double phase = adcConverter.convert(Binary.toUInt16(payload, 2));
-        return new Complex(gain, phase);
+        return fromAdc(Binary.toUInt16(payload, 0), Binary.toUInt16(payload, 2));
     }
 
     public void requestData() {

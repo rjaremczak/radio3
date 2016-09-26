@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.AnalyserUnit;
+import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.device.AdcConverter;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
@@ -43,10 +43,10 @@ public class VnaController implements Initializable {
     private ObservableList<XYChart.Series<Number, Number>> gainChartData;
     private ObservableList<XYChart.Series<Number, Number>> phaseChartData;
     private AdcConverter adcConverter = AdcConverter.getDefault();
-    private AnalyserUnit analyserUnit;
+    private Sweeper sweeper;
 
-    public VnaController(AnalyserUnit analyserUnit) {
-        this.analyserUnit = analyserUnit;
+    public VnaController(Sweeper sweeper) {
+        this.sweeper = sweeper;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class VnaController implements Initializable {
         long fEnd = (long)(Double.parseDouble(endFrequency.getText()) * MHZ);
         int steps = Integer.parseInt(numSteps.getText());
         int fStep = (int)((fEnd - fStart) / steps);
-        analyserUnit.startAnalyser(fStart, fStep, steps, AnalyserData.Source.VNA, this::updateData, this::updateState);
+        sweeper.startAnalyser(fStart, fStep, steps, AnalyserData.Source.VNA, this::updateData, this::updateState);
         statusLabel.setText("started");
     }
 

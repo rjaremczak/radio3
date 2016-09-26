@@ -4,17 +4,17 @@ package com.mindpart.radio3.device;
  * Created by Robert Jaremczak
  * Date: 2016.04.09
  */
-public class Probes {
+public class ProbeValues {
     private double logarithmic;
     private double linear;
     private Complex complex;
-    long fmeter;
+    private double fMeter;
 
-    public Probes(double logarithmic, double linear, Complex complex, long fmeter) {
+    public ProbeValues(double logarithmic, double linear, Complex complex, double fMeter) {
         this.logarithmic = logarithmic;
         this.linear = linear;
         this.complex = complex;
-        this.fmeter = fmeter;
+        this.fMeter = fMeter;
     }
 
     public double getLogarithmic() {
@@ -29,7 +29,7 @@ public class Probes {
         return complex;
     }
 
-    public long getFmeter() {
-        return fmeter;
+    public double getFMeter() {
+        return fMeter;
     }
 }

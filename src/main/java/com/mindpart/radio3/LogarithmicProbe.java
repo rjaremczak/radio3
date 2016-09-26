@@ -28,9 +28,13 @@ public class LogarithmicProbe implements FrameParser<Double> {
         return frame.getCommand() == LOGPROBE_GET;
     }
 
+    Double fromAdc(int adc) {
+        return -75.0 + adcConverter.convert(adc) / 0.025;
+    }
+
     @Override
     public Double parse(Frame frame) {
-        return adcConverter.convert(Binary.toUInt16(frame.getPayload()));
+        return fromAdc(Binary.toUInt16(frame.getPayload()));
     }
 
     public void requestData() {

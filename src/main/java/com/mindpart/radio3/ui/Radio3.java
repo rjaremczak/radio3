@@ -23,8 +23,9 @@ public class Radio3 extends Application {
     private VfoUnit vfoUnit;
     private DeviceInfoSource deviceInfoSource;
     private DeviceStateSource deviceStateSource;
-    private AnalyserUnit analyserUnit;
-    private FMeterUnit fMeterUnit;
+    private Sweeper sweeper;
+    private FMeterProbe fMeterProbe;
+    private MultipleProbes multipleProbes;
 
     private DeviceService deviceService;
     private MainController mainController;
@@ -32,7 +33,7 @@ public class Radio3 extends Application {
     private FMeterController fMeterController;
     private LogarithmicProbeController logarithmicProbeController;
     private LinearProbeController linearProbeController;
-    private VnaProbeController vnaProbeController;
+    private ComplexProbeController complexProbeController;
     private SweepController sweepController;
     private VnaController vnaController;
 
@@ -54,26 +55,29 @@ public class Radio3 extends Application {
         deviceService = new DeviceService();
         vfoController = new VfoController(deviceService);
 
-        fMeterUnit = new FMeterUnit(deviceService);
-        fMeterController = new FMeterController(fMeterUnit);
-        bind(fMeterUnit, fMeterController::setFrequency);
+        fMeterProbe = new FMeterProbe(deviceService);
+        fMeterController = new FMeterController(fMeterProbe);
+        bind(fMeterProbe, fMeterController::setFrequency);
 
         logarithmicProbe = new LogarithmicProbe(deviceService);
         logarithmicProbeController = new LogarithmicProbeController(logarithmicProbe);
-        bind(logarithmicProbe, logarithmicProbeController::setGain);
+        bind(logarithmicProbe, logarithmicProbeController::update);
 
         linearProbe = new LinearProbe(deviceService);
         linearProbeController = new LinearProbeController(linearProbe);
-        bind(linearProbe, linearProbeController::setGain);
+        bind(linearProbe, linearProbeController::update);
 
         complexProbe = new ComplexProbe(deviceService);
-        vnaProbeController = new VnaProbeController(complexProbe);
-        bind(complexProbe, vnaProbeController::setComplex);
+        complexProbeController = new ComplexProbeController(complexProbe);
+        bind(complexProbe, complexProbeController::update);
 
-        analyserUnit = new AnalyserUnit(deviceService);
-        vnaController = new VnaController(analyserUnit);
-        sweepController = new SweepController(analyserUnit);
-        bind(analyserUnit, deviceService::handleAnalyserData);
+        multipleProbes = new MultipleProbes(deviceService, logarithmicProbe, linearProbe, complexProbe, fMeterProbe);
+        bind(multipleProbes, this::updateAllProbes);
+
+        sweeper = new Sweeper(deviceService);
+        vnaController = new VnaController(sweeper);
+        sweepController = new SweepController(sweeper, logarithmicProbe, linearProbe);
+        bind(sweeper, deviceService::handleAnalyserData);
 
         vfoUnit = new VfoUnit(deviceService);
         bind(vfoUnit, vfoController::setFrequency);
@@ -88,7 +92,6 @@ public class Radio3 extends Application {
 
         bind(new LogMessageParser(), this::dumpDeviceLog);
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
-        bind(new ProbesParser(), this::updateAllProbes);
         bind(new AnalyserStateParser(), deviceService::handleAnalyserState);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
@@ -111,7 +114,7 @@ public class Radio3 extends Application {
         addFeatureBox(fMeterController, 1, 0);
         addFeatureBox(logarithmicProbeController, 0, 1);
         addFeatureBox(linearProbeController, 1, 1);
-        addFeatureBox(vnaProbeController, 0, 2);
+        addFeatureBox(complexProbeController, 0, 2);
     }
 
     @Override
@@ -123,34 +126,22 @@ public class Radio3 extends Application {
         logger.info("stopped");
     }
 
-    public void updateAllProbes(Probes probes) {
-        logarithmicProbeController.setGain(probes.getLogarithmic());
-        linearProbeController.setGain(probes.getLinear());
-        vnaProbeController.setComplex(probes.getComplex());
-        fMeterController.setFrequency(probes.getFmeter());
+    public void updateAllProbes(ProbeValues probeValues) {
+        logarithmicProbeController.update(probeValues.getLogarithmic());
+        linearProbeController.update(probeValues.getLinear());
+        complexProbeController.update(probeValues.getComplex());
+        fMeterController.setFrequency(probeValues.getFMeter());
     }
 
     protected void disableGetOnAllProbes(boolean disable) {
         logarithmicProbeController.disableMainButton(disable);
         linearProbeController.disableMainButton(disable);
-        vnaProbeController.disableMainButton(disable);
+        complexProbeController.disableMainButton(disable);
         fMeterController.disableMainButton(disable);
     }
 
     public String getDeviceStatus() {
         return deviceService.getStatus().toString();
-    }
-
-    public LogarithmicProbe getLogarithmicProbe() {
-        return logarithmicProbe;
-    }
-
-    public LinearProbe getLinearProbe() {
-        return linearProbe;
-    }
-
-    public ComplexProbe getComplexProbe() {
-        return complexProbe;
     }
 
     public VfoUnit getVfoUnit() {
@@ -191,15 +182,15 @@ public class Radio3 extends Application {
     }
 
     public void getProbes() {
-        deviceService.getProbes();
+        multipleProbes.requestData();
     }
 
     public void startProbesSampling() {
-        deviceService.startProbesSampling();
+        multipleProbes.startSampling();
     }
 
 
     public void stopProbesSampling() {
-        deviceService.stopProbesSampling();
+        multipleProbes.stopSampling();
     }
 }

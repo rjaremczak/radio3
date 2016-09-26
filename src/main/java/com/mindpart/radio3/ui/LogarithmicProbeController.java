@@ -4,11 +4,16 @@ import com.mindpart.radio3.LogarithmicProbe;
 import com.mindpart.radio3.device.DeviceService;
 import javafx.event.ActionEvent;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
 public class LogarithmicProbeController extends FeatureController {
+    private static final NumberFormat fmtPower = new DecimalFormat("0.000");
+
     private LogarithmicProbe logarithmicProbe;
 
     public LogarithmicProbeController(LogarithmicProbe logarithmicProbe) {
@@ -25,7 +30,7 @@ public class LogarithmicProbeController extends FeatureController {
         setUpAsProbe("Logarithmic Probe", "Power", "dBm");
     }
 
-    public void setGain(double gain) {
-        setValue(Double.toString(gain));
+    public void update(double power) {
+        setValue(fmtPower.format(power));
     }
 }

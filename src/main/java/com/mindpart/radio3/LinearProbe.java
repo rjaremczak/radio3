@@ -28,9 +28,14 @@ public class LinearProbe implements FrameParser<Double> {
         return frame.getCommand() == LINPROBE_GET;
     }
 
+    Double fromAdc(int adc) {
+        double vrms = adcConverter.convert(adc) * 0.133;
+        return 1000*(vrms*vrms)/50;
+    }
+
     @Override
     public Double parse(Frame frame) {
-        return adcConverter.convert(Binary.toUInt16(frame.getPayload()));
+        return fromAdc(Binary.toUInt16(frame.getPayload()));
     }
 
     public void requestData() {

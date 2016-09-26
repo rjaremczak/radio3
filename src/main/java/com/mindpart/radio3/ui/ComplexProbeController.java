@@ -6,17 +6,23 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class VnaProbeController extends FeatureController {
+public class ComplexProbeController extends FeatureController {
+    private static final NumberFormat fmtGain = new DecimalFormat("0.000");
+    private static final NumberFormat fmtPhase = new DecimalFormat("0.000");
+
     private Label phaseNameLabel;
     private TextField phaseValueField;
     private Label phaseUnitLabel;
     private ComplexProbe complexProbe;
 
-    public VnaProbeController(ComplexProbe complexProbe) {
+    public ComplexProbeController(ComplexProbe complexProbe) {
         this.complexProbe = complexProbe;
     }
 
@@ -41,8 +47,8 @@ public class VnaProbeController extends FeatureController {
         gridPane.add(buttonBox, 1, 2, Integer.MAX_VALUE, 1);
     }
 
-    public void setComplex(Complex complex) {
-        valueField.setText(Double.toString(complex.getValue()));
-        phaseValueField.setText(Double.toString(complex.getPhase()));
+    public void update(Complex complex) {
+        valueField.setText(fmtGain.format(complex.getValue()));
+        phaseValueField.setText(fmtPhase.format(complex.getPhase()));
     }
 }

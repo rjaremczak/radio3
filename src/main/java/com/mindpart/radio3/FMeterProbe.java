@@ -11,12 +11,12 @@ import static com.mindpart.radio3.device.FrameCommand.*;
  * Created by Robert Jaremczak
  * Date: 2016.02.22
  */
-public class FMeterUnit implements FrameParser<Long> {
+public class FMeterProbe implements FrameParser<Double> {
     static final Frame SAMPLE = new Frame(FMETER_GET);
 
     private DeviceService deviceService;
 
-    public FMeterUnit(DeviceService deviceService) {
+    public FMeterProbe(DeviceService deviceService) {
         this.deviceService = deviceService;
     }
 
@@ -25,12 +25,16 @@ public class FMeterUnit implements FrameParser<Long> {
         return frame.getCommand() == FMETER_GET && frame.getPayloadSize() == 4;
     }
 
+    Double fromAdc(long adc) {
+        return ((double)adc) / 1000000;
+    }
+
     @Override
-    public Long parse(Frame frame) {
-        return Binary.toUInt32(frame.getPayload());
+    public Double parse(Frame frame) {
+        return fromAdc(Binary.toUInt32(frame.getPayload()));
     }
 
     public void requestData() {
-        deviceService.performRequest(FMeterUnit.SAMPLE);
+        deviceService.performRequest(FMeterProbe.SAMPLE);
     }
 }
