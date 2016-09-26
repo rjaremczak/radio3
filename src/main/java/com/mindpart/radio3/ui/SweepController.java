@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.AnalyserModule;
+import com.mindpart.radio3.AnalyserUnit;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
 import javafx.collections.FXCollections;
@@ -39,10 +39,10 @@ public class SweepController implements Initializable {
     @FXML NumberAxis chartAxisY;
 
     private ObservableList<XYChart.Series<Double, Double>> lineChartData;
-    private AnalyserModule analyserModule;
+    private AnalyserUnit analyserUnit;
 
-    public SweepController(AnalyserModule analyserModule) {
-        this.analyserModule = analyserModule;
+    public SweepController(AnalyserUnit analyserUnit) {
+        this.analyserUnit = analyserUnit;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class SweepController implements Initializable {
         long fEnd = (long)(Double.parseDouble(endFrequency.getText()) * MHZ);
         int steps = Integer.parseInt(numSteps.getText());
         int fStep = (int)((fEnd - fStart) / steps);
-        analyserModule.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateData, this::updateState);
+        analyserUnit.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateData, this::updateState);
         statusLabel.setText("started");
     }
 

@@ -20,10 +20,10 @@ public class Radio3 extends Application {
     private LogarithmicProbe logarithmicProbe;
     private LinearProbe linearProbe;
     private ComplexProbe complexProbe;
-    private VfoModule vfoModule;
+    private VfoUnit vfoUnit;
     private DeviceInfoSource deviceInfoSource;
     private DeviceStateSource deviceStateSource;
-    private AnalyserModule analyserModule;
+    private AnalyserUnit analyserUnit;
     private FMeterUnit fMeterUnit;
 
     private DeviceService deviceService;
@@ -70,13 +70,13 @@ public class Radio3 extends Application {
         vnaProbeController = new VnaProbeController(complexProbe);
         bind(complexProbe, vnaProbeController::setComplex);
 
-        analyserModule = new AnalyserModule(deviceService);
-        vnaController = new VnaController(analyserModule);
-        sweepController = new SweepController(analyserModule);
-        bind(analyserModule, deviceService::handleAnalyserData);
+        analyserUnit = new AnalyserUnit(deviceService);
+        vnaController = new VnaController(analyserUnit);
+        sweepController = new SweepController(analyserUnit);
+        bind(analyserUnit, deviceService::handleAnalyserData);
 
-        vfoModule = new VfoModule(deviceService);
-        bind(vfoModule, vfoController::setFrequency);
+        vfoUnit = new VfoUnit(deviceService);
+        bind(vfoUnit, vfoController::setFrequency);
 
         mainController = new MainController(this);
 
@@ -153,8 +153,8 @@ public class Radio3 extends Application {
         return complexProbe;
     }
 
-    public VfoModule getVfoModule() {
-        return vfoModule;
+    public VfoUnit getVfoUnit() {
+        return vfoUnit;
     }
 
     public DeviceInfoSource getDeviceInfoSource() {

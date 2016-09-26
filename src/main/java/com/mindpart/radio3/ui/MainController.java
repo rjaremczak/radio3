@@ -1,10 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.DeviceInfoSource;
-import com.mindpart.radio3.DeviceStateSource;
-import com.mindpart.radio3.VfoModule;
 import com.mindpart.radio3.device.DeviceInfo;
-import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.radio3.device.DeviceState;
 import com.mindpart.radio3.device.ErrorCode;
 import javafx.beans.binding.Bindings;
@@ -102,7 +98,7 @@ public class MainController implements Initializable {
             updateOnConnect();
             radio3.getDeviceInfoSource().requestData();
             radio3.getDeviceStateSource().requestData();
-            radio3.getVfoModule().requestData();
+            radio3.getVfoUnit().requestData();
         } else {
             deviceConnectionStatus.setText(radio3.getDeviceStatus());
         }

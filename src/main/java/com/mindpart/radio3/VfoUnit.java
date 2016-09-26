@@ -11,12 +11,12 @@ import static com.mindpart.radio3.device.FrameCommand.VFO_GET_FREQ;
  * Created by Robert Jaremczak
  * Date: 2016.02.22
  */
-public class VfoModule implements FrameParser<Long> {
+public class VfoUnit implements FrameParser<Long> {
     static final Frame SAMPLE = new Frame(VFO_GET_FREQ);
 
     private DeviceService deviceService;
 
-    public VfoModule(DeviceService deviceService) {
+    public VfoUnit(DeviceService deviceService) {
         this.deviceService = deviceService;
     }
 
@@ -31,6 +31,6 @@ public class VfoModule implements FrameParser<Long> {
     }
 
     public void requestData() {
-        deviceService.performRequest(VfoModule.SAMPLE);
+        deviceService.performRequest(VfoUnit.SAMPLE);
     }
 }
