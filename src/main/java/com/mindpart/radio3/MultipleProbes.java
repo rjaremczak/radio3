@@ -19,14 +19,14 @@ public class MultipleProbes implements FrameParser<ProbeValues> {
     private DeviceService deviceService;
     private LogarithmicProbe logarithmicProbe;
     private LinearProbe linearProbe;
-    private ComplexProbe complexProbe;
+    private VnaProbe vnaProbe;
     private FMeterProbe fMeterProbe;
 
-    public MultipleProbes(DeviceService deviceService, LogarithmicProbe logarithmicProbe, LinearProbe linearProbe, ComplexProbe complexProbe, FMeterProbe fMeterProbe) {
+    public MultipleProbes(DeviceService deviceService, LogarithmicProbe logarithmicProbe, LinearProbe linearProbe, VnaProbe vnaProbe, FMeterProbe fMeterProbe) {
         this.deviceService = deviceService;
         this.logarithmicProbe = logarithmicProbe;
         this.linearProbe = linearProbe;
-        this.complexProbe = complexProbe;
+        this.vnaProbe = vnaProbe;
         this.fMeterProbe = fMeterProbe;
     }
 
@@ -39,7 +39,7 @@ public class MultipleProbes implements FrameParser<ProbeValues> {
         return new ProbeValues(
                 logarithmicProbe.fromAdc(logarithmic),
                 linearProbe.fromAdc(linear),
-                complexProbe.fromAdc(complexGain, complexPhase),
+                vnaProbe.fromAdc(complexGain, complexPhase),
                 fMeterProbe.fromAdc(fMeter)
         );
     }

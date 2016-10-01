@@ -9,13 +9,13 @@ import static com.mindpart.radio3.device.FrameCommand.CMPPROBE_GET;
  * Created by Robert Jaremczak
  * Date: 2016.03.13
  */
-public class ComplexProbe implements FrameParser<Complex> {
+public class VnaProbe implements FrameParser<Complex> {
     static final Frame SAMPLE = new Frame(CMPPROBE_GET);
 
     private DeviceService deviceService;
     private AdcConverter adcConverter;
 
-    public ComplexProbe(DeviceService deviceService) {
+    public VnaProbe(DeviceService deviceService) {
         this.deviceService = deviceService;
         this.adcConverter = AdcConverter.getDefault();
     }
@@ -25,8 +25,22 @@ public class ComplexProbe implements FrameParser<Complex> {
         return frame.getCommand() == CMPPROBE_GET;
     }
 
+    public double calculateSWR(int adcValue) {
+        double v = adcConverter.convert(adcValue);
+        double dB = -30.0 + (v - 0.03)/0.03;
+        double ratio = 1/Math.pow(10,dB/20);
+        double swr = Math.abs((1+ratio)/(1-ratio));
+        return swr;
+    }
+
+    public double calculatePhaseAngle(int adcValue) {
+        double v = adcConverter.convert(adcValue);
+        double phaseDiff = (v - 0.03)/0.01;
+        return phaseDiff;
+    }
+
     Complex fromAdc(int gain, int phase) {
-        return new Complex(adcConverter.convert(gain), adcConverter.convert(phase));
+        return new Complex(calculateSWR(gain), calculatePhaseAngle(phase));
     }
 
     @Override
@@ -36,6 +50,6 @@ public class ComplexProbe implements FrameParser<Complex> {
     }
 
     public void requestData() {
-        deviceService.performRequest(ComplexProbe.SAMPLE);
+        deviceService.performRequest(VnaProbe.SAMPLE);
     }
 }

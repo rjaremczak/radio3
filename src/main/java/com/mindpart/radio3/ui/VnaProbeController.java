@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.ComplexProbe;
+import com.mindpart.radio3.VnaProbe;
 import com.mindpart.radio3.device.Complex;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
@@ -13,27 +13,27 @@ import java.text.NumberFormat;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class ComplexProbeController extends FeatureController {
+public class VnaProbeController extends FeatureController {
     private static final NumberFormat fmtGain = new DecimalFormat("0.000");
     private static final NumberFormat fmtPhase = new DecimalFormat("0.000");
 
     private Label phaseNameLabel;
     private TextField phaseValueField;
     private Label phaseUnitLabel;
-    private ComplexProbe complexProbe;
+    private VnaProbe vnaProbe;
 
-    public ComplexProbeController(ComplexProbe complexProbe) {
-        this.complexProbe = complexProbe;
+    public VnaProbeController(VnaProbe vnaProbe) {
+        this.vnaProbe = vnaProbe;
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        complexProbe.requestData();
+        vnaProbe.requestData();
     }
 
     @Override
     public void initialize() {
-        setUpAsProbe("VNA Probe", "Gain", "dB");
+        setUpAsProbe("VNA Probe", "SWR", "");
         phaseNameLabel = new Label("Phase");
         phaseUnitLabel = new Label("°");
 

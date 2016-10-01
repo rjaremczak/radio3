@@ -5,6 +5,9 @@ import com.mindpart.radio3.LogarithmicProbe;
 import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,6 +23,7 @@ import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 
 /**
  * Created by Robert Jaremczak
@@ -44,6 +48,7 @@ public class SweepController implements Initializable {
     private Sweeper sweeper;
     private LogarithmicProbe logarithmicProbe;
     private LinearProbe linearProbe;
+    private Function<Integer, Double> probeAdcConverter;
 
     public SweepController(Sweeper sweeper, LogarithmicProbe logarithmicProbe, LinearProbe linearProbe) {
         this.sweeper = sweeper;
@@ -66,6 +71,25 @@ public class SweepController implements Initializable {
         sourceProbe.getItems().add(AnalyserData.Source.LOG_PROBE);
         sourceProbe.getItems().add(AnalyserData.Source.LIN_PROBE);
         sourceProbe.getSelectionModel().selectFirst();
+        sourceProbe.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> updateInputSource(newValue)));
+
+        updateInputSource(sourceProbe.getValue());
+    }
+
+    private void updateInputSource(AnalyserData.Source source) {
+        switch (source) {
+            case LOG_PROBE: {
+                chartAxisY.setLabel("Power [dBm]");
+                probeAdcConverter = logarithmicProbe::fromAdc;
+                break;
+            }
+            case LIN_PROBE: {
+                chartAxisY.setLabel("Power [mW]");
+                probeAdcConverter = linearProbe::fromAdc;
+                break;
+            }
+            default: throw new IllegalArgumentException("not supported data source "+source);
+        }
     }
 
     public void doStart() {
@@ -81,33 +105,22 @@ public class SweepController implements Initializable {
         statusLabel.setText(state.toString());
     }
 
-    private double autoTickUnit(double valueSpan) {
-        for(double div=0.000001; div<10; div*=10) {
-            if(valueSpan < div) {
-                return div/10;
-            }
-        }
-        return 1.0;
-    }
-
     public void updateData(AnalyserData ad) {
         long freqEnd = ad.getFreqStart() + (ad.getNumSteps() * ad.getFreqStep());
         double freqStartMHz = ((double)ad.getFreqStart())/MHZ;
         double freqEndMHz = ((double)freqEnd)/MHZ;
-        double freqSpanMHz = freqEndMHz - freqStartMHz;
         int samples[] = ad.getData()[0];
         lineChartData.clear();
         chartAxisX.setAutoRanging(false);
         chartAxisX.setLowerBound(freqStartMHz);
         chartAxisX.setUpperBound(freqEndMHz);
-        chartAxisX.setTickUnit(autoTickUnit(freqSpanMHz));
 
         XYChart.Series<Double,Double> chartSeries = new XYChart.Series<>();
         chartSeries.setName(ad.getSource().getSeriesTitle(0));
         ObservableList<XYChart.Data<Double,Double>> data = chartSeries.getData();
         long freq = ad.getFreqStart();
         for(int step=0; step<=ad.getNumSteps(); step++) {
-            XYChart.Data item = new XYChart.Data(((double)freq)/MHZ, samples[step]);
+            XYChart.Data item = new XYChart.Data(((double)freq)/MHZ, probeAdcConverter.apply(samples[step]));
             data.add(item);
             freq += ad.getFreqStep();
         }
@@ -132,6 +145,6 @@ public class SweepController implements Initializable {
     public void onPresets() {
         startFrequency.setText("1.8");
         endFrequency.setText("60.0");
-        numSteps.setText("1000");
+        numSteps.setText("500");
     }
 }

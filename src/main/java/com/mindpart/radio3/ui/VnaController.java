@@ -1,6 +1,7 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.Sweeper;
+import com.mindpart.radio3.VnaProbe;
 import com.mindpart.radio3.device.AdcConverter;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
@@ -42,11 +43,12 @@ public class VnaController implements Initializable {
 
     private ObservableList<XYChart.Series<Number, Number>> gainChartData;
     private ObservableList<XYChart.Series<Number, Number>> phaseChartData;
-    private AdcConverter adcConverter = AdcConverter.getDefault();
     private Sweeper sweeper;
+    private VnaProbe vnaProbe;
 
-    public VnaController(Sweeper sweeper) {
+    public VnaController(Sweeper sweeper, VnaProbe vnaProbe) {
         this.sweeper = sweeper;
+        this.vnaProbe = vnaProbe;
     }
 
     @Override
@@ -100,14 +102,14 @@ public class VnaController implements Initializable {
 
         NumberAxis swrAxis = (NumberAxis) swrChart.getYAxis();
         swrAxis.setAutoRanging(false);
-        Range swrRange = updateChart(swrChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[0], this::calculateSWR);
+        Range swrRange = updateChart(swrChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[0], vnaProbe::calculateSWR);
         swrAxis.setLowerBound(Math.min(1.0, swrRange.getMin()));
         swrAxis.setUpperBound(Math.max(2.0, swrRange.getMax()));
         swrAxis.setTickUnit(swrRange.span() < 5 ? 0.2 : (swrRange.span() < 20 ? 1.0 : 10.0));
 
         NumberAxis phaseAxis = (NumberAxis) phaseChart.getYAxis();
         phaseAxis.setAutoRanging(false);
-        updateChart(phaseChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[1], this::calculatePhaseAngle);
+        updateChart(phaseChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[1], vnaProbe::calculatePhaseAngle);
         phaseAxis.setLowerBound(0);
         phaseAxis.setUpperBound(180);
         phaseAxis.setTickUnit(20);
@@ -121,20 +123,6 @@ public class VnaController implements Initializable {
         axis.setLowerBound(freqStartMHz);
         axis.setUpperBound(freqEndMHz);
         axis.setTickUnit(autoTickUnit(freqSpanMHz));
-    }
-
-    private double calculateSWR(int adcValue) {
-        double v = adcConverter.convert(adcValue);
-        double dB = -30.0 + (v - 0.03)/0.03;
-        double ratio = 1/Math.pow(10,dB/20);
-        double swr = (1+ratio)/(1-ratio);
-        return swr;
-    }
-
-    private double calculatePhaseAngle(int adcValue) {
-        double v = adcConverter.convert(adcValue);
-        double phaseDiff = (v - 0.03)/0.01;
-        return phaseDiff;
     }
 
     private Range updateChart(LineChart<Number, Number> chart, long freqStart, long freqStep, int numSteps, int samples[], IntToDoubleFunction translate) {

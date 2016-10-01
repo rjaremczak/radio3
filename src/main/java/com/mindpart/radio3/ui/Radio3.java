@@ -19,7 +19,7 @@ public class Radio3 extends Application {
 
     private LogarithmicProbe logarithmicProbe;
     private LinearProbe linearProbe;
-    private ComplexProbe complexProbe;
+    private VnaProbe vnaProbe;
     private VfoUnit vfoUnit;
     private DeviceInfoSource deviceInfoSource;
     private DeviceStateSource deviceStateSource;
@@ -33,7 +33,7 @@ public class Radio3 extends Application {
     private FMeterController fMeterController;
     private LogarithmicProbeController logarithmicProbeController;
     private LinearProbeController linearProbeController;
-    private ComplexProbeController complexProbeController;
+    private VnaProbeController vnaProbeController;
     private SweepController sweepController;
     private VnaController vnaController;
 
@@ -67,15 +67,15 @@ public class Radio3 extends Application {
         linearProbeController = new LinearProbeController(linearProbe);
         bind(linearProbe, linearProbeController::update);
 
-        complexProbe = new ComplexProbe(deviceService);
-        complexProbeController = new ComplexProbeController(complexProbe);
-        bind(complexProbe, complexProbeController::update);
+        vnaProbe = new VnaProbe(deviceService);
+        vnaProbeController = new VnaProbeController(vnaProbe);
+        bind(vnaProbe, vnaProbeController::update);
 
-        multipleProbes = new MultipleProbes(deviceService, logarithmicProbe, linearProbe, complexProbe, fMeterProbe);
+        multipleProbes = new MultipleProbes(deviceService, logarithmicProbe, linearProbe, vnaProbe, fMeterProbe);
         bind(multipleProbes, this::updateAllProbes);
 
         sweeper = new Sweeper(deviceService);
-        vnaController = new VnaController(sweeper);
+        vnaController = new VnaController(sweeper, vnaProbe);
         sweepController = new SweepController(sweeper, logarithmicProbe, linearProbe);
         bind(sweeper, deviceService::handleAnalyserData);
 
@@ -114,7 +114,7 @@ public class Radio3 extends Application {
         addFeatureBox(fMeterController, 1, 0);
         addFeatureBox(logarithmicProbeController, 0, 1);
         addFeatureBox(linearProbeController, 1, 1);
-        addFeatureBox(complexProbeController, 0, 2);
+        addFeatureBox(vnaProbeController, 0, 2);
     }
 
     @Override
@@ -129,14 +129,14 @@ public class Radio3 extends Application {
     public void updateAllProbes(ProbeValues probeValues) {
         logarithmicProbeController.update(probeValues.getLogarithmic());
         linearProbeController.update(probeValues.getLinear());
-        complexProbeController.update(probeValues.getComplex());
+        vnaProbeController.update(probeValues.getComplex());
         fMeterController.setFrequency(probeValues.getFMeter());
     }
 
     protected void disableGetOnAllProbes(boolean disable) {
         logarithmicProbeController.disableMainButton(disable);
         linearProbeController.disableMainButton(disable);
-        complexProbeController.disableMainButton(disable);
+        vnaProbeController.disableMainButton(disable);
         fMeterController.disableMainButton(disable);
     }
 
