@@ -16,40 +16,40 @@ public class FrameHeaderTest {
         assertTrue(header.isFormatA());
         assertFalse(header.isFormatB());
         assertFalse(header.isFormatC());
-        assertEquals(0, header.getCommand());
+        assertEquals(FrameCommand.DEVICE_RESET, header.getCommand());
         assertEquals(6, header.getPayloadSize());
     }
 
     @Test
     public void testFormatB() {
-        FrameHeader header = new FrameHeader(0xE011);
+        FrameHeader header = new FrameHeader(0xE018);
         header.setSizeBytes(new byte[]{(byte)200});
         assertFalse(header.isFormatA());
         assertTrue(header.isFormatB());
         assertFalse(header.isFormatC());
-        assertEquals(0x11, header.getCommand());
+        assertEquals(FrameCommand.LINPROBE_GET, header.getCommand());
         assertEquals(214, header.getPayloadSize());
 
 
-        header = new FrameHeader(0xE013);
+        header = new FrameHeader(0xE020);
         header.setSizeBytes(new byte[]{(byte)0});
-        assertEquals(0x13, header.getCommand());
+        assertEquals(FrameCommand.CMPPROBE_GET, header.getCommand());
         assertEquals(14, header.getPayloadSize());
     }
 
     @Test
     public void testFormatC() {
-        FrameHeader header = new FrameHeader(0xF011);
+        FrameHeader header = new FrameHeader(0xF018);
         header.setSizeBytes(new byte[]{(byte)200, (byte)4});
         assertFalse(header.isFormatA());
         assertFalse(header.isFormatB());
         assertTrue(header.isFormatC());
-        assertEquals(0x11, header.getCommand());
+        assertEquals(FrameCommand.LINPROBE_GET, header.getCommand());
         assertEquals(1494, header.getPayloadSize());
 
-        header = new FrameHeader(0xF013);
+        header = new FrameHeader(0xF020);
         header.setSizeBytes(new byte[]{(byte)0, (byte)0});
-        assertEquals(0x13, header.getCommand());
+        assertEquals(FrameCommand.CMPPROBE_GET, header.getCommand());
         assertEquals(270, header.getPayloadSize());
     }
 }

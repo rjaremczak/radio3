@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="radio3">
+    <output-path>$PROJECT_DIR$/out/artifacts/radio3</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="com.mindpart.radio3.ui.Radio3" />
+        <option name="description" value="" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="nativeBundle" value="dmg" />
+        <option name="title" value="Radio3 by SQ6DGT" />
+        <option name="vendor" value="mindpart.com" />
+        <option name="version" value="" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="radio3.jar">
+        <element id="module-output" name="radio3" />
+      </element>
+    </root>
+  </artifact>
+</component>

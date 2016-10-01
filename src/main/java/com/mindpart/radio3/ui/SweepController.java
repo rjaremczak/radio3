@@ -95,24 +95,25 @@ public class SweepController implements Initializable {
         double freqStartMHz = ((double)ad.getFreqStart())/MHZ;
         double freqEndMHz = ((double)freqEnd)/MHZ;
         double freqSpanMHz = freqEndMHz - freqStartMHz;
-        int samples[][] = ad.getData();
+        int samples[] = ad.getData()[0];
         lineChartData.clear();
         chartAxisX.setAutoRanging(false);
         chartAxisX.setLowerBound(freqStartMHz);
         chartAxisX.setUpperBound(freqEndMHz);
         chartAxisX.setTickUnit(autoTickUnit(freqSpanMHz));
-        for(int series=0; series<ad.getNumSeries(); series++) {
-            XYChart.Series<Double,Double> chartSeries = new XYChart.Series<>();
-            chartSeries.setName(ad.getSource().getSeriesTitle(series));
-            ObservableList<XYChart.Data<Double,Double>> data = chartSeries.getData();
-            long freq = ad.getFreqStart();
-            for(int step=0; step<=ad.getNumSteps(); step++) {
-                XYChart.Data item = new XYChart.Data(((double)freq)/MHZ, samples[series][step]);
-                data.add(item);
-                freq += ad.getFreqStep();
-            }
-            lineChartData.add(chartSeries);
+
+        XYChart.Series<Double,Double> chartSeries = new XYChart.Series<>();
+        chartSeries.setName(ad.getSource().getSeriesTitle(0));
+        ObservableList<XYChart.Data<Double,Double>> data = chartSeries.getData();
+        long freq = ad.getFreqStart();
+        for(int step=0; step<=ad.getNumSteps(); step++) {
+            XYChart.Data item = new XYChart.Data(((double)freq)/MHZ, samples[step]);
+            data.add(item);
+            freq += ad.getFreqStep();
         }
+        lineChartData.add(chartSeries);
+
+        chartAxisY.setForceZeroInRange(false);
         chartAxisY.setAutoRanging(true);
     }
 

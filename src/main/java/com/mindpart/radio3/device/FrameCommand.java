@@ -53,6 +53,6 @@ public enum FrameCommand {
                 return frameCommand;
             }
         }
-        throw new IllegalArgumentException(String.format("unknown frame command code %04X",code));
+        throw new IllegalArgumentException(String.format("unknown frame command code 0x%04X",code));
     }
 }
