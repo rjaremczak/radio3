@@ -29,6 +29,6 @@ public class LinearProbeController extends FeatureController {
     }
 
     public void update(double power) {
-        setValue(fmtPower.format(power));
+        setValue(fmtPower.format(power * 1000));
     }
 }

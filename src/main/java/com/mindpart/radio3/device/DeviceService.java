@@ -26,7 +26,6 @@ public class DeviceService {
     private static final Logger logger = Logger.getLogger(DeviceService.class);
 
     private DataLink dataLink;
-    private Status status = OK;
     private Map<FrameParser, BiConsumer<FrameParser, Frame>> bindings = new HashMap<>();
     private Consumer<AnalyserData> analyserDataHandler;
     private Consumer<AnalyserState> analyserStateHandler;
@@ -49,24 +48,22 @@ public class DeviceService {
         logger.warn("no binding for frame "+frame);
     }
 
-    public boolean isConnected() {
-        return dataLink!=null && dataLink.isConnected();
-    }
-
     public Status connect(String portName) {
         framesReceived = 0;
-        disconnect();
         logger.debug("connecting to "+portName);
-        dataLink = new DataLink(portName);
+        dataLink = new DataLink(portName, this::frameHandler);
         try {
             dataLink.connect();
-            dataLink.attachFrameListener(this::frameHandler);
-            status = OK;
+            return OK;
         } catch (SerialPortException|SerialPortTimeoutException e) {
-            status = error(e);
+            return error(e);
         }
-        logger.debug(status);
-        return status;
+    }
+
+    public void disconnect() {
+        logger.debug("disconnect");
+        dataLink.disconnect();
+        dataLink = null;
     }
 
     public void setVfoFrequency(int frequency) {
@@ -93,20 +90,8 @@ public class DeviceService {
             dataLink.writeFrame(request);
             Thread.sleep(100);
         } catch (Exception e) {
-            status = error(e.getMessage());
             logger.error(e,e);
         }
-    }
-
-    public Status disconnect() {
-        if(dataLink!=null) {
-            logger.debug("disconnect");
-            dataLink.disconnect();
-            dataLink = null;
-            status = OK;
-        }
-        logger.debug(status);
-        return status;
     }
 
     public List<String> availableSerialPorts() {

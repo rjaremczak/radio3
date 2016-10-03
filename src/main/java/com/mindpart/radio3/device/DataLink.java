@@ -19,6 +19,7 @@ public class DataLink {
     private static final Logger logger = Logger.getLogger(DataLink.class);
 
     private SerialPort serialPort;
+    private Consumer<Frame> frameHandler;
 
     private static final int TIMEOUT_MS = 1000;
     private static final int BAUD_RATE = SerialPort.BAUDRATE_115200;
@@ -26,18 +27,24 @@ public class DataLink {
     private static final int STOP_BITS = SerialPort.STOPBITS_1;
     private static final int PARITY = SerialPort.PARITY_NONE;
 
-    public DataLink(String portName) {
+    public DataLink(String portName, Consumer<Frame> frameHandler) {
         this.serialPort = new SerialPort(portName);
+        this.frameHandler = frameHandler;
     }
 
     public void connect() throws SerialPortException, SerialPortTimeoutException {
-        serialPort.openPort();
-        serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY, false, false);
-        serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
-        flushReadBuffer();
+        if(serialPort.openPort()) {
+            logger.debug("port opened");
+            serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY, false, false);
+            serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
+            flushReadBuffer();
+            attachEventListener();
+        } else {
+            logger.error("port not opened");
+        }
     }
 
-    public void attachFrameListener(Consumer<Frame> frameHandler) throws SerialPortException {
+    private void attachEventListener() throws SerialPortException {
         serialPort.addEventListener(serialPortEvent -> {
             try {
                 Frame frame = readFrame();
@@ -49,14 +56,12 @@ public class DataLink {
         }, SerialPort.MASK_RXCHAR);
     }
 
-    public boolean isConnected() {
-        return serialPort!=null && serialPort.isOpened();
-    }
-
     public void disconnect() {
         try {
+            flushReadBuffer();
             serialPort.removeEventListener();
             serialPort.closePort();
+            logger.debug("port closed");
         } catch (SerialPortException e) {
             logger.error("exception closing port "+serialPort.getPortName(),e);
         }
