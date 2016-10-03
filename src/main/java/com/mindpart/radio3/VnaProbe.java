@@ -27,7 +27,7 @@ public class VnaProbe implements FrameParser<Complex> {
 
     public double calculateSWR(int adcValue) {
         double v = adcConverter.convert(adcValue);
-        double dB = -30.0 + (v - 0.03)/0.03;
+        double dB = -32.0 + (v - 0.03)/0.03;
         double ratio = 1/Math.pow(10,dB/20);
         double swr = Math.abs((1+ratio)/(1-ratio));
         return swr;

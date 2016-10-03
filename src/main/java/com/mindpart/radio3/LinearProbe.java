@@ -30,7 +30,7 @@ public class LinearProbe implements FrameParser<Double> {
 
     public Double fromAdc(int adc) {
         double vrms = adcConverter.convert(adc) * 0.133;
-        return 10000*(vrms*vrms)/50;
+        return vrms * 1000;//10000*(vrms*vrms)/50;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.mindpart.radio3.device;
 
-import com.mindpart.radio3.MultipleProbes;
 import com.mindpart.radio3.Status;
 import com.mindpart.utils.Binary;
 import com.mindpart.utils.BinaryBuilder;
@@ -31,12 +30,15 @@ public class DeviceService {
     private Map<FrameParser, BiConsumer<FrameParser, Frame>> bindings = new HashMap<>();
     private Consumer<AnalyserData> analyserDataHandler;
     private Consumer<AnalyserState> analyserStateHandler;
+    private long framesReceived;
 
     public <T extends FrameParser<U>, U> void registerBinding(T parser, BiConsumer<FrameParser, Frame> handler) {
         bindings.put(parser, handler);
     }
 
     public void frameHandler(Frame frame) {
+        framesReceived++;
+
         for(Map.Entry<FrameParser, BiConsumer<FrameParser, Frame>> binding : bindings.entrySet()) {
             FrameParser parser = binding.getKey();
             if(parser.recognizes(frame)) {
@@ -52,20 +54,17 @@ public class DeviceService {
     }
 
     public Status connect(String portName) {
-        logger.debug("connect to "+portName);
-        if(isConnected()) {
-            status = error("already connected");
-        } else {
-            dataLink = new DataLink(portName);
-            try {
-                dataLink.connect();
-                dataLink.attachFrameListener(this::frameHandler);
-                status = OK;
-            } catch (SerialPortException|SerialPortTimeoutException e) {
-                status = error(e);
-            }
+        framesReceived = 0;
+        disconnect();
+        logger.debug("connecting to "+portName);
+        dataLink = new DataLink(portName);
+        try {
+            dataLink.connect();
+            dataLink.attachFrameListener(this::frameHandler);
+            status = OK;
+        } catch (SerialPortException|SerialPortTimeoutException e) {
+            status = error(e);
         }
-
         logger.debug(status);
         return status;
     }
@@ -100,10 +99,8 @@ public class DeviceService {
     }
 
     public Status disconnect() {
-        logger.debug("disconnect");
-        if(!isConnected()) {
-            status = error("not connected");
-        } else {
+        if(dataLink!=null) {
+            logger.debug("disconnect");
             dataLink.disconnect();
             dataLink = null;
             status = OK;
@@ -116,15 +113,15 @@ public class DeviceService {
         return Arrays.asList(SerialPortList.getPortNames());
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
     public void handleAnalyserData(AnalyserData analyserData) {
         analyserDataHandler.accept(analyserData);
     }
 
     public void handleAnalyserState(AnalyserState analyserState) {
         analyserStateHandler.accept(analyserState);
+    }
+
+    public long getFramesReceived() {
+        return framesReceived;
     }
 }

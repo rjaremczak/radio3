@@ -20,6 +20,6 @@ public class AdcConverter {
     }
 
     public static AdcConverter getDefault() {
-        return new AdcConverter(0, 4035, 0.0, 3.277);
+        return new AdcConverter(0, 4035, 0.0, 3.45);
     }
 }

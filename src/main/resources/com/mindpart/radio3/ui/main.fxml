@@ -29,7 +29,7 @@
             <Label fx:id="deviceConnectionStatus" text="Label" />
             </items>
         </ToolBar>
-          <AnchorPane VBox.vgrow="ALWAYS">
+          <AnchorPane fx:id="mainPane" VBox.vgrow="ALWAYS">
          <children>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <tabs>

@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static com.mindpart.radio3.ui.Radio3State.*;
+
 public class Radio3 extends Application {
     private static Logger logger = Logger.getLogger(Radio3.class);
 
@@ -36,6 +38,8 @@ public class Radio3 extends Application {
     private VnaProbeController vnaProbeController;
     private SweepController sweepController;
     private VnaController vnaController;
+
+    private Radio3State state = DISCONNECTED;
 
     private <T extends FrameParser<U>, U> void bind(T parser, Consumer<U> handler) {
         deviceService.registerBinding(parser, (frameParser, frame) -> {
@@ -120,9 +124,8 @@ public class Radio3 extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        if(deviceService.isConnected()) {
-            deviceService.disconnect();
-        }
+        disconnect();
+        mainController.shutdown();
         logger.info("stopped");
     }
 
@@ -138,10 +141,6 @@ public class Radio3 extends Application {
         linearProbeController.disableMainButton(disable);
         vnaProbeController.disableMainButton(disable);
         fMeterController.disableMainButton(disable);
-    }
-
-    public String getDeviceStatus() {
-        return deviceService.getStatus().toString();
     }
 
     public VfoUnit getVfoUnit() {
@@ -161,24 +160,42 @@ public class Radio3 extends Application {
         logger.info("DEVICE: "+ logMessage.getMessage());
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
     public List<String> availableSerialPorts() {
         return deviceService.availableSerialPorts();
     }
 
-    public Status connect(String portName) {
-        return deviceService.connect(portName);
+    private void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    public Status disconnect() {
-        return deviceService.disconnect();
+    public void connect(String portName) {
+        state = CONNECTING;
+        if(deviceService.connect(portName).isOk()) {
+            sleep(200);
+            deviceInfoSource.requestData();
+            sleep(200);
+            if(deviceService.getFramesReceived() > 0) {
+                state = CONNECTED;
+            } else {
+                deviceService.disconnect();
+                state = CONNECTION_TIMEOUT;
+            }
+        } else {
+            state = DEVICE_ERROR;
+        }
+    }
+
+    public void disconnect() {
+        deviceService.disconnect();
+        state = DISCONNECTED;
     }
 
     public boolean isConnected() {
-        return deviceService.isConnected();
+        return state == CONNECTED;
     }
 
     public void getProbes() {
@@ -193,4 +210,13 @@ public class Radio3 extends Application {
     public void stopProbesSampling() {
         multipleProbes.stopSampling();
     }
+
+    public Radio3State getState() {
+        return state;
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
 }

@@ -29,7 +29,7 @@ public class LogarithmicProbe implements FrameParser<Double> {
     }
 
     public Double fromAdc(int adc) {
-        return -75.0 + adcConverter.convert(adc) / 0.025;
+        return -89.7 + adcConverter.convert(adc) / 0.025;
     }
 
     @Override

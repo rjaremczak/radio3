@@ -84,7 +84,7 @@ public class SweepController implements Initializable {
                 break;
             }
             case LIN_PROBE: {
-                chartAxisY.setLabel("Power [mW]");
+                chartAxisY.setLabel("Voltage [mV]");
                 probeAdcConverter = linearProbe::fromAdc;
                 break;
             }
