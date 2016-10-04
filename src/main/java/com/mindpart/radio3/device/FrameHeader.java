@@ -37,13 +37,19 @@ class FrameHeader {
     private FrameCommand command;
     private int size;
 
-    FrameHeader(int header) {
-        this.format = (header >> 12) & 0x0f;
-        this.command = FrameCommand.of(header & 0x7ff);
+    FrameHeader(int format, FrameCommand command) {
+        this.format = format;
+        this.command = command;
 
         if(isFormatA()) {
             size = format;
         }
+    }
+
+    static FrameHeader fromCode(int header) {
+        int format = (header >> 12) & 0x0f;
+        FrameCommand command = FrameCommand.fromCode(header & 0x7ff);
+        return new FrameHeader(format, command);
     }
 
     FrameHeader(Frame frame) {

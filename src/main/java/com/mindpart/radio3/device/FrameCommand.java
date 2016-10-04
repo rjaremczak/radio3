@@ -47,7 +47,7 @@ public enum FrameCommand {
         return code;
     }
 
-    public static FrameCommand of(int code) {
+    public static FrameCommand fromCode(int code) {
         for(FrameCommand frameCommand : values()) {
             if(frameCommand.code == code) {
                 return frameCommand;

@@ -12,7 +12,7 @@ public class FrameHeaderTest {
 
     @Test
     public void testFormatA() {
-        FrameHeader header = new FrameHeader(0x6000);
+        FrameHeader header = FrameHeader.fromCode(0x6000);
         assertTrue(header.isFormatA());
         assertFalse(header.isFormatB());
         assertFalse(header.isFormatC());
@@ -22,7 +22,7 @@ public class FrameHeaderTest {
 
     @Test
     public void testFormatB() {
-        FrameHeader header = new FrameHeader(0xE018);
+        FrameHeader header = FrameHeader.fromCode(0xE018);
         header.setSizeBytes(new byte[]{(byte)200});
         assertFalse(header.isFormatA());
         assertTrue(header.isFormatB());
@@ -31,7 +31,7 @@ public class FrameHeaderTest {
         assertEquals(214, header.getPayloadSize());
 
 
-        header = new FrameHeader(0xE020);
+        header = FrameHeader.fromCode(0xE020);
         header.setSizeBytes(new byte[]{(byte)0});
         assertEquals(FrameCommand.CMPPROBE_GET, header.getCommand());
         assertEquals(14, header.getPayloadSize());
@@ -39,7 +39,7 @@ public class FrameHeaderTest {
 
     @Test
     public void testFormatC() {
-        FrameHeader header = new FrameHeader(0xF018);
+        FrameHeader header = FrameHeader.fromCode(0xF018);
         header.setSizeBytes(new byte[]{(byte)200, (byte)4});
         assertFalse(header.isFormatA());
         assertFalse(header.isFormatB());
@@ -47,7 +47,7 @@ public class FrameHeaderTest {
         assertEquals(FrameCommand.LINPROBE_GET, header.getCommand());
         assertEquals(1494, header.getPayloadSize());
 
-        header = new FrameHeader(0xF020);
+        header = FrameHeader.fromCode(0xF020);
         header.setSizeBytes(new byte[]{(byte)0, (byte)0});
         assertEquals(FrameCommand.CMPPROBE_GET, header.getCommand());
         assertEquals(270, header.getPayloadSize());

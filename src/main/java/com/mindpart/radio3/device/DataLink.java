@@ -51,7 +51,7 @@ public class DataLink {
                 flushReadBuffer();
                 frameHandler.accept(frame);
             } catch (Exception e) {
-                logger.error("exception reading frame", e);
+                logger.error(e);
             }
         }, SerialPort.MASK_RXCHAR);
     }
@@ -83,7 +83,7 @@ public class DataLink {
         Crc8 crc8 = new Crc8();
         byte[] headerBytes = readBytes(2);
         crc8.addBytes(headerBytes);
-        FrameHeader header = new FrameHeader(Binary.toUInt16(headerBytes));
+        FrameHeader header = FrameHeader.fromCode(Binary.toUInt16(headerBytes));
         if(header.getSizeBytesCount()>0) {
             byte[] sizeBytes = readBytes(Math.max(2, header.getSizeBytesCount()));
             header.setSizeBytes(sizeBytes);
@@ -108,7 +108,7 @@ public class DataLink {
             int flushed = 0;
             int remaining = serialPort.getInputBufferBytesCount();
             while(remaining > 0) {
-                flushed += serialPort.readBytes(remaining).length;
+                flushed += serialPort.readBytes(remaining, TIMEOUT_MS).length;
             }
             if(logger.isDebugEnabled() && flushed>0) { logger.debug("flushed "+flushed+" bytes from read buffer"); }
             return flushed;

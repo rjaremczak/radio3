@@ -61,9 +61,11 @@ public class DeviceService {
     }
 
     public void disconnect() {
-        logger.debug("disconnect");
-        dataLink.disconnect();
-        dataLink = null;
+        if(dataLink!=null) {
+            logger.debug("disconnect");
+            dataLink.disconnect();
+            dataLink = null;
+        }
     }
 
     public void setVfoFrequency(int frequency) {
