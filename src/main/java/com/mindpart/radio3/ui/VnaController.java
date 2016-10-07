@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -42,7 +43,6 @@ public class VnaController implements Initializable {
     @FXML VBox vBox;
     @FXML LineChart<Number, Number> swrChart;
     @FXML LineChart<Number, Number> phaseChart;
-    @FXML ChoiceBox<String> calibrationProfile;
 
     private ObservableList<XYChart.Series<Number, Number>> gainChartData;
     private ObservableList<XYChart.Series<Number, Number>> phaseChartData;
@@ -56,8 +56,6 @@ public class VnaController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        initCalibrationProfiles();
-
         statusLabel.setText("initialized");
         gainChartData = FXCollections.observableArrayList();
         swrChart.setData(gainChartData);
@@ -67,11 +65,20 @@ public class VnaController implements Initializable {
         phaseChart.setData(phaseChartData);
         phaseChart.setCreateSymbols(false);
 
+        setUpAxis(swrChart.getXAxis(), 1, 55, 2.5);
+        setUpAxis(swrChart.getYAxis(), 1, 5, 0.25);
+        setUpAxis(phaseChart.getXAxis(), 1, 55, 2.5);
+        setUpAxis(phaseChart.getYAxis(), 0, 180, 45);
+
         onPresets();
     }
 
-    private void initCalibrationProfiles() {
-        calibrationProfile.getItems().add("None");
+    private void setUpAxis(Axis<Number> axis, double min, double max, double tickUnit) {
+        NumberAxis numberAxis = (NumberAxis)axis;
+        numberAxis.setAutoRanging(false);
+        numberAxis.setLowerBound(min);
+        numberAxis.setUpperBound(max);
+        numberAxis.setTickUnit(tickUnit);
     }
 
     public void doStart() {
@@ -88,9 +95,9 @@ public class VnaController implements Initializable {
     }
 
     private double autoTickUnit(double valueSpan) {
-        for(double div=0.000001; div<10; div*=10) {
+        for(double div=0.000001; div<=100; div*=10) {
             if(valueSpan < div) {
-                return div/10;
+                return div/25;
             }
         }
         return 1.0;
@@ -100,7 +107,7 @@ public class VnaController implements Initializable {
         long freqEnd = ad.getFreqStart() + (ad.getNumSteps() * ad.getFreqStep());
         int samples[][] = ad.getData();
 
-        updateFrequencyAxis((NumberAxis) swrChart.getXAxis(), ad.getFreqStart(), freqEnd);
+        updateFrequencyAxis((NumberAxis)swrChart.getXAxis(), ad.getFreqStart(), freqEnd);
         updateFrequencyAxis((NumberAxis)phaseChart.getXAxis(), ad.getFreqStart(), freqEnd);
 
         NumberAxis swrAxis = (NumberAxis) swrChart.getYAxis();
@@ -110,12 +117,7 @@ public class VnaController implements Initializable {
         swrAxis.setUpperBound(Math.max(2.0, swrRange.getMax()));
         swrAxis.setTickUnit(swrRange.span() < 5 ? 0.2 : (swrRange.span() < 20 ? 1.0 : 10.0));
 
-        NumberAxis phaseAxis = (NumberAxis) phaseChart.getYAxis();
-        phaseAxis.setAutoRanging(false);
         updateChart(phaseChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[1], vnaProbe::calculatePhaseAngle);
-        phaseAxis.setLowerBound(0);
-        phaseAxis.setUpperBound(180);
-        phaseAxis.setTickUnit(20);
     }
 
     private void updateFrequencyAxis(NumberAxis axis, long freqStart, long freqEnd) {
@@ -126,6 +128,7 @@ public class VnaController implements Initializable {
         axis.setLowerBound(freqStartMHz);
         axis.setUpperBound(freqEndMHz);
         axis.setTickUnit(autoTickUnit(freqSpanMHz));
+        //axis.setForceZeroInRange(false);
     }
 
     private Range updateChart(LineChart<Number, Number> chart, long freqStart, long freqStep, int numSteps, int samples[], IntToDoubleFunction translate) {
