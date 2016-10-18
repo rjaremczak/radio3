@@ -1,6 +1,6 @@
 package com.mindpart.radio3;
 
-import com.mindpart.radio3.device.AdcConverter;
+import com.mindpart.radio3.device.Adc;
 import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
@@ -16,11 +16,11 @@ public class LinearProbe implements FrameParser<Double> {
     static final Frame SAMPLE = new Frame(LINPROBE_GET);
 
     private DeviceService deviceService;
-    private AdcConverter adcConverter;
+    private Adc adc;
 
     public LinearProbe(DeviceService deviceService) {
         this.deviceService = deviceService;
-        this.adcConverter = AdcConverter.getDefault();
+        this.adc = Adc.getDefault();
     }
 
     @Override
@@ -29,7 +29,7 @@ public class LinearProbe implements FrameParser<Double> {
     }
 
     public Double fromAdc(int adc) {
-        return adcConverter.convert(adc);
+        return this.adc.convert(adc);
         //return adcConverter.convert(adc) * 0.133;
     }
 

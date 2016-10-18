@@ -1,0 +1,29 @@
+{
+  "linearAdc": {
+    "adcBase": 0,
+    "base": 0.0,
+    "multiplier": 0.00085501858736
+  },
+  "logarithmicAdc": {
+    "adcBase": 0,
+    "base": 0.0,
+    "multiplier": 0.00085501858736
+  },
+  "vnaGainAdc": {
+    "adcBase": 0,
+    "base": 0.0,
+    "multiplier": 0.00085501858736
+  },
+  "vnaPhaseAdc": {
+    "adcBase": 0,
+    "base": 0.0,
+    "multiplier": 0.00085501858736
+  },
+  "sweepProfiles": [
+    {
+      "name": "160m",
+      "freqMin": 1.7,
+      "freqMax": 2.1
+    }
+  ]
+}

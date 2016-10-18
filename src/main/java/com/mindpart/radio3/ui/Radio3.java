@@ -29,6 +29,7 @@ public class Radio3 extends Application {
     private FMeterProbe fMeterProbe;
     private MultipleProbes multipleProbes;
 
+    private ConfigurationService configurationService;
     private DeviceService deviceService;
     private MainController mainController;
     private VfoController vfoController;
@@ -38,6 +39,7 @@ public class Radio3 extends Application {
     private VnaProbeController vnaProbeController;
     private SweepController sweepController;
     private VnaController vnaController;
+
 
     private Radio3State state = DISCONNECTED;
 
@@ -55,7 +57,10 @@ public class Radio3 extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
+        configurationService = new ConfigurationService();
+        configurationService.init();
+
         deviceService = new DeviceService();
         vfoController = new VfoController(deviceService);
 

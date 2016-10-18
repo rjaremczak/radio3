@@ -1,6 +1,6 @@
 package com.mindpart.radio3;
 
-import com.mindpart.radio3.device.AdcConverter;
+import com.mindpart.radio3.device.Adc;
 import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
@@ -16,11 +16,11 @@ public class LogarithmicProbe implements FrameParser<Double> {
     private static final Frame SAMPLE = new Frame(LOGPROBE_GET);
 
     private DeviceService deviceService;
-    private AdcConverter adcConverter;
+    private Adc adc;
 
     public LogarithmicProbe(DeviceService deviceService) {
         this.deviceService = deviceService;
-        this.adcConverter = AdcConverter.getDefault();
+        this.adc = Adc.getDefault();
     }
 
     @Override
@@ -29,7 +29,7 @@ public class LogarithmicProbe implements FrameParser<Double> {
     }
 
     public Double fromAdc(int adc) {
-        return -89.7 + adcConverter.convert(adc) / 0.025;
+        return -89.7 + this.adc.convert(adc) / 0.025;
     }
 
     @Override

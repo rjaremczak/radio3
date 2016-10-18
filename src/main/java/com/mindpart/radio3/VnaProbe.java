@@ -13,11 +13,11 @@ public class VnaProbe implements FrameParser<Complex> {
     static final Frame SAMPLE = new Frame(CMPPROBE_GET);
 
     private DeviceService deviceService;
-    private AdcConverter adcConverter;
+    private Adc adc;
 
     public VnaProbe(DeviceService deviceService) {
         this.deviceService = deviceService;
-        this.adcConverter = AdcConverter.getDefault();
+        this.adc = Adc.getDefault();
     }
 
     @Override
@@ -26,7 +26,7 @@ public class VnaProbe implements FrameParser<Complex> {
     }
 
     public double calculateSWR(int adcValue) {
-        double v = adcConverter.convert(adcValue);
+        double v = adc.convert(adcValue);
         double dB = -32.0 + (v - 0.03)/0.03;
         double ratio = 1/Math.pow(10,dB/20);
         double swr = Math.abs((1+ratio)/(1-ratio));
@@ -34,7 +34,7 @@ public class VnaProbe implements FrameParser<Complex> {
     }
 
     public double calculatePhaseAngle(int adcValue) {
-        double v = adcConverter.convert(adcValue);
+        double v = adc.convert(adcValue);
         double phaseDiff = (v - 0.03)/0.01;
         return phaseDiff;
     }

@@ -2,7 +2,6 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.VnaProbe;
-import com.mindpart.radio3.device.AdcConverter;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
 import com.mindpart.utils.Range;
@@ -10,18 +9,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -128,7 +123,6 @@ public class VnaController implements Initializable {
         axis.setLowerBound(freqStartMHz);
         axis.setUpperBound(freqEndMHz);
         axis.setTickUnit(autoTickUnit(freqSpanMHz));
-        //axis.setForceZeroInRange(false);
     }
 
     private Range updateChart(LineChart<Number, Number> chart, long freqStart, long freqStep, int numSteps, int samples[], IntToDoubleFunction translate) {
@@ -143,11 +137,6 @@ public class VnaController implements Initializable {
             minValue = Math.min(minValue, value);
             maxValue = Math.max(maxValue, value);
             XYChart.Data item = new XYChart.Data(((double)freq)/MHZ, value);
-
-            //Rectangle rect = new Rectangle(5,5);
-            //rect.setFill(Color.BLUE);
-            //item.setNode(rect);
-
             data.add(item);
             freq += freqStep;
         }
