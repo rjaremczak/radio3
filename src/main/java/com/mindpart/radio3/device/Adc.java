@@ -1,20 +1,14 @@
 package com.mindpart.radio3.device;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-
 /**
  * Created by Robert Jaremczak
  * Date: 2016.09.23
  */
 
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 public class Adc {
-    int adcBase;
-    double base;
-    double multiplier;
-
-    public Adc() {
-    }
+    private int adcBase;
+    private double base;
+    private double multiplier;
 
     public Adc(int adcValueMin, int adcValueMax, double valueMin, double valueMax) {
         this.adcBase = adcValueMin;

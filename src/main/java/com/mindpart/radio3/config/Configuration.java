@@ -1,7 +1,7 @@
-package com.mindpart.radio3;
+package com.mindpart.radio3.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.mindpart.radio3.device.Adc;
+import com.mindpart.radio3.SweepProfile;
 
 import java.util.List;
 
@@ -12,9 +12,9 @@ import java.util.List;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 public class Configuration {
-    public Adc linearAdc;
-    public Adc logarithmicAdc;
-    public Adc vnaGainAdc;
-    public Adc vnaPhaseAdc;
+    public FMeterConfig fMeter;
+    public LinearProbeConfig linearProbe;
+    public LogarithmicProbeConfig logarithmicProbe;
+    public VnaConfig vna;
     public List<SweepProfile> sweepProfiles;
 }

@@ -1,6 +1,7 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.device.DeviceService;
+import com.mindpart.types.Frequency;
 import javafx.event.ActionEvent;
 
 /**
@@ -16,17 +17,18 @@ public class VfoController extends FeatureController {
 
     @Override
     public void initialize() {
-        setUp("VFO", "Frequency", true, "Hz", "Set");
+        setUp("VFO", "Frequency", true, "Set");
     }
 
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        int frequency = Integer.parseInt(valueField.getText());
-        deviceService.setVfoFrequency(frequency);
+        Frequency frequency = Frequency.parse(valueField.getText());
+        deviceService.setVfoFrequency((int)frequency.toHz());
+        setFrequency(frequency);
     }
 
-    public void setFrequency(Long frequency) {
-        setValue(frequency.toString());
+    public void setFrequency(Frequency frequency) {
+        setValue(frequency.format());
     }
 }

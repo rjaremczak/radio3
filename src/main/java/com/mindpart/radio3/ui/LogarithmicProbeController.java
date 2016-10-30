@@ -27,10 +27,10 @@ public class LogarithmicProbeController extends FeatureController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("Logarithmic Probe", "Power", "dBm");
+        setUpAsProbe("Logarithmic Probe", "Power");
     }
 
     public void update(double power) {
-        setValue(fmtPower.format(power));
+        setValue(fmtPower.format(power)+" dBm");
     }
 }

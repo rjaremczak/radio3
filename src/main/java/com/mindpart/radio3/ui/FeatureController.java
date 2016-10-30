@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -21,7 +22,6 @@ public abstract class FeatureController implements Initializable {
     @FXML protected TitledPane pane;
     @FXML protected Label nameLabel;
     @FXML protected TextField valueField;
-    @FXML protected Label unitLabel;
     @FXML protected HBox buttonBox;
     @FXML protected Button mainButton;
     @FXML protected GridPane gridPane;
@@ -31,16 +31,16 @@ public abstract class FeatureController implements Initializable {
         initialize();
     }
 
-    protected void setUpAsProbe(String title, String name, String unit) {
-        setUp(title, name, false, unit, "Get");
+    protected void setUpAsProbe(String title, String name) {
+        setUp(title, name, false, "Get");
     }
 
-    protected void setUp(String title, String name, boolean editable, String unit, String mainButtonText) {
+    protected void setUp(String title, String name, boolean editable, String mainButtonText) {
         pane.setText(title);
         nameLabel.setText(name);
         valueField.setText("");
         valueField.setEditable(editable);
-        unitLabel.setText(unit);
+        valueField.setFont(Font.font("Cousine", 15));
         mainButton.setText(mainButtonText);
     }
 

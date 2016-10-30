@@ -1,3 +1,7 @@
+@font-face {
+    src: url('Cousine-Bold.ttf');
+}
+
 .root {
 }
 
@@ -27,4 +31,10 @@
 
 .titled-pane .content AnchorPane {
     -fx-padding: 0;
+}
+
+.value-field {
+    -fx-font-family: "Cousine";
+    -fx-font-weight: bold;
+    -fx-font-size: 15;
 }

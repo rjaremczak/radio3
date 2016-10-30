@@ -5,9 +5,6 @@ import com.mindpart.radio3.LogarithmicProbe;
 import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
-import javafx.beans.Observable;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -80,12 +77,12 @@ public class SweepController implements Initializable {
         switch (source) {
             case LOG_PROBE: {
                 chartAxisY.setLabel("Power [dBm]");
-                probeAdcConverter = logarithmicProbe::fromAdc;
+                probeAdcConverter = logarithmicProbe::parse;
                 break;
             }
             case LIN_PROBE: {
                 chartAxisY.setLabel("Voltage [mV]");
-                probeAdcConverter = linearProbe::fromAdc;
+                probeAdcConverter = linearProbe::parse;
                 break;
             }
             default: throw new IllegalArgumentException("not supported data source "+source);

@@ -1,4 +1,4 @@
-package com.mindpart.radio3;
+package com.mindpart.radio3.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
@@ -45,7 +45,7 @@ public class ConfigurationService {
     }
 
     public void save() throws IOException {
-        new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(configurationFile.toFile(), Configuration.class);
+        new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(configurationFile.toFile(), configuration);
     }
 
     public void loadDefaults() throws IOException {

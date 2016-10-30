@@ -35,19 +35,19 @@ public class MultipleProbes implements FrameParser<ProbeValues> {
         return frame.getCommand() == PROBES_GET;
     }
 
-    ProbeValues fromAdc(int logarithmic, int linear, int complexGain, int complexPhase, long fMeter) {
+    ProbeValues parse(int logarithmic, int linear, int complexGain, int complexPhase, long fMeter) {
         return new ProbeValues(
-                logarithmicProbe.fromAdc(logarithmic),
-                linearProbe.fromAdc(linear),
-                vnaProbe.fromAdc(complexGain, complexPhase),
-                fMeterProbe.fromAdc(fMeter)
+                logarithmicProbe.parse(logarithmic),
+                linearProbe.parse(linear),
+                vnaProbe.parse(complexGain, complexPhase),
+                fMeterProbe.parse(fMeter)
         );
     }
 
     @Override
     public ProbeValues parse(Frame frame) {
         byte[] payload = frame.getPayload();
-        return fromAdc(Binary.toUInt16(payload, 0),
+        return parse(Binary.toUInt16(payload, 0),
                 Binary.toUInt16(payload, 2),
                 Binary.toUInt16(payload, 4),
                 Binary.toUInt16(payload, 6),

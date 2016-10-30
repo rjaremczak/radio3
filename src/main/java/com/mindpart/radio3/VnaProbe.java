@@ -39,14 +39,14 @@ public class VnaProbe implements FrameParser<Complex> {
         return phaseDiff;
     }
 
-    Complex fromAdc(int gain, int phase) {
+    Complex parse(int gain, int phase) {
         return new Complex(calculateSWR(gain), calculatePhaseAngle(phase));
     }
 
     @Override
     public Complex parse(Frame frame) {
         byte[] payload = frame.getPayload();
-        return fromAdc(Binary.toUInt16(payload, 0), Binary.toUInt16(payload, 2));
+        return parse(Binary.toUInt16(payload, 0), Binary.toUInt16(payload, 2));
     }
 
     public void requestData() {

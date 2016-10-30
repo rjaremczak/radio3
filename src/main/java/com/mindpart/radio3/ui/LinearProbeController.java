@@ -25,10 +25,10 @@ public class LinearProbeController extends FeatureController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("Linear Probe", "Voltage", "mV");
+        setUpAsProbe("Linear Probe", "Vrms");
     }
 
     public void update(double power) {
-        setValue(fmtPower.format(power * 1000));
+        setValue(fmtPower.format(power * 1000)+" mV");
     }
 }

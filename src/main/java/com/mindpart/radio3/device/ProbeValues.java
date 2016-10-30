@@ -1,5 +1,7 @@
 package com.mindpart.radio3.device;
 
+import com.mindpart.types.Frequency;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.04.09
@@ -8,9 +10,9 @@ public class ProbeValues {
     private double logarithmic;
     private double linear;
     private Complex complex;
-    private double fMeter;
+    private Frequency fMeter;
 
-    public ProbeValues(double logarithmic, double linear, Complex complex, double fMeter) {
+    public ProbeValues(double logarithmic, double linear, Complex complex, Frequency fMeter) {
         this.logarithmic = logarithmic;
         this.linear = linear;
         this.complex = complex;
@@ -29,7 +31,7 @@ public class ProbeValues {
         return complex;
     }
 
-    public double getFMeter() {
+    public Frequency getFMeter() {
         return fMeter;
     }
 }

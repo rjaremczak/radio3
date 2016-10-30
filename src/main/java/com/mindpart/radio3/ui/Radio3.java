@@ -1,6 +1,8 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.*;
+import com.mindpart.radio3.config.Configuration;
+import com.mindpart.radio3.config.ConfigurationService;
 import com.mindpart.radio3.device.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -60,11 +62,12 @@ public class Radio3 extends Application {
     public void start(Stage primaryStage) throws Exception {
         configurationService = new ConfigurationService();
         configurationService.init();
+        Configuration configuration = configurationService.getConfiguration();
 
         deviceService = new DeviceService();
         vfoController = new VfoController(deviceService);
 
-        fMeterProbe = new FMeterProbe(deviceService);
+        fMeterProbe = new FMeterProbe(deviceService, configuration.fMeter);
         fMeterController = new FMeterController(fMeterProbe);
         bind(fMeterProbe, fMeterController::setFrequency);
 
@@ -106,7 +109,7 @@ public class Radio3 extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);
         Parent root = loader.load();
-        primaryStage.setTitle("Radio 3 by SQ6DGT");
+        primaryStage.setTitle("radio3 by SQ6DGT");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
         mainController.postDisplayInit();

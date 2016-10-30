@@ -3,6 +3,7 @@ package com.mindpart.radio3;
 import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
+import com.mindpart.types.Frequency;
 import com.mindpart.utils.Binary;
 
 import static com.mindpart.radio3.device.FrameCommand.VFO_GET_FREQ;
@@ -11,7 +12,7 @@ import static com.mindpart.radio3.device.FrameCommand.VFO_GET_FREQ;
  * Created by Robert Jaremczak
  * Date: 2016.02.22
  */
-public class VfoUnit implements FrameParser<Long> {
+public class VfoUnit implements FrameParser<Frequency> {
     static final Frame SAMPLE = new Frame(VFO_GET_FREQ);
 
     private DeviceService deviceService;
@@ -26,8 +27,8 @@ public class VfoUnit implements FrameParser<Long> {
     }
 
     @Override
-    public Long parse(Frame frame) {
-        return Binary.toUInt32(frame.getPayload());
+    public Frequency parse(Frame frame) {
+        return Frequency.fromHz(Binary.toUInt32(frame.getPayload()));
     }
 
     public void requestData() {

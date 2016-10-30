@@ -1,6 +1,7 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.FMeterProbe;
+import com.mindpart.types.Frequency;
 import javafx.event.ActionEvent;
 
 /**
@@ -16,7 +17,7 @@ public class FMeterController extends FeatureController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("F-Meter", "Frequency", "MHz");
+        setUpAsProbe("F-Meter", "Frequency");
     }
 
     @Override
@@ -24,7 +25,7 @@ public class FMeterController extends FeatureController {
         fMeterProbe.requestData();
     }
 
-    public void setFrequency(Double frequency) {
-        setValue(frequency.toString());
+    public void setFrequency(Frequency frequency) {
+        setValue(frequency.format());
     }
 }
