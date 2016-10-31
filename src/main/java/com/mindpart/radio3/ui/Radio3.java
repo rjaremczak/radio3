@@ -39,7 +39,7 @@ public class Radio3 extends Application {
     private LogarithmicProbeController logarithmicProbeController;
     private LinearProbeController linearProbeController;
     private VnaProbeController vnaProbeController;
-    private SweepController sweepController;
+    private SweepGeneratorController sweepGeneratorController;
     private VnaController vnaController;
 
 
@@ -88,7 +88,7 @@ public class Radio3 extends Application {
 
         sweeper = new Sweeper(deviceService);
         vnaController = new VnaController(sweeper, vnaProbe);
-        sweepController = new SweepController(sweeper, logarithmicProbe, linearProbe);
+        sweepGeneratorController = new SweepGeneratorController(sweeper, logarithmicProbe, linearProbe, configuration.sweepProfiles);
         bind(sweeper, deviceService::handleAnalyserData);
 
         vfoUnit = new VfoUnit(deviceService);
@@ -115,7 +115,7 @@ public class Radio3 extends Application {
         mainController.postDisplayInit();
 
         loader = new FXMLLoader(getClass().getResource("sweepPane.fxml"));
-        loader.setControllerFactory(clazz -> sweepController);
+        loader.setControllerFactory(clazz -> sweepGeneratorController);
         mainController.sweepTab.setContent(loader.load());
 
         loader = new FXMLLoader(getClass().getResource("vnaPane.fxml"));

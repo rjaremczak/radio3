@@ -107,11 +107,15 @@ public class DataLink {
         try {
             int flushed = 0;
             int remaining = serialPort.getInputBufferBytesCount();
-            while(remaining > 0) {
+            while (remaining > 0) {
                 flushed += serialPort.readBytes(remaining, TIMEOUT_MS).length;
             }
-            if(logger.isDebugEnabled() && flushed>0) { logger.debug("flushed "+flushed+" bytes from read buffer"); }
+            if (logger.isDebugEnabled() && flushed > 0) {
+                logger.debug("flushed " + flushed + " bytes from read buffer");
+            }
             return flushed;
+        } catch (SerialPortTimeoutException e) {
+            logger.error("timeout accessing device "+serialPort.getPortName());
         } catch (Exception e) {
             logger.error("error flushing read buffer", e);
         }
