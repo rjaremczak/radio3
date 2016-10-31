@@ -29,15 +29,32 @@ import java.util.function.IntToDoubleFunction;
 public class VnaController implements Initializable {
     private static final long MHZ = 1000000;
 
-    @FXML Button presetsButton;
-    @FXML TextField startFrequency;
-    @FXML TextField endFrequency;
-    @FXML TextField numSteps;
-    @FXML Button startButton;
-    @FXML Label statusLabel;
-    @FXML VBox vBox;
-    @FXML LineChart<Number, Number> swrChart;
-    @FXML LineChart<Number, Number> phaseChart;
+    @FXML
+    Button presetsButton;
+
+    @FXML
+    TextField startFrequency;
+
+    @FXML
+    TextField endFrequency;
+
+    @FXML
+    TextField numSteps;
+
+    @FXML
+    Button startButton;
+
+    @FXML
+    Label statusLabel;
+
+    @FXML
+    VBox vBox;
+
+    @FXML
+    LineChart<Number, Number> swrChart;
+
+    @FXML
+    LineChart<Number, Number> phaseChart;
 
     private ObservableList<XYChart.Series<Number, Number>> gainChartData;
     private ObservableList<XYChart.Series<Number, Number>> phaseChartData;
@@ -69,7 +86,7 @@ public class VnaController implements Initializable {
     }
 
     private void setUpAxis(Axis<Number> axis, double min, double max, double tickUnit) {
-        NumberAxis numberAxis = (NumberAxis)axis;
+        NumberAxis numberAxis = (NumberAxis) axis;
         numberAxis.setAutoRanging(false);
         numberAxis.setLowerBound(min);
         numberAxis.setUpperBound(max);
@@ -77,10 +94,10 @@ public class VnaController implements Initializable {
     }
 
     public void doStart() {
-        long fStart = (long)(Double.parseDouble(startFrequency.getText()) * MHZ);
-        long fEnd = (long)(Double.parseDouble(endFrequency.getText()) * MHZ);
+        long fStart = (long) (Double.parseDouble(startFrequency.getText()) * MHZ);
+        long fEnd = (long) (Double.parseDouble(endFrequency.getText()) * MHZ);
         int steps = Integer.parseInt(numSteps.getText());
-        int fStep = (int)((fEnd - fStart) / steps);
+        int fStep = (int) ((fEnd - fStart) / steps);
         sweeper.startAnalyser(fStart, fStep, steps, AnalyserData.Source.VNA, this::updateData, this::updateState);
         statusLabel.setText("started");
     }
@@ -90,9 +107,9 @@ public class VnaController implements Initializable {
     }
 
     private double autoTickUnit(double valueSpan) {
-        for(double div=0.000001; div<=100; div*=10) {
-            if(valueSpan < div) {
-                return div/25;
+        for (double div = 0.000001; div <= 100; div *= 10) {
+            if (valueSpan < div) {
+                return div / 25;
             }
         }
         return 1.0;
@@ -102,8 +119,8 @@ public class VnaController implements Initializable {
         long freqEnd = ad.getFreqStart() + (ad.getNumSteps() * ad.getFreqStep());
         int samples[][] = ad.getData();
 
-        updateFrequencyAxis((NumberAxis)swrChart.getXAxis(), ad.getFreqStart(), freqEnd);
-        updateFrequencyAxis((NumberAxis)phaseChart.getXAxis(), ad.getFreqStart(), freqEnd);
+        updateFrequencyAxis((NumberAxis) swrChart.getXAxis(), ad.getFreqStart(), freqEnd);
+        updateFrequencyAxis((NumberAxis) phaseChart.getXAxis(), ad.getFreqStart(), freqEnd);
 
         NumberAxis swrAxis = (NumberAxis) swrChart.getYAxis();
         swrAxis.setAutoRanging(false);
@@ -116,8 +133,8 @@ public class VnaController implements Initializable {
     }
 
     private void updateFrequencyAxis(NumberAxis axis, long freqStart, long freqEnd) {
-        double freqStartMHz = ((double)freqStart)/MHZ;
-        double freqEndMHz = ((double)freqEnd)/MHZ;
+        double freqStartMHz = ((double) freqStart) / MHZ;
+        double freqEndMHz = ((double) freqEnd) / MHZ;
         double freqSpanMHz = freqEndMHz - freqStartMHz;
         axis.setAutoRanging(false);
         axis.setLowerBound(freqStartMHz);
@@ -127,16 +144,16 @@ public class VnaController implements Initializable {
 
     private Range updateChart(LineChart<Number, Number> chart, long freqStart, long freqStep, int numSteps, int samples[], IntToDoubleFunction translate) {
         chart.getData().clear();
-        XYChart.Series<Number,Number> chartSeries = new XYChart.Series<>();
-        ObservableList<XYChart.Data<Number,Number>> data = chartSeries.getData();
+        XYChart.Series<Number, Number> chartSeries = new XYChart.Series<>();
+        ObservableList<XYChart.Data<Number, Number>> data = chartSeries.getData();
         long freq = freqStart;
         double minValue = Double.MAX_VALUE;
         double maxValue = Double.MIN_VALUE;
-        for(int num=0; num<=numSteps; num++) {
+        for (int num = 0; num <= numSteps; num++) {
             double value = translate.applyAsDouble(samples[num]);
             minValue = Math.min(minValue, value);
             maxValue = Math.max(maxValue, value);
-            XYChart.Data item = new XYChart.Data(((double)freq)/MHZ, value);
+            XYChart.Data item = new XYChart.Data(((double) freq) / MHZ, value);
             data.add(item);
             freq += freqStep;
         }

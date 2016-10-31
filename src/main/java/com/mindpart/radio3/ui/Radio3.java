@@ -52,10 +52,10 @@ public class Radio3 extends Application {
         });
     }
 
-    private <T extends FeatureController> void addFeatureBox(T controller, int column, int row) throws IOException {
+    private <T extends ComponentController> void addFeatureBox(T controller) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("featureBox.fxml"));
         loader.setControllerFactory(clazz -> controller);
-        mainController.manualControlPane.add(loader.load(), column, row);
+        mainController.componentsBox.getChildren().add(loader.load());
     }
 
     @Override
@@ -122,11 +122,11 @@ public class Radio3 extends Application {
         loader.setControllerFactory(clazz -> vnaController);
         mainController.vnaTab.setContent(loader.load());
 
-        addFeatureBox(vfoController, 0, 0);
-        addFeatureBox(fMeterController, 1, 0);
-        addFeatureBox(logarithmicProbeController, 0, 1);
-        addFeatureBox(linearProbeController, 1, 1);
-        addFeatureBox(vnaProbeController, 0, 2);
+        addFeatureBox(vfoController);
+        addFeatureBox(fMeterController);
+        addFeatureBox(logarithmicProbeController);
+        addFeatureBox(linearProbeController);
+        addFeatureBox(vnaProbeController);
     }
 
     @Override

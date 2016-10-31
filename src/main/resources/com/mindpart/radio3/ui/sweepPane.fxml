@@ -21,8 +21,8 @@
             <GridPane hgap="5.0" vgap="3.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="90.0" prefWidth="90.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="90.0" prefWidth="90.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="-Infinity" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="-Infinity" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="90.0" prefWidth="90.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="50.0" prefWidth="50.0" />
@@ -33,17 +33,16 @@
                 <RowConstraints maxHeight="27.0" minHeight="27.0" prefHeight="27.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <TextField fx:id="startFrequency" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onStartFrequency" prefHeight="27.0" prefWidth="80.0" promptText="MHz" styleClass="value-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Label text="start freq." GridPane.columnIndex="1" />
-                  <Label text="end freq." GridPane.columnIndex="2" />
-                  <TextField fx:id="endFrequency" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onEndFrequency" prefHeight="27.0" prefWidth="80.0" promptText="MHz" styleClass="value-field" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <TextField fx:id="startFrequency" alignment="CENTER_RIGHT" onAction="#onStartFrequency" prefHeight="27.0" prefWidth="80.0" promptText="from" styleClass="value-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="endFrequency" alignment="CENTER_RIGHT" onAction="#onEndFrequency" prefHeight="27.0" prefWidth="80.0" promptText="to" styleClass="value-field" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <TextField fx:id="numSteps" alignment="CENTER_RIGHT" onAction="#onNumSteps" prefHeight="27.0" prefWidth="64.0" promptText="number" styleClass="value-field" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                  <Button fx:id="startButton" defaultButton="true" mnemonicParsing="false" onAction="#doStart" text="Start" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                  <Button fx:id="presetsButton" focusTraversable="false" mnemonicParsing="false" onAction="#onPresets" prefHeight="27.0" prefWidth="161.0" text="Default Range" GridPane.rowIndex="1" />
+                  <Label text="frequency range" GridPane.columnIndex="1" GridPane.columnSpan="2" />
                   <Label text="steps" GridPane.columnIndex="3" />
-                  <TextField fx:id="numSteps" alignment="CENTER_RIGHT" focusTraversable="false" onAction="#onNumSteps" prefHeight="27.0" prefWidth="64.0" promptText="number" styleClass="value-field" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                  <Button fx:id="presetsButton" mnemonicParsing="false" onAction="#onPresets" prefHeight="27.0" prefWidth="161.0" text="Default Range" GridPane.rowIndex="1" />
                   <Label text="input probe" GridPane.columnIndex="4" />
-                  <ChoiceBox fx:id="sourceProbe" prefHeight="27.0" prefWidth="194.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                  <ChoiceBox fx:id="sourceProbe" focusTraversable="false" prefHeight="27.0" prefWidth="194.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
                   <Label fx:id="statusLabel" text="Label" GridPane.columnIndex="6" GridPane.rowIndex="1" />
-                  <Button fx:id="startButton" mnemonicParsing="false" onAction="#doStart" text="Start" GridPane.columnIndex="5" GridPane.rowIndex="1" />
                   <Label text="presets" />
                </children>
             </GridPane>

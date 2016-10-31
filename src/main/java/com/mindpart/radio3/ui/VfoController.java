@@ -8,7 +8,7 @@ import javafx.event.ActionEvent;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class VfoController extends FeatureController {
+public class VfoController extends ComponentController {
     private DeviceService deviceService;
 
     public VfoController(DeviceService deviceService) {

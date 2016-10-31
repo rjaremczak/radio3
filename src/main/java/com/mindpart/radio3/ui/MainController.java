@@ -11,8 +11,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,26 +26,50 @@ import java.util.stream.Collectors;
  */
 public class MainController {
 
-    @FXML ChoiceBox<String> deviceSelection;
-    @FXML Button deviceSelectionRefresh;
-    @FXML Button deviceConnect;
-    @FXML Label deviceConnectionStatus;
+    @FXML
+    ChoiceBox<String> deviceSelection;
 
-    @FXML AnchorPane mainPane;
-    @FXML Tab deviceInfoTab;
+    @FXML
+    Button deviceSelectionRefresh;
 
-    @FXML TableView<Property> devicePropertiesTable;
-    @FXML Button deviceInfoBtn;
+    @FXML
+    Button deviceConnect;
 
-    @FXML Tab manualControlTab;
-    @FXML Tab sweepTab;
-    @FXML Tab vnaTab;
-    @FXML GridPane manualControlPane;
-    @FXML ToggleButton continuousSamplingOfAllProbesBtn;
-    @FXML Button sampleAllProbesBtn;
+    @FXML
+    Label deviceConnectionStatus;
+
+    @FXML
+    AnchorPane mainPane;
+
+    @FXML
+    Tab deviceInfoTab;
+
+    @FXML
+    TableView<Property> devicePropertiesTable;
+
+    @FXML
+    Button deviceInfoBtn;
+
+    @FXML
+    Tab manualControlTab;
+
+    @FXML
+    Tab sweepTab;
+
+    @FXML
+    Tab vnaTab;
+
+    @FXML
+    VBox componentsBox;
+
+    @FXML
+    ToggleButton continuousSamplingOfAllProbesBtn;
+
+    @FXML
+    Button sampleAllProbesBtn;
 
     private Radio3 radio3;
-    private Map<String,String> devicePropertiesMap = new LinkedHashMap<>();
+    private Map<String, String> devicePropertiesMap = new LinkedHashMap<>();
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
     private ExecutorService background = Executors.newSingleThreadExecutor();
@@ -63,10 +87,10 @@ public class MainController {
     }
 
     private void setDisabledOf(boolean flag, Object... items) {
-        for(Object item : items) {
-            if(item instanceof Node) {
+        for (Object item : items) {
+            if (item instanceof Node) {
                 ((Node) item).setDisable(flag);
-            } else if(item instanceof Tab) {
+            } else if (item instanceof Tab) {
                 ((Tab) item).setDisable(flag);
             }
         }
@@ -74,7 +98,7 @@ public class MainController {
 
     public void updateAvailablePorts() {
         availablePortNames.setAll(radio3.availableSerialPorts());
-        if(availablePortNames.isEmpty()) {
+        if (availablePortNames.isEmpty()) {
             disableItems(deviceSelection, deviceConnect);
         } else {
             enableItems(deviceSelection, deviceConnect);
@@ -104,7 +128,7 @@ public class MainController {
             radio3.connect(deviceSelection.getValue());
             Platform.runLater(() -> {
                 enableItems(deviceConnect, deviceSelectionRefresh, deviceSelection);
-                if(radio3.isConnected()) {
+                if (radio3.isConnected()) {
                     updateOnConnect();
                     radio3.getDeviceStateSource().requestData();
                     radio3.getVfoUnit().requestData();
@@ -125,38 +149,42 @@ public class MainController {
     }
 
     public void doConnectDisconnect() {
-        if(radio3.isConnected()) { doDisconnect(); } else { doConnect(); }
+        if (radio3.isConnected()) {
+            doDisconnect();
+        } else {
+            doConnect();
+        }
     }
 
     private void updateDeviceProperties() {
-        deviceProperties.setAll(devicePropertiesMap.entrySet().stream().map( e -> new Property(e.getKey(), e.getValue())).collect(Collectors.toList()));
+        deviceProperties.setAll(devicePropertiesMap.entrySet().stream().map(e -> new Property(e.getKey(), e.getValue())).collect(Collectors.toList()));
     }
 
     public void updateDeviceInfo(DeviceInfo di) {
         devicePropertiesMap.put("Device", di.name);
         devicePropertiesMap.put("Build Id", di.buildId);
-        devicePropertiesMap.put("VFO", di.vfo.name+" (freq: "+di.vfo.minFrequency+" to "+di.vfo.maxFrequency+" Hz)");
-        devicePropertiesMap.put("FMeter", di.fMeter.name+" (freq: "+di.fMeter.minFrequency+" to "+di.fMeter.maxFrequency+" Hz)");
-        devicePropertiesMap.put("Logarithmic probe", di.logProbe.name+" (power: "+di.logProbe.minDBm+" to "+di.logProbe.maxDBm+" dBm)");
+        devicePropertiesMap.put("VFO", di.vfo.name + " (freq: " + di.vfo.minFrequency + " to " + di.vfo.maxFrequency + " Hz)");
+        devicePropertiesMap.put("FMeter", di.fMeter.name + " (freq: " + di.fMeter.minFrequency + " to " + di.fMeter.maxFrequency + " Hz)");
+        devicePropertiesMap.put("Logarithmic probe", di.logProbe.name + " (power: " + di.logProbe.minDBm + " to " + di.logProbe.maxDBm + " dBm)");
         devicePropertiesMap.put("VNA", di.vna.name);
         updateDeviceProperties();
-        deviceConnectionStatus.setText("connected to "+di.name);
+        deviceConnectionStatus.setText("connected to " + di.name);
     }
 
     public void updateDeviceState(DeviceState ds) {
-        if(continuousSamplingOfAllProbesBtn.isSelected() != ds.isProbesSampling()) {
+        if (continuousSamplingOfAllProbesBtn.isSelected() != ds.isProbesSampling()) {
             continuousSamplingOfAllProbesBtn.setSelected(ds.isProbesSampling());
             doContinuousSamplingOfAllProbes();
         }
         devicePropertiesMap.put("Continuous sampling", Boolean.toString(ds.isProbesSampling()));
-        devicePropertiesMap.put("Sampling period", ds.getSamplingPeriodMs()+" ms");
-        devicePropertiesMap.put("Time since reset", ds.getTimeMs()+" ms");
+        devicePropertiesMap.put("Sampling period", ds.getSamplingPeriodMs() + " ms");
+        devicePropertiesMap.put("Time since reset", ds.getTimeMs() + " ms");
         updateDeviceProperties();
     }
 
     private void disableHeader(TableView tableView) {
         Pane header = (Pane) tableView.lookup("TableHeaderRow");
-        if(header!=null && header.isVisible()) {
+        if (header != null && header.isVisible()) {
             header.setMaxHeight(0);
             header.setMinHeight(0);
             header.setPrefHeight(0);
@@ -193,9 +221,9 @@ public class MainController {
     public void handleErrorCode(ErrorCode errorCode) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Device Error");
-        alert.setHeaderText("Code: "+errorCode.getFrameCommand());
-        if(errorCode.hasAuxCode()) {
-            alert.setContentText("auxiliary code: "+errorCode.getAuxCode());
+        alert.setHeaderText("Code: " + errorCode.getFrameCommand());
+        if (errorCode.hasAuxCode()) {
+            alert.setContentText("auxiliary code: " + errorCode.getAuxCode());
         }
     }
 
@@ -204,7 +232,7 @@ public class MainController {
     }
 
     public void doContinuousSamplingOfAllProbes() {
-        if(continuousSamplingOfAllProbesBtn.isSelected()) {
+        if (continuousSamplingOfAllProbesBtn.isSelected()) {
             disableItems(sampleAllProbesBtn, deviceConnect, sweepTab, deviceInfoTab, vnaTab);
             radio3.startProbesSampling();
             radio3.disableGetOnAllProbes(true);

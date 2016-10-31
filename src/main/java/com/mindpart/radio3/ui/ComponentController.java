@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 
 import java.net.URL;
@@ -18,13 +19,25 @@ import java.util.ResourceBundle;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public abstract class FeatureController implements Initializable {
-    @FXML protected TitledPane pane;
-    @FXML protected Label nameLabel;
-    @FXML protected TextField valueField;
-    @FXML protected HBox buttonBox;
-    @FXML protected Button mainButton;
-    @FXML protected GridPane gridPane;
+public abstract class ComponentController implements Initializable {
+
+    @FXML
+    protected Pane pane;
+
+    @FXML
+    protected Label probeName;
+
+    @FXML
+    protected Label valueName;
+
+    @FXML
+    protected TextField valueField;
+
+    @FXML
+    protected HBox mainBox;
+
+    @FXML
+    protected Button mainButton;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -36,11 +49,10 @@ public abstract class FeatureController implements Initializable {
     }
 
     protected void setUp(String title, String name, boolean editable, String mainButtonText) {
-        pane.setText(title);
-        nameLabel.setText(name);
+        probeName.setText(title);
+        valueName.setText(name);
         valueField.setText("");
         valueField.setEditable(editable);
-        valueField.setFont(Font.font("Cousine", 15));
         mainButton.setText(mainButtonText);
     }
 
@@ -48,7 +60,9 @@ public abstract class FeatureController implements Initializable {
         pane.setDisable(disable);
     }
 
-    public void disableMainButton(boolean disable) { mainButton.setDisable(disable); }
+    public void disableMainButton(boolean disable) {
+        mainButton.setDisable(disable);
+    }
 
     public void setValue(String str) {
         valueField.setText(str);
@@ -59,5 +73,6 @@ public abstract class FeatureController implements Initializable {
     }
 
     abstract protected void initialize();
+
     abstract public void onMainButton(ActionEvent actionEvent);
 }

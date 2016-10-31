@@ -8,7 +8,7 @@ import javafx.event.ActionEvent;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class FMeterController extends FeatureController {
+public class FMeterController extends ComponentController {
     private FMeterProbe fMeterProbe;
 
     public FMeterController(FMeterProbe fMeterProbe) {

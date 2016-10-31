@@ -1,7 +1,6 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.LogarithmicProbe;
-import com.mindpart.radio3.device.DeviceService;
 import javafx.event.ActionEvent;
 
 import java.text.DecimalFormat;
@@ -11,7 +10,7 @@ import java.text.NumberFormat;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class LogarithmicProbeController extends FeatureController {
+public class LogarithmicProbeController extends ComponentController {
     private static final NumberFormat fmtPower = new DecimalFormat("0.000");
 
     private LogarithmicProbe logarithmicProbe;

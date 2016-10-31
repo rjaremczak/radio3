@@ -13,19 +13,16 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.MainController">
     <children>
         <ToolBar>
             <items>
-                <Button fx:id="deviceSelectionRefresh" mnemonicParsing="false" onAction="#updateAvailablePorts" text="Refresh" />
+                <Button fx:id="deviceSelectionRefresh" focusTraversable="false" mnemonicParsing="false" onAction="#updateAvailablePorts" text="Refresh" />
                 <ChoiceBox fx:id="deviceSelection" minWidth="212.0" prefHeight="27.0" prefWidth="212.0" />
-                <Button fx:id="deviceConnect" mnemonicParsing="false" onAction="#doConnectDisconnect" text="Connect" />
+                <Button fx:id="deviceConnect" defaultButton="true" mnemonicParsing="false" onAction="#doConnectDisconnect" text="Connect" />
             <Label fx:id="deviceConnectionStatus" text="Label" />
             </items>
         </ToolBar>
@@ -33,11 +30,11 @@
          <children>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <tabs>
-                <Tab fx:id="manualControlTab" text="Manual Control">
+                <Tab fx:id="manualControlTab" text="Components">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <VBox fx:id="componentsBox" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
                                     <HBox spacing="5.0">
                                        <children>
@@ -52,20 +49,6 @@
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                        </padding>
                                     </HBox>
-                                    <GridPane fx:id="manualControlPane" hgap="5.0" vgap="5.0" VBox.vgrow="ALWAYS">
-                                      <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="280.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="280.0" />
-                                      </columnConstraints>
-                                      <rowConstraints>
-                                        <RowConstraints />
-                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
-                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
-                                      </rowConstraints>
-                                       <padding>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </padding>
-                                    </GridPane>
                                  </children>
                               </VBox>
                            </children>
@@ -75,7 +58,7 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                <Tab fx:id="deviceInfoTab" text="Device Info">
+                <Tab fx:id="deviceInfoTab" text="Configuration">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -108,7 +91,7 @@
                         </AnchorPane>
                   </content>
                 </Tab>
-                  <Tab fx:id="sweepTab" text="Sweep" />
+                  <Tab fx:id="sweepTab" text="Sweep Generator" />
                   <Tab fx:id="vnaTab" text="VNA" />
               </tabs>
             </TabPane>

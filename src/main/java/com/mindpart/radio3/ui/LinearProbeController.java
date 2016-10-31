@@ -10,7 +10,7 @@ import java.text.NumberFormat;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class LinearProbeController extends FeatureController {
+public class LinearProbeController extends ComponentController {
     private static final NumberFormat fmtPower = new DecimalFormat("0.000");
     private LinearProbe linearProbe;
 
