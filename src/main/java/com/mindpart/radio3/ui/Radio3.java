@@ -87,7 +87,7 @@ public class Radio3 extends Application {
         bind(multipleProbes, this::updateAllProbes);
 
         sweeper = new Sweeper(deviceService);
-        vnaController = new VnaController(sweeper, vnaProbe);
+        vnaController = new VnaController(sweeper, vnaProbe, configuration.sweepProfiles);
         sweepGeneratorController = new SweepGeneratorController(sweeper, logarithmicProbe, linearProbe, configuration.sweepProfiles);
         bind(sweeper, deviceService::handleAnalyserData);
 

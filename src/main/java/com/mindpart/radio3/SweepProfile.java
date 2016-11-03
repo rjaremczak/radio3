@@ -9,10 +9,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 public class SweepProfile {
+    public static final int DEFAULT_STEPS = 500;
+
     public String name;
-    public long freqMin;
-    public long freqMax;
-    public int steps;
+    public String freqMin;
+    public String freqMax;
+    public int steps = DEFAULT_STEPS;
 
     @Override
     public String toString() {

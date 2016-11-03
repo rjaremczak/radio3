@@ -6,11 +6,10 @@ import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
+import com.mindpart.types.Frequency;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -18,12 +17,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.function.Function;
 
 /**
@@ -34,16 +32,10 @@ public class SweepGeneratorController {
     private static final long MHZ = 1000000;
 
     @FXML
-    Button presetsButton;
+    VBox vBox;
 
     @FXML
-    TextField startFrequency;
-
-    @FXML
-    TextField endFrequency;
-
-    @FXML
-    TextField numSteps;
+    HBox hBox;
 
     @FXML
     ChoiceBox<AnalyserData.Source> sourceProbe;
@@ -53,9 +45,6 @@ public class SweepGeneratorController {
 
     @FXML
     Label statusLabel;
-
-    @FXML
-    VBox vBox;
 
     @FXML
     LineChart<Double, Double> lineChart;
@@ -71,31 +60,24 @@ public class SweepGeneratorController {
     private LogarithmicProbe logarithmicProbe;
     private LinearProbe linearProbe;
     private Function<Integer, Double> probeAdcConverter;
-    private SweepConfigController sweepConfigController;
+    private SweepConfigControl sweepConfigControl;
 
     public SweepGeneratorController(Sweeper sweeper, LogarithmicProbe logarithmicProbe, LinearProbe linearProbe, List<SweepProfile> sweepProfiles) {
         this.sweeper = sweeper;
         this.logarithmicProbe = logarithmicProbe;
         this.linearProbe = linearProbe;
-        this.sweepConfigController = new SweepConfigController(sweepProfiles);
+        this.sweepConfigControl = new SweepConfigControl(sweepProfiles);
     }
 
     public void initialize() throws IOException {
         initInputProbeList();
 
-        statusLabel.setText("initialized");
+        statusLabel.setText("ready");
         lineChartData = FXCollections.observableArrayList();
         lineChart.setData(lineChartData);
         lineChart.setCreateSymbols(false);
-        onPresets();
 
-
-        //FXMLLoader loader = new FXMLLoader(getClass().getResource("sweepGeneratorConfig.fxml"));
-        //loader.setController(sweepConfigController);
-        //loader.setControllerFactory(clazz -> sweepConfigController);
-        //vBox.getChildren().add(0, loader.load());
-
-
+        hBox.getChildren().add(0, sweepConfigControl);
     }
 
     private void initInputProbeList() {
@@ -125,9 +107,9 @@ public class SweepGeneratorController {
     }
 
     public void doStart() {
-        long fStart = (long) (Double.parseDouble(startFrequency.getText()) * MHZ);
-        long fEnd = (long) (Double.parseDouble(endFrequency.getText()) * MHZ);
-        int steps = Integer.parseInt(numSteps.getText());
+        long fStart = sweepConfigControl.getStartFrequency().toHz();
+        long fEnd = sweepConfigControl.getEndFrequency().toHz();
+        int steps = sweepConfigControl.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
         sweeper.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateData, this::updateState);
         statusLabel.setText("started");
@@ -138,14 +120,10 @@ public class SweepGeneratorController {
     }
 
     public void updateData(AnalyserData ad) {
-        long freqEnd = ad.getFreqStart() + (ad.getNumSteps() * ad.getFreqStep());
-        double freqStartMHz = ((double) ad.getFreqStart()) / MHZ;
-        double freqEndMHz = ((double) freqEnd) / MHZ;
         int samples[] = ad.getData()[0];
         lineChartData.clear();
-        chartAxisX.setAutoRanging(false);
-        chartAxisX.setLowerBound(freqStartMHz);
-        chartAxisX.setUpperBound(freqEndMHz);
+
+        updateFrequencyAxis(chartAxisX, ad.getFreqStart(), ad.getFreqEnd());
 
         XYChart.Series<Double, Double> chartSeries = new XYChart.Series<>();
         chartSeries.setName(ad.getSource().getSeriesTitle(0));
@@ -162,21 +140,22 @@ public class SweepGeneratorController {
         chartAxisY.setAutoRanging(true);
     }
 
-    public void onStartFrequency() {
-
+    private double autoTickUnit(double valueSpan) {
+        for (double div = 0.000001; div <= 100; div *= 10) {
+            if (valueSpan < div) {
+                return div / 25;
+            }
+        }
+        return 1.0;
     }
 
-    public void onEndFrequency() {
-
-    }
-
-    public void onNumSteps() {
-
-    }
-
-    public void onPresets() {
-        startFrequency.setText("1.8");
-        endFrequency.setText("60.0");
-        numSteps.setText("500");
+    private void updateFrequencyAxis(NumberAxis axis, long freqStart, long freqEnd) {
+        double freqStartMHz = ((double) freqStart) / MHZ;
+        double freqEndMHz = ((double) freqEnd) / MHZ;
+        double freqSpanMHz = freqEndMHz - freqStartMHz;
+        axis.setAutoRanging(false);
+        axis.setLowerBound(freqStartMHz);
+        axis.setUpperBound(freqEndMHz);
+        axis.setTickUnit(autoTickUnit(freqSpanMHz));
     }
 }

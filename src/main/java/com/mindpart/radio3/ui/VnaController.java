@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.VnaProbe;
 import com.mindpart.radio3.device.AnalyserData;
@@ -16,9 +17,11 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.IntToDoubleFunction;
 
@@ -26,29 +29,20 @@ import java.util.function.IntToDoubleFunction;
  * Created by Robert Jaremczak
  * Date: 2016.04.15
  */
-public class VnaController implements Initializable {
+public class VnaController {
     private static final long MHZ = 1000000;
 
     @FXML
-    Button presetsButton;
+    VBox vBox;
 
     @FXML
-    TextField startFrequency;
-
-    @FXML
-    TextField endFrequency;
-
-    @FXML
-    TextField numSteps;
+    HBox hBox;
 
     @FXML
     Button startButton;
 
     @FXML
     Label statusLabel;
-
-    @FXML
-    VBox vBox;
 
     @FXML
     LineChart<Number, Number> swrChart;
@@ -60,15 +54,16 @@ public class VnaController implements Initializable {
     private ObservableList<XYChart.Series<Number, Number>> phaseChartData;
     private Sweeper sweeper;
     private VnaProbe vnaProbe;
+    private SweepConfigControl sweepConfigControl;
 
-    public VnaController(Sweeper sweeper, VnaProbe vnaProbe) {
+    public VnaController(Sweeper sweeper, VnaProbe vnaProbe, List<SweepProfile> sweepProfiles) {
         this.sweeper = sweeper;
         this.vnaProbe = vnaProbe;
+        this.sweepConfigControl = new SweepConfigControl(sweepProfiles);
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        statusLabel.setText("initialized");
+    public void initialize() {
+        statusLabel.setText("ready");
         gainChartData = FXCollections.observableArrayList();
         swrChart.setData(gainChartData);
         swrChart.setCreateSymbols(false);
@@ -82,7 +77,7 @@ public class VnaController implements Initializable {
         setUpAxis(phaseChart.getXAxis(), 1, 55, 2.5);
         setUpAxis(phaseChart.getYAxis(), 0, 180, 45);
 
-        onPresets();
+        hBox.getChildren().add(0, sweepConfigControl);
     }
 
     private void setUpAxis(Axis<Number> axis, double min, double max, double tickUnit) {
@@ -94,9 +89,9 @@ public class VnaController implements Initializable {
     }
 
     public void doStart() {
-        long fStart = (long) (Double.parseDouble(startFrequency.getText()) * MHZ);
-        long fEnd = (long) (Double.parseDouble(endFrequency.getText()) * MHZ);
-        int steps = Integer.parseInt(numSteps.getText());
+        long fStart = sweepConfigControl.getStartFrequency().toHz();
+        long fEnd = sweepConfigControl.getEndFrequency ().toHz();
+        int steps = sweepConfigControl.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
         sweeper.startAnalyser(fStart, fStep, steps, AnalyserData.Source.VNA, this::updateData, this::updateState);
         statusLabel.setText("started");
@@ -159,23 +154,5 @@ public class VnaController implements Initializable {
         }
         chart.getData().add(chartSeries);
         return new Range(minValue, maxValue);
-    }
-
-    public void onStartFrequency() {
-
-    }
-
-    public void onEndFrequency() {
-
-    }
-
-    public void onNumSteps() {
-
-    }
-
-    public void onPresets() {
-        startFrequency.setText("1.8");
-        endFrequency.setText("60.0");
-        numSteps.setText("500");
     }
 }

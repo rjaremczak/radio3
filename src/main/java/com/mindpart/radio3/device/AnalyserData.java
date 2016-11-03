@@ -54,6 +54,9 @@ public class AnalyserData {
         return freqStart;
     }
 
+    public long getFreqEnd() {
+        return freqStart + numSteps * freqStep;
+    }
     public long getFreqStep() {
         return freqStep;
     }

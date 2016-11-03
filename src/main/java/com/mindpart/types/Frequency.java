@@ -62,12 +62,28 @@ public class Frequency {
     public static final Frequency parse(String str) {
         String norm = str.trim();
         String value = extractValue(norm, SYMBOL_MHZ);
-        if(value != null) { return fromMHz(Double.parseDouble(value)); }
+        if(value != null) { return fromMHz(NumberUtils.toDouble(value, 0)); }
 
         value = extractValue(norm, SYMBOL_KHZ);
-        if(value != null) { return fromKHz(Double.parseDouble(value)); }
+        if(value != null) { return fromKHz(NumberUtils.toDouble(value, 0)); }
 
         value = extractValue(norm, SYMBOL_HZ);
         return new Frequency((int)NumberUtils.toDouble(value!=null ? value : norm, 0));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Frequency frequency = (Frequency) o;
+
+        return valueHz == frequency.valueHz;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (valueHz ^ (valueHz >>> 32));
     }
 }

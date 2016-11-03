@@ -6,10 +6,10 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
@@ -17,32 +17,25 @@
    <children>
       <VBox fx:id="vBox" layoutX="211.0" layoutY="50.0" prefHeight="200.0" prefWidth="738.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <GridPane hgap="5.0" vgap="3.0">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="-Infinity" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="-Infinity" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="90.0" prefWidth="90.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="50.0" prefWidth="50.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints maxHeight="17.0" minHeight="17.0" prefHeight="17.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="27.0" minHeight="27.0" prefHeight="27.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+            <HBox fx:id="hBox" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                <children>
-                  <Button fx:id="presetsButton" mnemonicParsing="false" onAction="#onPresets" prefHeight="27.0" prefWidth="161.0" text="Default Range" GridPane.rowIndex="1" />
-                  <TextField fx:id="startFrequency" alignment="CENTER_RIGHT" onAction="#onStartFrequency" prefHeight="27.0" prefWidth="80.0" promptText="from" styleClass="value-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <TextField fx:id="endFrequency" alignment="CENTER_RIGHT" onAction="#onEndFrequency" prefHeight="27.0" prefWidth="80.0" promptText="to" styleClass="value-field" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                  <TextField fx:id="numSteps" alignment="CENTER_RIGHT" onAction="#onNumSteps" prefHeight="27.0" prefWidth="64.0" promptText="number" styleClass="value-field" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                  <Button fx:id="startButton" defaultButton="true" mnemonicParsing="false" onAction="#doStart" text="Start" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                  <Label text="frequency range" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-                  <Label text="steps" GridPane.columnIndex="3" />
-                  <Label fx:id="statusLabel" text="Label" GridPane.columnIndex="5" GridPane.rowIndex="1" />
-                  <Label text="presets" />
+                  <GridPane hgap="5.0" vgap="3.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="50.0" prefWidth="50.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Button fx:id="startButton" defaultButton="true" mnemonicParsing="false" onAction="#doStart" text="Start" GridPane.rowIndex="1" />
+                        <Label fx:id="statusLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                     </children>
+                  </GridPane>
                </children>
-            </GridPane>
-            <LineChart fx:id="swrChart" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
+            </HBox>
+            <LineChart fx:id="swrChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
                <xAxis>
                   <NumberAxis autoRanging="false" label="Frequency [MHz]" />
                </xAxis>
@@ -53,7 +46,7 @@
                   <Insets left="5.0" top="5.0" />
                </padding>
             </LineChart>
-            <LineChart fx:id="phaseChart" horizontalZeroLineVisible="false" legendVisible="false" prefHeight="200.0" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
+            <LineChart fx:id="phaseChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" prefHeight="200.0" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
                <xAxis>
                   <NumberAxis autoRanging="false" forceZeroInRange="false" />
                </xAxis>
