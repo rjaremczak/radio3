@@ -89,9 +89,12 @@ public class SweepGeneratorController {
         lineChart.setCreateSymbols(false);
         onPresets();
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("sweepGeneratorConfig.fxml"));
-        loader.setControllerFactory(clazz -> sweepConfigController);
-        vBox.getChildren().add(0, loader.load());
+
+        //FXMLLoader loader = new FXMLLoader(getClass().getResource("sweepGeneratorConfig.fxml"));
+        //loader.setController(sweepConfigController);
+        //loader.setControllerFactory(clazz -> sweepConfigController);
+        //vBox.getChildren().add(0, loader.load());
+
 
     }
 

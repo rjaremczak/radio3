@@ -100,9 +100,11 @@ public class MainController {
         availablePortNames.setAll(radio3.availableSerialPorts());
         if (availablePortNames.isEmpty()) {
             disableItems(deviceSelection, deviceConnect);
+            deviceConnectionStatus.setText("");
         } else {
             enableItems(deviceSelection, deviceConnect);
             deviceSelection.getSelectionModel().selectFirst();
+            updateConnectionStatus();
         }
     }
 

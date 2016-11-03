@@ -11,7 +11,8 @@ import static org.junit.Assert.*;
 public class AdcTest {
 
     private double adcToVoltage(int adcValue) {
-        return ((3.277)*((double)adcValue))/4035.0;
+        double multiplier = (3.45 - 0.0) / (4035 - 0);
+        return 0.0 + adcValue * multiplier;
     }
 
     @Test

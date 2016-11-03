@@ -13,7 +13,7 @@ public class Adc {
     public Adc(int adcValueMin, int adcValueMax, double valueMin, double valueMax) {
         this.adcBase = adcValueMin;
         this.base = valueMin;
-        multiplier = (valueMax - valueMin) / (adcValueMax - adcValueMin);
+        this.multiplier = (valueMax - valueMin) / (adcValueMax - adcValueMin);
     }
 
     public double convert(int adcValue) {
