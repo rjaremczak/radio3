@@ -21,8 +21,8 @@
       <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
-      <FrequencyField fx:id="startFrequencyField" alignment="CENTER_RIGHT" promptText="from" styleClass="value-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <FrequencyField fx:id="endFrequencyField" alignment="CENTER_RIGHT" promptText="to" styleClass="value-field" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+      <FrequencyField fx:id="startFrequencyField" label="start frequency" alignment="CENTER_RIGHT" promptText="from" styleClass="value-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <FrequencyField fx:id="endFrequencyField" label="end frequency" alignment="CENTER_RIGHT" promptText="to" styleClass="value-field" GridPane.columnIndex="2" GridPane.rowIndex="1" />
       <TextField fx:id="stepsField" alignment="CENTER_RIGHT" promptText="num" styleClass="value-field" GridPane.columnIndex="3" GridPane.rowIndex="1" />
       <Label text="frequency range" GridPane.columnIndex="1" GridPane.columnSpan="2" />
       <Label text="steps" GridPane.columnIndex="3" />

@@ -11,30 +11,30 @@ import static org.junit.Assert.*;
 public class FrequencyTest {
     @Test
     public void testFormatAsHz() {
-        assertTrue(Frequency.fromHz(3000).format().endsWith("Hz"));
+        assertTrue(Frequency.ofHz(3000).format().endsWith("Hz"));
     }
 
     @Test
     public void testFormatAsKHz() {
-        assertTrue(Frequency.fromHz(900000).format().endsWith("kHz"));
+        assertTrue(Frequency.ofHz(900000).format().endsWith("kHz"));
     }
 
     @Test
     public void testFormatAsMHz() {
-        assertTrue(Frequency.fromHz(29000600).format().endsWith("MHz"));
+        assertTrue(Frequency.ofHz(29000600).format().endsWith("MHz"));
     }
 
     @Test
     public void testConstructors() {
-        assertEquals(2000123, Frequency.fromMHz(2.000123).toHz());
-        assertEquals(37000123, Frequency.fromKHz(37000.123).toHz());
-        assertEquals(37000123, Frequency.fromHz(37000123).toHz());
+        assertEquals(2000123, Frequency.ofMHz(2.000123).toHz());
+        assertEquals(37000123, Frequency.ofKHz(37000.123).toHz());
+        assertEquals(37000123, Frequency.ofHz(37000123).toHz());
     }
 
     @Test
     public void testConvertMethods() {
-        assertEquals(32.768, Frequency.fromHz(32768).toKHz(), Double.MIN_VALUE);
-        assertEquals(64.000768, Frequency.fromHz(64000768).toMHz(), Double.MIN_VALUE);
-        assertEquals(3567000, Frequency.fromMHz(3.567).toHz());
+        assertEquals(32.768, Frequency.ofHz(32768).toKHz(), Double.MIN_VALUE);
+        assertEquals(64.000768, Frequency.ofHz(64000768).toMHz(), Double.MIN_VALUE);
+        assertEquals(3567000, Frequency.ofMHz(3.567).toHz());
     }
 }

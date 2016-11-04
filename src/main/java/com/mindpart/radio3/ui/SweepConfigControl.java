@@ -6,14 +6,12 @@ import com.mindpart.ui.FrequencyField;
 import com.mindpart.utils.FxUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
@@ -42,6 +40,10 @@ public class SweepConfigControl extends GridPane {
     }
 
     public void initialize() {
+        startFrequencyField.setMaxSupplier(() -> endFrequencyField.getFrequency());
+        endFrequencyField.setMinSupplier(() -> startFrequencyField.getFrequency());
+        endFrequencyField.setMaxSupplier(() -> Frequency.ofMHz(70));
+
         presetsChoiceBox.setItems(presets);
         presetsChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue!=null) {

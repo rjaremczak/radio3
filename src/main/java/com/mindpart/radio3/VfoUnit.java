@@ -28,7 +28,7 @@ public class VfoUnit implements FrameParser<Frequency> {
 
     @Override
     public Frequency parse(Frame frame) {
-        return Frequency.fromHz(Binary.toUInt32(frame.getPayload()));
+        return Frequency.ofHz(Binary.toUInt32(frame.getPayload()));
     }
 
     public void requestData() {

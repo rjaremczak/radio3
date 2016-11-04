@@ -39,6 +39,6 @@ public class FMeterProbe implements FrameParser<Frequency> {
     }
 
     Frequency parse(long count) {
-        return Frequency.fromHz((count * config.multiplier) + config.base);
+        return Frequency.ofHz((count * config.multiplier) + config.base);
     }
 }

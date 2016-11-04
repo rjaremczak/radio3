@@ -1,6 +1,7 @@
 package com.mindpart.utils;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
 
 import java.io.IOException;
 
@@ -21,5 +22,17 @@ public final class FxUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void alert(Alert.AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    public static void alertInputError(String label, String message, String details) {
+        alert(Alert.AlertType.ERROR, label, message, details);
     }
 }
