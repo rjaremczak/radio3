@@ -5,24 +5,27 @@ import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.VnaProbe;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
+import com.mindpart.types.Frequency;
+import com.mindpart.types.Phase;
+import com.mindpart.types.SWR;
+import com.mindpart.ui.ChartGuides;
 import com.mindpart.utils.Range;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.apache.log4j.Logger;
 
-import java.net.URL;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.function.IntToDoubleFunction;
 
 /**
@@ -31,6 +34,10 @@ import java.util.function.IntToDoubleFunction;
  */
 public class VnaController {
     private static final long MHZ = 1000000;
+    private static Logger logger = Logger.getLogger(VnaController.class);
+
+    @FXML
+    AnchorPane anchorPane;
 
     @FXML
     VBox vBox;
@@ -50,11 +57,13 @@ public class VnaController {
     @FXML
     LineChart<Number, Number> phaseChart;
 
-    private ObservableList<XYChart.Series<Number, Number>> gainChartData;
-    private ObservableList<XYChart.Series<Number, Number>> phaseChartData;
+    private ObservableList<XYChart.Series<Number, Number>> swrDataSeries;
+    private ObservableList<XYChart.Series<Number, Number>> phaseDataSeries;
     private Sweeper sweeper;
     private VnaProbe vnaProbe;
     private SweepConfigControl sweepConfigControl;
+    private ChartGuides chartGuides;
+
 
     public VnaController(Sweeper sweeper, VnaProbe vnaProbe, List<SweepProfile> sweepProfiles) {
         this.sweeper = sweeper;
@@ -62,14 +71,44 @@ public class VnaController {
         this.sweepConfigControl = new SweepConfigControl(sweepProfiles);
     }
 
+    private Frequency scenePosToFrequency(Point2D scenePos) {
+        double axisX = swrChart.getXAxis().sceneToLocal(scenePos).getX();
+        return Frequency.ofMHz(swrChart.getXAxis().getValueForDisplay(axisX).doubleValue());
+    }
+
+    private double valueFromSeries(XYChart.Series<Number, Number> series, double argument) {
+        Number number = null;
+        for(XYChart.Data<Number, Number> item : series.getData()) {
+            if(item.getXValue().doubleValue() > argument) { break; }
+            number = item.getYValue();
+        }
+        return number!=null ? number.doubleValue() : 0;
+    }
+
+    private Point2D swrToLocalPos(SWR swr) {
+        return anchorPane.sceneToLocal(swrChart.getYAxis().localToScene(0,swrChart.getYAxis().getDisplayPosition(swr.getValue())));
+    }
+
     public void initialize() {
         statusLabel.setText("ready");
-        gainChartData = FXCollections.observableArrayList();
-        swrChart.setData(gainChartData);
+        swrDataSeries = FXCollections.observableArrayList();
+        swrChart.setData(swrDataSeries);
         swrChart.setCreateSymbols(false);
 
-        phaseChartData = FXCollections.observableArrayList();
-        phaseChart.setData(phaseChartData);
+        chartGuides = new ChartGuides(anchorPane, swrChart, mousePos -> {
+            Frequency freq = scenePosToFrequency(mousePos);
+            SWR swr = new SWR(valueFromSeries(swrDataSeries.get(0), freq.toMHz()));
+            Phase phase = new Phase(valueFromSeries(phaseDataSeries.get(0), freq.toMHz()));
+            Point2D selectionPos = new Point2D(mousePos.getX(), swrToLocalPos(swr).getY());
+            return new ChartGuides.SelectionData(selectionPos , "freq: "+freq+"\nswr: "+swr+"\nphase: "+phase);
+        });
+
+        swrChart.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> chartGuides.updateChartBounds());
+        swrChart.setOnMouseClicked(chartGuides::onMouseClicked);
+        swrChart.setOnMouseExited(chartGuides::onMouseExited);
+
+        phaseDataSeries = FXCollections.observableArrayList();
+        phaseChart.setData(phaseDataSeries);
         phaseChart.setCreateSymbols(false);
 
         setUpAxis(swrChart.getXAxis(), 1, 55, 2.5);
@@ -128,13 +167,12 @@ public class VnaController {
     }
 
     private void updateFrequencyAxis(NumberAxis axis, long freqStart, long freqEnd) {
-        double freqStartMHz = ((double) freqStart) / MHZ;
-        double freqEndMHz = ((double) freqEnd) / MHZ;
-        double freqSpanMHz = freqEndMHz - freqStartMHz;
+        Frequency fStart = Frequency.ofHz(freqStart);
+        Frequency fEnd = Frequency.ofHz(freqEnd);
         axis.setAutoRanging(false);
-        axis.setLowerBound(freqStartMHz);
-        axis.setUpperBound(freqEndMHz);
-        axis.setTickUnit(autoTickUnit(freqSpanMHz));
+        axis.setLowerBound(fStart.toMHz());
+        axis.setUpperBound(fEnd.toMHz());
+        axis.setTickUnit(autoTickUnit(fEnd.toMHz() - fStart.toMHz()));
     }
 
     private Range updateChart(LineChart<Number, Number> chart, long freqStart, long freqStep, int numSteps, int samples[], IntToDoubleFunction translate) {

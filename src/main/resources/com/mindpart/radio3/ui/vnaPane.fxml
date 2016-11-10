@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane minHeight="300.0" minWidth="650.0" prefHeight="600.0" prefWidth="914.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.VnaController">
+<AnchorPane fx:id="anchorPane" minHeight="300.0" minWidth="650.0" prefHeight="600.0" prefWidth="914.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.VnaController">
    <children>
       <VBox fx:id="vBox" layoutX="211.0" layoutY="50.0" prefHeight="200.0" prefWidth="738.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -35,7 +35,7 @@
                   </GridPane>
                </children>
             </HBox>
-            <LineChart fx:id="swrChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
+            <LineChart fx:id="swrChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false">
                <xAxis>
                   <NumberAxis autoRanging="false" label="Frequency [MHz]" />
                </xAxis>

@@ -1,16 +1,19 @@
 package com.mindpart.types;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.10.30
  */
 public class Frequency implements Comparable<Frequency> {
-    private static final double VALUE_MHZ = 1000000;
-    private static final double VALUE_KHZ = 1000;
-    
-    private static final String SYMBOL_MHZ = "MHz";
-    private static final String SYMBOL_KHZ = "kHz";
-    private static final String SYMBOL_HZ = "Hz";
+    private static final double MHZ_VALUE = 1000000;
+    private static final double HZ_VALUE = 1000;
+    private static final NumberFormat FORMAT_MHZ = new DecimalFormat("0.### MHz");
+    private static final NumberFormat FORMAT_KHZ = new DecimalFormat("0.### kHz");
+    private static final NumberFormat FORMAT_HZ = new DecimalFormat("# Hz");
 
     public static final Frequency ZERO = Frequency.ofHz(0);
 
@@ -21,11 +24,11 @@ public class Frequency implements Comparable<Frequency> {
     }
 
     public double toMHz() {
-        return valueHz / VALUE_MHZ;
+        return valueHz / MHZ_VALUE;
     }
 
     public double toKHz() {
-        return valueHz / VALUE_KHZ;
+        return valueHz / HZ_VALUE;
     }
 
     public long toHz() {
@@ -33,42 +36,39 @@ public class Frequency implements Comparable<Frequency> {
     }
 
     public String format() {
-        if(valueHz >= VALUE_MHZ) {
-            return toMHz() + " " + SYMBOL_MHZ;
-        } else if(valueHz >= VALUE_KHZ) {
-            return toKHz() + " " + SYMBOL_KHZ;
+        if(valueHz >= MHZ_VALUE) {
+            return FORMAT_MHZ.format(toMHz());
+        } else if(valueHz >= HZ_VALUE) {
+            return FORMAT_KHZ.format(toKHz());
         } else {
-            return toHz() + " " + SYMBOL_HZ;
+            return FORMAT_HZ.format(toHz());
         }
     }
 
     public static final Frequency ofMHz(double mhz) {
-        return new Frequency(Math.round(mhz * VALUE_MHZ));
+        return new Frequency(Math.round(mhz * MHZ_VALUE));
     }
 
     public static final Frequency ofKHz(double khz) {
-        return new Frequency((long) (khz * VALUE_KHZ));
+        return new Frequency((long) (khz * HZ_VALUE));
     }
 
     public static final Frequency ofHz(long hz) {
         return new Frequency(hz);
     }
 
-    private static String extractValue(String str, String unitSymbol) {
-        int pos = str.indexOf(unitSymbol);
-        return pos>0 ? str.substring(0,pos) : null;
-    }
-    
     public static final Frequency parse(String str) {
         String norm = str.trim();
-        String value = extractValue(norm, SYMBOL_MHZ);
-        if(value != null) { return ofMHz(Double.parseDouble(value)); }
+        ParsePosition pos = new ParsePosition(0);
 
-        value = extractValue(norm, SYMBOL_KHZ);
-        if(value != null) { return ofKHz(Double.parseDouble(value)); }
+        Number value = FORMAT_MHZ.parse(norm, pos);
+        if(value!=null) { return ofMHz(value.doubleValue()); }
 
-        value = extractValue(norm, SYMBOL_HZ);
-        return new Frequency((int)Double.parseDouble(value!=null ? value : norm));
+        value = FORMAT_KHZ.parse(norm, pos);
+        if(value != null) { return ofKHz(value.doubleValue()); }
+
+        value = FORMAT_HZ.parse(norm, pos);
+        return ofHz(value!=null ? value.intValue() : Integer.parseInt(norm));
     }
 
     @Override
