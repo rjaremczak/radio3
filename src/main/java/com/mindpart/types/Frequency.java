@@ -9,8 +9,8 @@ import java.text.ParsePosition;
  * Date: 2016.10.30
  */
 public class Frequency implements Comparable<Frequency> {
-    private static final double MHZ_VALUE = 1000000;
-    private static final double HZ_VALUE = 1000;
+    private static final double VALUE_MHz = 1000000;
+    private static final double VALUE_kHz = 1000;
     private static final NumberFormat FORMAT_MHZ = new DecimalFormat("0.### MHz");
     private static final NumberFormat FORMAT_KHZ = new DecimalFormat("0.### kHz");
     private static final NumberFormat FORMAT_HZ = new DecimalFormat("# Hz");
@@ -24,11 +24,11 @@ public class Frequency implements Comparable<Frequency> {
     }
 
     public double toMHz() {
-        return valueHz / MHZ_VALUE;
+        return valueHz / VALUE_MHz;
     }
 
     public double toKHz() {
-        return valueHz / HZ_VALUE;
+        return valueHz / VALUE_kHz;
     }
 
     public long toHz() {
@@ -36,9 +36,9 @@ public class Frequency implements Comparable<Frequency> {
     }
 
     public String format() {
-        if(valueHz >= MHZ_VALUE) {
+        if(valueHz >= VALUE_MHz) {
             return FORMAT_MHZ.format(toMHz());
-        } else if(valueHz >= HZ_VALUE) {
+        } else if(valueHz >= VALUE_kHz) {
             return FORMAT_KHZ.format(toKHz());
         } else {
             return FORMAT_HZ.format(toHz());
@@ -46,11 +46,11 @@ public class Frequency implements Comparable<Frequency> {
     }
 
     public static final Frequency ofMHz(double mhz) {
-        return new Frequency(Math.round(mhz * MHZ_VALUE));
+        return new Frequency(Math.round(mhz * VALUE_MHz));
     }
 
     public static final Frequency ofKHz(double khz) {
-        return new Frequency((long) (khz * HZ_VALUE));
+        return new Frequency((long) (khz * VALUE_kHz));
     }
 
     public static final Frequency ofHz(long hz) {
@@ -69,6 +69,10 @@ public class Frequency implements Comparable<Frequency> {
 
         value = FORMAT_HZ.parse(norm, pos);
         return ofHz(value!=null ? value.intValue() : Integer.parseInt(norm));
+    }
+
+    public static final double toMHz(long hz) {
+        return ((double) hz) / VALUE_MHz;
     }
 
     @Override

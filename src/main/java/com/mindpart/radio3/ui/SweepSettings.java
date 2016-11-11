@@ -18,7 +18,7 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2016.10.31
  */
-public class SweepConfigControl extends GridPane {
+public class SweepSettings extends GridPane {
 
     @FXML
     FrequencyField startFrequencyField;
@@ -34,7 +34,7 @@ public class SweepConfigControl extends GridPane {
 
     private ObservableList<SweepProfile> presets = FXCollections.observableArrayList();
 
-    public SweepConfigControl(List<SweepProfile> presets) {
+    public SweepSettings(List<SweepProfile> presets) {
         this.presets.addAll(presets);
         FxUtils.loadFxml(this, "sweepConfigControl.fxml");
     }

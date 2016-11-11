@@ -7,16 +7,20 @@ import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserState;
 import com.mindpart.types.Frequency;
+import com.mindpart.types.Power;
+import com.mindpart.types.Voltage;
+import com.mindpart.ui.ChartMarker;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -24,12 +28,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 
+import static com.mindpart.utils.FxUtils.valueFromSeries;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.04.15
  */
-public class SweepGeneratorController {
-    private static final long MHZ = 1000000;
+public class SweepController {
+    @FXML
+    AnchorPane anchorPane;
 
     @FXML
     VBox vBox;
@@ -47,37 +54,55 @@ public class SweepGeneratorController {
     Label statusLabel;
 
     @FXML
-    LineChart<Double, Double> lineChart;
+    LineChart<Number, Number> signalChart;
 
     @FXML
-    NumberAxis chartAxisX;
+    NumberAxis signalAxisX;
 
     @FXML
-    NumberAxis chartAxisY;
+    NumberAxis signalAxisY;
 
-    private ObservableList<XYChart.Series<Double, Double>> lineChartData;
+    private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
     private Sweeper sweeper;
     private LogarithmicProbe logarithmicProbe;
     private LinearProbe linearProbe;
     private Function<Integer, Double> probeAdcConverter;
-    private SweepConfigControl sweepConfigControl;
+    private SweepSettings sweepSettings;
+    private ChartMarker chartMarker = new ChartMarker();
+    private Function<Double, String> probeValueFormatter;
 
-    public SweepGeneratorController(Sweeper sweeper, LogarithmicProbe logarithmicProbe, LinearProbe linearProbe, List<SweepProfile> sweepProfiles) {
+    public SweepController(Sweeper sweeper, LogarithmicProbe logarithmicProbe, LinearProbe linearProbe, List<SweepProfile> sweepProfiles) {
         this.sweeper = sweeper;
         this.logarithmicProbe = logarithmicProbe;
         this.linearProbe = linearProbe;
-        this.sweepConfigControl = new SweepConfigControl(sweepProfiles);
+        this.sweepSettings = new SweepSettings(sweepProfiles);
+    }
+
+    private Frequency scenePosToFrequency(Point2D scenePos) {
+        double axisX = signalAxisX.sceneToLocal(scenePos).getX();
+        return Frequency.ofMHz(signalAxisX.getValueForDisplay(axisX).doubleValue());
+    }
+
+    private Point2D valueToRefPos(double value) {
+        return anchorPane.sceneToLocal(signalAxisY.localToScene(0, signalAxisY.getDisplayPosition(value)));
     }
 
     public void initialize() throws IOException {
         initInputProbeList();
 
-        statusLabel.setText("ready");
-        lineChartData = FXCollections.observableArrayList();
-        lineChart.setData(lineChartData);
-        lineChart.setCreateSymbols(false);
+        chartMarker.initialize(anchorPane, signalChart, scenePos -> {
+            Frequency freq = scenePosToFrequency(scenePos);
+            double value = valueFromSeries(signalDataSeries.get(0), freq.toMHz());
+            Point2D selectionPos = new Point2D(scenePos.getX(), valueToRefPos(value).getY());
+            return new ChartMarker.SelectionData(selectionPos, "freq: "+freq+"\n"+probeValueFormatter.apply(value));
+        });
 
-        hBox.getChildren().add(0, sweepConfigControl);
+        statusLabel.setText("ready");
+        signalDataSeries = FXCollections.observableArrayList();
+        signalChart.setData(signalDataSeries);
+        signalChart.setCreateSymbols(false);
+
+        hBox.getChildren().add(0, sweepSettings);
     }
 
     private void initInputProbeList() {
@@ -92,24 +117,25 @@ public class SweepGeneratorController {
     private void updateInputSource(AnalyserData.Source source) {
         switch (source) {
             case LOG_PROBE: {
-                chartAxisY.setLabel("Power [dBm]");
+                signalAxisY.setLabel("Power [dBm]");
                 probeAdcConverter = logarithmicProbe::parse;
+                probeValueFormatter = dBm -> "power: "+Power.ofDBm(dBm).formatDBm();
                 break;
             }
             case LIN_PROBE: {
-                chartAxisY.setLabel("Voltage [mV]");
+                signalAxisY.setLabel("Voltage [mV]");
                 probeAdcConverter = linearProbe::parse;
+                probeValueFormatter = mV -> "voltage: "+Voltage.ofMilliVolt(mV).format();
                 break;
             }
             default:
                 throw new IllegalArgumentException("not supported data source " + source);
         }
     }
-
     public void doStart() {
-        long fStart = sweepConfigControl.getStartFrequency().toHz();
-        long fEnd = sweepConfigControl.getEndFrequency().toHz();
-        int steps = sweepConfigControl.getSteps();
+        long fStart = sweepSettings.getStartFrequency().toHz();
+        long fEnd = sweepSettings.getEndFrequency().toHz();
+        int steps = sweepSettings.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
         sweeper.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateData, this::updateState);
         statusLabel.setText("started");
@@ -121,41 +147,22 @@ public class SweepGeneratorController {
 
     public void updateData(AnalyserData ad) {
         int samples[] = ad.getData()[0];
-        lineChartData.clear();
+        signalDataSeries.clear();
 
-        updateFrequencyAxis(chartAxisX, ad.getFreqStart(), ad.getFreqEnd());
+        FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, ad.getFreqStart(), ad.getFreqEnd());
 
-        XYChart.Series<Double, Double> chartSeries = new XYChart.Series<>();
+        XYChart.Series<Number, Number> chartSeries = new XYChart.Series<>();
         chartSeries.setName(ad.getSource().getSeriesTitle(0));
-        ObservableList<XYChart.Data<Double, Double>> data = chartSeries.getData();
+        ObservableList<XYChart.Data<Number, Number>> data = chartSeries.getData();
         long freq = ad.getFreqStart();
         for (int step = 0; step <= ad.getNumSteps(); step++) {
-            XYChart.Data item = new XYChart.Data(((double) freq) / MHZ, probeAdcConverter.apply(samples[step]));
+            XYChart.Data item = new XYChart.Data(Frequency.toMHz(freq), probeAdcConverter.apply(samples[step]));
             data.add(item);
             freq += ad.getFreqStep();
         }
-        lineChartData.add(chartSeries);
+        signalDataSeries.add(chartSeries);
 
-        chartAxisY.setForceZeroInRange(false);
-        chartAxisY.setAutoRanging(true);
-    }
-
-    private double autoTickUnit(double valueSpan) {
-        for (double div = 0.000001; div <= 100; div *= 10) {
-            if (valueSpan < div) {
-                return div / 25;
-            }
-        }
-        return 1.0;
-    }
-
-    private void updateFrequencyAxis(NumberAxis axis, long freqStart, long freqEnd) {
-        double freqStartMHz = ((double) freqStart) / MHZ;
-        double freqEndMHz = ((double) freqEnd) / MHZ;
-        double freqSpanMHz = freqEndMHz - freqStartMHz;
-        axis.setAutoRanging(false);
-        axis.setLowerBound(freqStartMHz);
-        axis.setUpperBound(freqEndMHz);
-        axis.setTickUnit(autoTickUnit(freqSpanMHz));
+        signalAxisY.setForceZeroInRange(false);
+        signalAxisY.setAutoRanging(true);
     }
 }

@@ -36,23 +36,15 @@
                </children>
             </HBox>
             <LineChart fx:id="swrChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false">
-               <xAxis>
-                  <NumberAxis autoRanging="false" label="Frequency [MHz]" />
-               </xAxis>
-               <yAxis>
-                  <NumberAxis fx:id="gainAxis" autoRanging="false" label="SWR" minWidth="-Infinity" prefWidth="60.0" tickUnit="0.5" upperBound="10.0" />
-               </yAxis>
+               <xAxis><NumberAxis fx:id="swrAxisX" autoRanging="false" label="Frequency [MHz]" /></xAxis>
+               <yAxis><NumberAxis fx:id="swrAxisY" autoRanging="false" label="SWR" minWidth="-Infinity" prefWidth="60.0" tickUnit="0.5" upperBound="10.0" /></yAxis>
                <padding>
                   <Insets left="5.0" top="5.0" />
                </padding>
             </LineChart>
             <LineChart fx:id="phaseChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" prefHeight="200.0" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
-               <xAxis>
-                  <NumberAxis autoRanging="false" forceZeroInRange="false" />
-               </xAxis>
-               <yAxis>
-                  <NumberAxis fx:id="phaseAxis" autoRanging="false" label="Phase [°]" minWidth="-Infinity" prefWidth="60.0" tickUnit="45.0" upperBound="180.0" />
-               </yAxis>
+               <xAxis><NumberAxis fx:id="phaseAxisX" autoRanging="false" forceZeroInRange="false" /></xAxis>
+               <yAxis><NumberAxis fx:id="phaseAxisY" autoRanging="false" label="Phase [°]" minWidth="-Infinity" prefWidth="60.0" tickUnit="45.0" upperBound="180.0" /></yAxis>
                <padding>
                   <Insets left="5.0" top="5.0" />
                </padding>
