@@ -1,7 +1,10 @@
 package com.mindpart.ui;
 
 import com.sun.istack.internal.NotNull;
-import javafx.geometry.*;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
@@ -47,6 +50,43 @@ public class ChartMarker {
         }
     }
 
+    private void initSelectionLabel() {
+        selectionLabel = new Label();
+        selectionLabel.setStyle("-fx-border-color: black; -fx-text-fill: black; -fx-background-color: white");
+        selectionLabel.setPadding(new Insets(10));
+        referencePane.getChildren().add(selectionLabel);
+    }
+
+    private void initSelectionPopup() {
+        selectionPopup = new Popup();
+        selectionPopup.getContent().add(selectionLabel);
+        selectionPopup.setAutoHide(false);
+        selectionPopup.setAutoFix(true);
+        selectionPopup.setConsumeAutoHidingEvents(false);
+    }
+
+    private void initSelectionPoint() {
+        selectionPoint = new Circle(0,0,5, Color.WHITE);
+        selectionPoint.setStroke(Color.RED);
+        referencePane.getChildren().add(selectionPoint);
+    }
+
+    private void initSelectionRuler() {
+        selectionRuler = new Line();
+        selectionRuler.setStroke(Color.LIGHTCORAL);
+        referencePane.getChildren().add(selectionRuler);
+    }
+
+    private void initRangeRulers() {
+        rangeEndRuler = new Line();
+        rangeEndRuler.setStroke(Color.RED);
+
+        rangeStartRuler = new Line();
+        rangeStartRuler.setStroke(Color.RED);
+
+        referencePane.getChildren().addAll(rangeStartRuler, rangeEndRuler);
+    }
+
     public void initialize(Pane referencePane, XYChart<Number, Number> chart, Function<Point2D, SelectionData> selectionFunction) {
         this.referencePane = referencePane;
         this.chart = chart;
@@ -54,29 +94,11 @@ public class ChartMarker {
         this.chartAxisY = (NumberAxis) chart.getYAxis();
         this.selectionHandler = selectionFunction;
 
-        selectionLabel = new Label();
-        selectionLabel.setStyle("-fx-border-color: black; -fx-text-fill: black; -fx-background-color: white");
-        selectionLabel.setPadding(new Insets(10));
-
-        selectionPopup = new Popup();
-        selectionPopup.getContent().add(selectionLabel);
-        selectionPopup.setAutoHide(false);
-        selectionPopup.setAutoFix(true);
-        selectionPopup.setConsumeAutoHidingEvents(false);
-
-        selectionPoint = new Circle(0,0,5, Color.WHITE);
-        selectionPoint.setStroke(Color.RED);
-
-        selectionRuler = new Line();
-        selectionRuler.setStroke(Color.LIGHTCORAL);
-
-        rangeEndRuler = new Line();
-        rangeEndRuler.setStroke(Color.RED);
-
-        rangeStartRuler = new Line();
-        rangeStartRuler.setStroke(Color.RED);
-
-        referencePane.getChildren().addAll(selectionRuler, selectionPoint, rangeEndRuler, rangeStartRuler);
+        initSelectionLabel();
+        initSelectionPopup();
+        initSelectionRuler();
+        initSelectionPoint();
+        initRangeRulers();
 
         chart.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> updateChartBounds());
         chart.setOnMouseClicked(this::onMouseClicked);
@@ -100,10 +122,6 @@ public class ChartMarker {
 
     private boolean isRangeSelection() {
         return rangeStartHandler!=null && rangeEndHandler!=null;
-    }
-
-    public void setRangeEndHandler(Consumer<XYChart.Data<Number, Number>> handler) {
-        this.rangeEndHandler = handler;
     }
 
     private void setupRuler(Line vLine) {

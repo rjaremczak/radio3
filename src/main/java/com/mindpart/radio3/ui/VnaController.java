@@ -129,7 +129,6 @@ public class VnaController {
     }
 
     public void doStart() {
-        chartMarker.reset();
         long fStart = sweepSettings.getStartFrequency().toHz();
         long fEnd = sweepSettings.getEndFrequency ().toHz();
         int steps = sweepSettings.getSteps();
@@ -143,6 +142,7 @@ public class VnaController {
     }
 
     public void updateData(AnalyserData ad) {
+        chartMarker.reset();
         long freqEnd = ad.getFreqStart() + (ad.getNumSteps() * ad.getFreqStep());
         int samples[][] = ad.getData();
 

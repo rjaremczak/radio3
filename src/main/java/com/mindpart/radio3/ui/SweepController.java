@@ -137,7 +137,6 @@ public class SweepController {
         }
     }
     public void doStart() {
-        chartMarker.reset();
         long fStart = sweepSettings.getStartFrequency().toHz();
         long fEnd = sweepSettings.getEndFrequency().toHz();
         int steps = sweepSettings.getSteps();
@@ -151,6 +150,7 @@ public class SweepController {
     }
 
     public void updateData(AnalyserData ad) {
+        chartMarker.reset();
         int samples[] = ad.getData()[0];
         signalDataSeries.clear();
 

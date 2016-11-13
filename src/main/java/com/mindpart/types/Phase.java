@@ -1,10 +1,15 @@
 package com.mindpart.types;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.11.09
  */
 public class Phase {
+    private static final NumberFormat FORMAT_DEG = new DecimalFormat("0 °");
+
     private int angle;
 
     public Phase(int angle) {
@@ -16,7 +21,7 @@ public class Phase {
     }
 
     public String format() {
-        return Integer.toString(angle);
+        return FORMAT_DEG.format(angle);
     }
 
     public void parse(String str) {
