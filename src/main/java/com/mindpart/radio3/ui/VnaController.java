@@ -71,14 +71,14 @@ public class VnaController {
     private ObservableList<XYChart.Series<Number, Number>> phaseDataSeries;
     private Sweeper sweeper;
     private VnaProbe vnaProbe;
-    private SweepSettings sweepConfigControl;
+    private SweepSettings sweepSettings;
     private ChartMarker chartMarker = new ChartMarker();
 
 
     public VnaController(Sweeper sweeper, VnaProbe vnaProbe, List<SweepProfile> sweepProfiles) {
         this.sweeper = sweeper;
         this.vnaProbe = vnaProbe;
-        this.sweepConfigControl = new SweepSettings(sweepProfiles);
+        this.sweepSettings = new SweepSettings(sweepProfiles);
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -104,6 +104,10 @@ public class VnaController {
             return new ChartMarker.SelectionData(selectionPos , "freq: "+freq+"\nswr: "+swr+"\nphase: "+phase);
         });
 
+        chartMarker.setupRangeSelection(
+                data -> sweepSettings.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
+                data -> sweepSettings.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
+
         phaseDataSeries = FXCollections.observableArrayList();
         phaseChart.setData(phaseDataSeries);
         phaseChart.setCreateSymbols(false);
@@ -113,7 +117,7 @@ public class VnaController {
         setUpAxis(phaseAxisX, 1, 55, 2.5);
         setUpAxis(phaseAxisY, 0, 180, 45);
 
-        hBox.getChildren().add(0, sweepConfigControl);
+        hBox.getChildren().add(0, sweepSettings);
     }
 
     private void setUpAxis(Axis<Number> axis, double min, double max, double tickUnit) {
@@ -125,9 +129,10 @@ public class VnaController {
     }
 
     public void doStart() {
-        long fStart = sweepConfigControl.getStartFrequency().toHz();
-        long fEnd = sweepConfigControl.getEndFrequency ().toHz();
-        int steps = sweepConfigControl.getSteps();
+        chartMarker.reset();
+        long fStart = sweepSettings.getStartFrequency().toHz();
+        long fEnd = sweepSettings.getEndFrequency ().toHz();
+        int steps = sweepSettings.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
         sweeper.startAnalyser(fStart, fStep, steps, AnalyserData.Source.VNA, this::updateData, this::updateState);
         statusLabel.setText("started");

@@ -11,7 +11,6 @@ import static com.mindpart.radio3.device.FrameCommand.CMPPROBE_GET;
  */
 public class VnaProbe implements FrameParser<Complex> {
     private static final Frame SAMPLE = new Frame(CMPPROBE_GET);
-    private static final double MAX_SWR = 5.0;
 
     private DeviceService deviceService;
     private Adc adc;
@@ -30,8 +29,7 @@ public class VnaProbe implements FrameParser<Complex> {
         double v = adc.convert(adcValue);
         double dB = -32.0 + (v - 0.03)/0.03;
         double ratio = 1/Math.pow(10,dB/20);
-        double swr = Math.abs((1+ratio)/(1-ratio));
-        return Math.min(MAX_SWR, swr);
+        return Math.abs((1+ratio)/(1-ratio));
     }
 
     public double calculatePhaseAngle(int adcValue) {

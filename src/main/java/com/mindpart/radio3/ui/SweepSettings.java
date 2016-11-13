@@ -65,8 +65,16 @@ public class SweepSettings extends GridPane {
         return startFrequencyField.getFrequency();
     }
 
+    public void setStartFrequency(Frequency frequency) {
+        startFrequencyField.setFrequency(frequency);
+    }
+
     public Frequency getEndFrequency() {
         return endFrequencyField.getFrequency();
+    }
+
+    public void setEndFrequency(Frequency frequency) {
+        endFrequencyField.setFrequency(frequency);
     }
 
     public int getSteps() {

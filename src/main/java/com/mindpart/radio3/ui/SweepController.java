@@ -97,6 +97,10 @@ public class SweepController {
             return new ChartMarker.SelectionData(selectionPos, "freq: "+freq+"\n"+probeValueFormatter.apply(value));
         });
 
+        chartMarker.setupRangeSelection(
+                data -> sweepSettings.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
+                data -> sweepSettings.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
+
         statusLabel.setText("ready");
         signalDataSeries = FXCollections.observableArrayList();
         signalChart.setData(signalDataSeries);
@@ -133,6 +137,7 @@ public class SweepController {
         }
     }
     public void doStart() {
+        chartMarker.reset();
         long fStart = sweepSettings.getStartFrequency().toHz();
         long fEnd = sweepSettings.getEndFrequency().toHz();
         int steps = sweepSettings.getSteps();
