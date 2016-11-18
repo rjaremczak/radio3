@@ -24,7 +24,7 @@ public class Sweeper implements FrameParser<AnalyserData> {
     @Override
     public AnalyserData parse(Frame frame) {
         BinaryIterator bi = frame.binaryIterator();
-        AnalyserData ad = new AnalyserData(bi.nextUInt32(), bi.nextUInt32(), bi.nextUInt16(), AnalyserData.Source.values()[bi.nextUInt16()]);
+        AnalyserData ad = new AnalyserData(bi.nextUInt32(), bi.nextUInt32(), bi.nextUInt16(), AnalyserDataSource.values()[bi.nextUInt16()]);
         int data[][] = ad.getData();
         for(int step=0; step<=ad.getNumSteps(); step++) {
             for(int series=0; series<ad.getNumSeries(); series++) {
@@ -34,7 +34,7 @@ public class Sweeper implements FrameParser<AnalyserData> {
         return ad;
     }
 
-    public void startAnalyser(long fStart, int fStep, int steps, AnalyserData.Source source,  Consumer<AnalyserData> dataHandler, Consumer<AnalyserState> stateHandler) {
+    public void startAnalyser(long fStart, int fStep, int steps, AnalyserDataSource source,  Consumer<AnalyserData> dataHandler, Consumer<AnalyserState> stateHandler) {
         deviceService.startAnalyser(fStart, fStep, steps, 10, source, dataHandler, stateHandler);
     }
 }

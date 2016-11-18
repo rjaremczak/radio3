@@ -73,7 +73,7 @@ public class DeviceService {
     }
 
     public void startAnalyser(long freqStart, long freqStep, int numSteps, int stepWaitMs,
-                              AnalyserData.Source source,
+                              AnalyserDataSource source,
                               Consumer<AnalyserData> analyserDataHandler,
                               Consumer<AnalyserState> analyserStateHandler) {
         this.analyserDataHandler = analyserDataHandler;

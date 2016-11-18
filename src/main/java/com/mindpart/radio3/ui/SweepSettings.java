@@ -80,4 +80,11 @@ public class SweepSettings extends GridPane {
     public int getSteps() {
         return NumberUtils.toInt(stepsField.getText(), 100);
     }
+
+    public void setEditable(boolean editable) {
+        startFrequencyField.setEditable(editable);
+        endFrequencyField.setEditable(editable);
+        stepsField.setEditable(editable);
+        presetsChoiceBox.setDisable(!editable);
+    }
 }

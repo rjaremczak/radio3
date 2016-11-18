@@ -4,6 +4,7 @@ import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.VnaProbe;
 import com.mindpart.radio3.device.AnalyserData;
+import com.mindpart.radio3.device.AnalyserDataSource;
 import com.mindpart.radio3.device.AnalyserState;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.Phase;
@@ -133,7 +134,7 @@ public class VnaController {
         long fEnd = sweepSettings.getEndFrequency ().toHz();
         int steps = sweepSettings.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
-        sweeper.startAnalyser(fStart, fStep, steps, AnalyserData.Source.VNA, this::updateData, this::updateState);
+        sweeper.startAnalyser(fStart, fStep, steps, AnalyserDataSource.VNA, this::updateData, this::updateState);
         statusLabel.setText("started");
     }
 
