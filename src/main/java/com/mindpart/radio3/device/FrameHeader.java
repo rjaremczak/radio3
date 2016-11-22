@@ -28,7 +28,7 @@ import com.mindpart.utils.Binary;
  format C:
  15 - two byte size (-269) followed by payload (size of 0 means 269 bytes)
 
- - additional crc8 or crc16 can be appended at the end of the frame, to be defined ...
+ - additional crc8 appended at the end of the frame
 
  */
 

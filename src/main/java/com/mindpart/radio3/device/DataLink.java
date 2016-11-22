@@ -51,7 +51,7 @@ public class DataLink {
                 flushReadBuffer();
                 frameHandler.accept(frame);
             } catch (Exception e) {
-                logger.error(e);
+                logger.error(e.getMessage());
             }
         }, SerialPort.MASK_RXCHAR);
     }

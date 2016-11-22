@@ -33,7 +33,7 @@ public class Frame {
 
     @Override
     public String toString() {
-        return command + ", payload size: "+getPayloadSize();
+        return String.format("%04X, payload size: %d", command.getCode(), getPayloadSize());
     }
 
     public BinaryIterator binaryIterator() {
