@@ -35,6 +35,8 @@ import static com.mindpart.utils.FxUtils.valueFromSeries;
  * Date: 2016.04.15
  */
 public class VnaController {
+    private static final double MAX_SWR = 5.0;
+
     @FXML
     AnchorPane anchorPane;
 
@@ -151,7 +153,9 @@ public class VnaController {
         FrequencyAxisUtils.setupFrequencyAxis(phaseAxisX, ad.getFreqStart(), freqEnd);
 
         swrAxisY.setAutoRanging(false);
-        Range swrRange = updateChart(swrChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[0], vnaProbe::calculateSWR);
+        Range swrRange = updateChart(swrChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[0],
+                adcValue -> Math.min(MAX_SWR, vnaProbe.calculateSWR(adcValue)));
+
         swrAxisY.setLowerBound(Math.min(1.0, swrRange.getMin()));
         swrAxisY.setUpperBound(Math.max(2.0, swrRange.getMax()));
         swrAxisY.setTickUnit(swrRange.span() < 5 ? 0.2 : (swrRange.span() < 20 ? 1.0 : 10.0));
