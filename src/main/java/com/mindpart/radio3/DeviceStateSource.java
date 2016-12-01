@@ -24,7 +24,6 @@ public class DeviceStateSource implements FrameParser<DeviceState> {
     @Override
     public DeviceState parse(Frame frame) {
         BinaryIterator bi = frame.binaryIterator();
-        bi.nextUInt8();
         return new DeviceState(bi.nextBool(), bi.nextUInt16(), bi.nextUInt32());
     }
 
