@@ -68,6 +68,12 @@ public class MainController {
     @FXML
     Button sampleAllProbesBtn;
 
+    @FXML
+    Button ddsRelayVfo;
+
+    @FXML
+    Button ddsRelayVna;
+
     private Radio3 radio3;
     private Map<String, String> devicePropertiesMap = new LinkedHashMap<>();
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
@@ -244,5 +250,15 @@ public class MainController {
             enableItems(sampleAllProbesBtn, deviceConnect, sweepTab, deviceInfoTab, vnaTab);
             radio3.disableGetOnAllProbes(false);
         }
+    }
+
+    @FXML
+    void onDdsRelayVfo() {
+        radio3.ddsRelayVfo();
+    }
+
+    @FXML
+    void onDdsRelayVna() {
+        radio3.ddsRelayVna();
     }
 }

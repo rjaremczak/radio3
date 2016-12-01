@@ -227,4 +227,11 @@ public class Radio3 extends Application {
         launch(args);
     }
 
+    public void ddsRelayVfo() {
+        deviceService.performRequest(new Frame(FrameCommand.DDS_RELAY_SET_VFO));
+    }
+
+    public void ddsRelayVna() {
+        deviceService.performRequest(new Frame(FrameCommand.DDS_RELAY_SET_VNA));
+    }
 }

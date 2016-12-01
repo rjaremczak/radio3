@@ -6,6 +6,7 @@ import com.mindpart.radio3.VnaProbe;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserDataSource;
 import com.mindpart.radio3.device.AnalyserState;
+import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.Phase;
 import com.mindpart.types.SWR;
@@ -76,7 +77,6 @@ public class VnaController {
     private VnaProbe vnaProbe;
     private SweepSettings sweepSettings;
     private ChartMarker chartMarker = new ChartMarker();
-
 
     public VnaController(Sweeper sweeper, VnaProbe vnaProbe, List<SweepProfile> sweepProfiles) {
         this.sweeper = sweeper;
