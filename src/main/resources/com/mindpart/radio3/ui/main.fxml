@@ -46,9 +46,8 @@
                                              </HBox.margin>
                                           </ToggleButton>
                                           <Separator prefWidth="200.0" visible="false" />
-                                          <Label text="DDS relay:" />
-                                          <Button fx:id="ddsRelayVfo" mnemonicParsing="false" onAction="#onDdsRelayVfo" text="VFO" />
-                                          <Button fx:id="ddsRelayVna" mnemonicParsing="false" onAction="#onDdsRelayVna" text="VNA" />
+                                          <Label text="DDS out:" />
+                                          <ChoiceBox fx:id="ddsOutput" />
                                        </children>
                                        <padding>
                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.device.DdsOut;
 import com.mindpart.radio3.device.DeviceInfo;
 import com.mindpart.radio3.device.DeviceState;
 import com.mindpart.radio3.device.ErrorCode;
@@ -69,10 +70,7 @@ public class MainController {
     Button sampleAllProbesBtn;
 
     @FXML
-    Button ddsRelayVfo;
-
-    @FXML
-    Button ddsRelayVna;
+    ChoiceBox<DdsOut> ddsOutput;
 
     private Radio3 radio3;
     private Map<String, String> devicePropertiesMap = new LinkedHashMap<>();
@@ -171,10 +169,7 @@ public class MainController {
     public void updateDeviceInfo(DeviceInfo di) {
         devicePropertiesMap.put("Device", di.name);
         devicePropertiesMap.put("Build Id", di.buildId);
-        devicePropertiesMap.put("VFO", di.vfo.name + " (freq: " + di.vfo.minFrequency + " to " + di.vfo.maxFrequency + " Hz)");
-        devicePropertiesMap.put("FMeter", di.fMeter.name + " (freq: " + di.fMeter.minFrequency + " to " + di.fMeter.maxFrequency + " Hz)");
-        devicePropertiesMap.put("Logarithmic probe", di.logProbe.name + " (power: " + di.logProbe.minDBm + " to " + di.logProbe.maxDBm + " dBm)");
-        devicePropertiesMap.put("VNA", di.vna.name);
+        devicePropertiesMap.put("VFO", di.vfo.type.getDescription() + " (freq: " + di.vfo.minFrequency + " to " + di.vfo.maxFrequency + " Hz)");
         updateDeviceProperties();
         deviceConnectionStatus.setText("connected to " + di.name);
     }
@@ -187,7 +182,10 @@ public class MainController {
         devicePropertiesMap.put("Continuous sampling", Boolean.toString(ds.isProbesSampling()));
         devicePropertiesMap.put("Sampling period", ds.getSamplingPeriodMs() + " ms");
         devicePropertiesMap.put("Time since reset", ds.getTimeMs() + " ms");
+        devicePropertiesMap.put("Analyser's state", ds.getAnalyserState().toString());
+        devicePropertiesMap.put("DDS output", ds.getDdsOut().toString());
         updateDeviceProperties();
+        ddsOutput.getSelectionModel().select(ds.getDdsOut());
     }
 
     private void disableHeader(TableView tableView) {
@@ -206,6 +204,10 @@ public class MainController {
         radio3.getDeviceStateSource().requestData();
     }
 
+    private void initDdsOut() {
+        ddsOutput.getItems().setAll(DdsOut.values());
+    }
+
     @FXML
     public void initialize() {
         devicePropertiesTable.setItems(deviceProperties);
@@ -213,6 +215,7 @@ public class MainController {
         updateOnDisconnect();
         updateConnectionStatus();
         updateAvailablePorts();
+        initDdsOut();
     }
 
     public void shutdown() {
@@ -250,15 +253,5 @@ public class MainController {
             enableItems(sampleAllProbesBtn, deviceConnect, sweepTab, deviceInfoTab, vnaTab);
             radio3.disableGetOnAllProbes(false);
         }
-    }
-
-    @FXML
-    void onDdsRelayVfo() {
-        radio3.ddsRelayVfo();
-    }
-
-    @FXML
-    void onDdsRelayVna() {
-        radio3.ddsRelayVna();
     }
 }

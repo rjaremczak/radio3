@@ -72,8 +72,7 @@ public class DeviceService {
         performRequest(new Frame(FrameCommand.VFO_SET_FREQ, Binary.fromUInt32(frequency)));
     }
 
-    public void startAnalyser(long freqStart, long freqStep, int numSteps, int stepWaitMs,
-                              AnalyserDataSource source,
+    public void startAnalyser(long freqStart, long freqStep, int numSteps, AnalyserDataSource source,
                               Consumer<AnalyserData> analyserDataHandler,
                               Consumer<AnalyserState> analyserStateHandler) {
         this.analyserDataHandler = analyserDataHandler;
@@ -82,8 +81,7 @@ public class DeviceService {
         builder.addUInt32(freqStart);
         builder.addUInt32(freqStep);
         builder.addUInt16(numSteps);
-        builder.addUInt16(stepWaitMs);
-        builder.addUInt16(source.ordinal());
+        builder.addUInt8(source.ordinal());
         performRequest(new Frame(FrameCommand.ANALYSER_REQUEST, builder.getBytes()));
     }
 

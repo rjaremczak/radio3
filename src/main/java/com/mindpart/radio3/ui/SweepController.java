@@ -55,7 +55,7 @@ public class SweepController {
     ChoiceBox<AnalyserDataSource> sourceProbe;
 
     @FXML
-    ToggleButton btnRelative;
+    ToggleButton btnNormalize;
 
     @FXML
     Button startButton;
@@ -110,8 +110,8 @@ public class SweepController {
         return value - referenceData.get(index);
     }
 
-    private Double fromLinearToRelativeGain(int index, Double value) {
-        return 20 * Math.log10(value/referenceData.get(index));
+    private Double fromLinearTo1mV(int index, Double value) {
+        return 1.0 + (value - referenceData.get(index));
     }
 
     public void initialize() throws IOException {
@@ -135,22 +135,28 @@ public class SweepController {
 
         hBox.getChildren().add(0, sweepSettings);
 
-        btnRelative.selectedProperty().addListener(this::onRelativeChanged);
+        btnNormalize.selectedProperty().addListener(this::onNormalizeChanged);
     }
 
-    private void onRelativeChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean relative) {
+    private void onNormalizeChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean relative) {
         sweepSettings.setEditable(!relative);
         sourceProbe.setDisable(relative);
         if(relative) {
             referenceData = receivedData.stream().map(XYChart.Data::getYValue).collect(Collectors.toList());
-            signalAxisY.setLabel("Relative Gain [dB]");
-            probeAdcConverter = logarithmicProbe::parse;
-            probeValueFormatter = dB -> "gain: "+dB+" dB";
-            valueProcessor = selectPostProcessor(sourceProbe.getValue());
+            if(sourceProbe.getValue() == AnalyserDataSource.LOG_PROBE) {
+                signalAxisY.setLabel("Normalized Power [dBm]");
+                probeAdcConverter = logarithmicProbe::parse;
+                probeValueFormatter = this::powerValueFormatter;
+                valueProcessor = this::fromLogarithmicToRelativeGain;
+            } else {
+                signalAxisY.setLabel("Normalized Voltage [mV]");
+                probeAdcConverter = linearProbe::parse;
+                probeValueFormatter = this::voltageValueFormatter;
+                valueProcessor = this::fromLinearTo1mV;
+            }
         } else {
             referenceData.clear();
             updateInputSource(sourceProbe.getValue());
-            valueProcessor = this::originalValue;
         }
 
         updateChart();
@@ -165,12 +171,12 @@ public class SweepController {
         updateInputSource(sourceProbe.getValue());
     }
 
-    private BiFunction<Integer, Double, Double> selectPostProcessor(AnalyserDataSource source) {
-        switch (source) {
-            case LOG_PROBE: return this::fromLogarithmicToRelativeGain;
-            case LIN_PROBE: return this::fromLinearToRelativeGain;
-            default: throw new IllegalArgumentException("not supported data source " + source);
-        }
+    private String powerValueFormatter(double dBm) {
+        return "power: "+Power.ofDBm(dBm).formatDBm();
+    }
+
+    private String voltageValueFormatter(double mV) {
+        return "voltage: "+Voltage.ofMilliVolt(mV).format();
     }
 
     private void updateInputSource(AnalyserDataSource source) {
@@ -178,13 +184,15 @@ public class SweepController {
             case LOG_PROBE: {
                 signalAxisY.setLabel("Power [dBm]");
                 probeAdcConverter = logarithmicProbe::parse;
-                probeValueFormatter = dBm -> "power: "+Power.ofDBm(dBm).formatDBm();
+                probeValueFormatter = this::powerValueFormatter;
+                valueProcessor = this::originalValue;
                 break;
             }
             case LIN_PROBE: {
                 signalAxisY.setLabel("Voltage [mV]");
                 probeAdcConverter = linearProbe::parse;
-                probeValueFormatter = mV -> "voltage: "+Voltage.ofMilliVolt(mV).format();
+                probeValueFormatter = this::voltageValueFormatter;
+                valueProcessor = this::originalValue;
                 break;
             }
             default:
@@ -193,20 +201,20 @@ public class SweepController {
     }
 
     public void doStart() {
-        btnRelative.setDisable(true);
+        btnNormalize.setDisable(true);
         long fStart = sweepSettings.getStartFrequency().toHz();
         long fEnd = sweepSettings.getEndFrequency().toHz();
         int steps = sweepSettings.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
-        sweeper.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateReceivedData, this::updateState);
-        statusLabel.setText("started");
+        sweeper.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateAnalyserData, this::updateAnalyserState);
+        statusLabel.setText(AnalyserState.PROCESSING.toString());
     }
 
-    public void updateState(AnalyserState state) {
+    public void updateAnalyserState(AnalyserState state) {
         statusLabel.setText(state.toString());
     }
 
-    public void updateReceivedData(AnalyserData ad) {
+    public void updateAnalyserData(AnalyserData ad) {
         receivedDataInfo = ad.toInfo();
         receivedData.clear();
 
@@ -239,6 +247,6 @@ public class SweepController {
 
         signalAxisY.setAutoRanging(true);
         signalAxisY.setForceZeroInRange(false);
-        btnRelative.setDisable(false);
+        btnNormalize.setDisable(false);
     }
 }

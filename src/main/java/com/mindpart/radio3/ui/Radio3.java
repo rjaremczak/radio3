@@ -104,7 +104,6 @@ public class Radio3 extends Application {
 
         bind(new LogMessageParser(), this::dumpDeviceLog);
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
-        bind(new AnalyserStateParser(), deviceService::handleAnalyserState);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
         loader.setControllerFactory(clazz -> mainController);
