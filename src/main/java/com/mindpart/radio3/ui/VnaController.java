@@ -135,7 +135,7 @@ public class VnaController {
         long fEnd = sweepSettings.getEndFrequency ().toHz();
         int steps = sweepSettings.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
-        sweeper.startAnalyser(fStart, fStep, steps, AnalyserDataSource.VNA, this::updateAnalyserData, this::updateAnalyserState);
+        sweeper.startAnalyser(fStart, fStep, steps, AnalyserDataSource.VNA, this::updateAnalyserData);
         statusLabel.setText("started");
     }
 

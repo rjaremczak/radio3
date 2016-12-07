@@ -28,7 +28,6 @@ public class DeviceService {
     private DataLink dataLink;
     private Map<FrameParser, BiConsumer<FrameParser, Frame>> bindings = new HashMap<>();
     private Consumer<AnalyserData> analyserDataHandler;
-    private Consumer<AnalyserState> analyserStateHandler;
     private long framesReceived;
 
     public <T extends FrameParser<U>, U> void registerBinding(T parser, BiConsumer<FrameParser, Frame> handler) {
@@ -73,10 +72,8 @@ public class DeviceService {
     }
 
     public void startAnalyser(long freqStart, long freqStep, int numSteps, AnalyserDataSource source,
-                              Consumer<AnalyserData> analyserDataHandler,
-                              Consumer<AnalyserState> analyserStateHandler) {
+                              Consumer<AnalyserData> analyserDataHandler) {
         this.analyserDataHandler = analyserDataHandler;
-        this.analyserStateHandler = analyserStateHandler;
         BinaryBuilder builder = new BinaryBuilder(14);
         builder.addUInt32(freqStart);
         builder.addUInt32(freqStep);
@@ -100,10 +97,6 @@ public class DeviceService {
 
     public void handleAnalyserData(AnalyserData analyserData) {
         analyserDataHandler.accept(analyserData);
-    }
-
-    public void handleAnalyserState(AnalyserState analyserState) {
-        analyserStateHandler.accept(analyserState);
     }
 
     public long getFramesReceived() {

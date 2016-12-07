@@ -186,6 +186,7 @@ public class MainController {
         devicePropertiesMap.put("DDS output", ds.getDdsOut().toString());
         updateDeviceProperties();
         ddsOutput.getSelectionModel().select(ds.getDdsOut());
+
     }
 
     private void disableHeader(TableView tableView) {
@@ -206,6 +207,12 @@ public class MainController {
 
     private void initDdsOut() {
         ddsOutput.getItems().setAll(DdsOut.values());
+        ddsOutput.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            switch (newValue) {
+                case VFO: radio3.ddsOutVfo(); break;
+                case VNA: radio3.ddsOutVna(); break;
+            }
+        });
     }
 
     @FXML

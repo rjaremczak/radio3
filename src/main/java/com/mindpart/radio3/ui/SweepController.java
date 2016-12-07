@@ -206,7 +206,7 @@ public class SweepController {
         long fEnd = sweepSettings.getEndFrequency().toHz();
         int steps = sweepSettings.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
-        sweeper.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateAnalyserData, this::updateAnalyserState);
+        sweeper.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateAnalyserData);
         statusLabel.setText(AnalyserState.PROCESSING.toString());
     }
 

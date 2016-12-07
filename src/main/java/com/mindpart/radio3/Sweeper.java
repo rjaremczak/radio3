@@ -39,7 +39,7 @@ public class Sweeper implements FrameParser<AnalyserData> {
         return ad;
     }
 
-    public void startAnalyser(long fStart, int fStep, int steps, AnalyserDataSource source,  Consumer<AnalyserData> dataHandler, Consumer<AnalyserState> stateHandler) {
-        deviceService.startAnalyser(fStart, fStep, steps, source, dataHandler, stateHandler);
+    public void startAnalyser(long fStart, int fStep, int steps, AnalyserDataSource source,  Consumer<AnalyserData> dataHandler) {
+        deviceService.startAnalyser(fStart, fStep, steps, source, dataHandler);
     }
 }

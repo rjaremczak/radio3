@@ -100,7 +100,11 @@ public class Radio3 extends Application {
         bind(deviceInfoSource, mainController::updateDeviceInfo);
 
         deviceStateSource = new DeviceStateSource(deviceService);
-        bind(deviceStateSource, mainController::updateDeviceState);
+        bind(deviceStateSource, deviceState -> {
+            mainController.updateDeviceState(deviceState);
+            vnaController.updateAnalyserState(deviceState.getAnalyserState());
+            sweepController.updateAnalyserState(deviceState.getAnalyserState());
+        });
 
         bind(new LogMessageParser(), this::dumpDeviceLog);
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
@@ -226,11 +230,11 @@ public class Radio3 extends Application {
         launch(args);
     }
 
-    public void ddsRelayVfo() {
+    public void ddsOutVfo() {
         deviceService.performRequest(new Frame(FrameCommand.DDS_RELAY_SET_VFO));
     }
 
-    public void ddsRelayVna() {
+    public void ddsOutVna() {
         deviceService.performRequest(new Frame(FrameCommand.DDS_RELAY_SET_VNA));
     }
 }
