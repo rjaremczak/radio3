@@ -1,6 +1,5 @@
 package com.mindpart.ui;
 
-import com.sun.istack.internal.NotNull;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -114,8 +113,8 @@ public class ChartMarker {
         rangeEndRuler.setVisible(false);
     }
 
-    public void setupRangeSelection(@NotNull Consumer<XYChart.Data<Number, Number>> startHandler,
-                                    @NotNull Consumer<XYChart.Data<Number, Number>> endHandler) {
+    public void setupRangeSelection(Consumer<XYChart.Data<Number, Number>> startHandler,
+                                    Consumer<XYChart.Data<Number, Number>> endHandler) {
         this.rangeStartHandler = startHandler;
         this.rangeEndHandler = endHandler;
     }

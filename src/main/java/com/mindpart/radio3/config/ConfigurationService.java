@@ -21,16 +21,21 @@ public class ConfigurationService {
     private Path configurationFile;
     private Configuration configuration;
 
-    private void initOwnDirectory() throws IOException {
-        ownDirectory = Paths.get(System.getenv("HOME") + "/.radio3");
-        if(!Files.exists(ownDirectory, LinkOption.NOFOLLOW_LINKS)) {
-            logger.info("create application's directory " + ownDirectory);
-            Files.createDirectory(ownDirectory);
+    private void initOwnDirectories() throws IOException {
+        ownDirectory = Paths.get(System.getProperty("user.home"),".radio3");
+        initDirectory(ownDirectory);
+        initDirectory(Paths.get(ownDirectory.toString(),"log"));
+    }
+
+    private void initDirectory(Path directory) throws IOException {
+        if(!Files.exists(directory, LinkOption.NOFOLLOW_LINKS)) {
+            logger.info("create directory " + directory);
+            Files.createDirectory(directory);
         }
     }
 
     public void init() throws IOException {
-        initOwnDirectory();
+        initOwnDirectories();
         configurationFile = Paths.get(ownDirectory.toString(),"configuration.json");
         if(Files.exists(configurationFile, LinkOption.NOFOLLOW_LINKS)) {
             load();

@@ -60,6 +60,7 @@ public class Radio3 extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        logger.debug("started");
         configurationService = new ConfigurationService();
         configurationService.init();
         Configuration configuration = configurationService.getConfiguration();
@@ -137,7 +138,7 @@ public class Radio3 extends Application {
         super.stop();
         disconnect();
         mainController.shutdown();
-        logger.info("stopped");
+        logger.debug("stopped");
     }
 
     public void updateAllProbes(ProbeValues probeValues) {

@@ -98,9 +98,8 @@ public class DataLink {
         if(serialPort.getInputBufferBytesCount()!=0) {
             logger.warn("remaining "+serialPort.getInputBufferBytesCount()+" bytes in RX buffer");
         }
-        Frame frame = new Frame(header.getCommand(), payload);
 
-        return frame;
+        return new Frame(header.getCommand(), payload);
     }
 
     public int flushReadBuffer() {
