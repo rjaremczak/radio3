@@ -24,7 +24,7 @@ public class ConfigurationService {
     private void initOwnDirectories() throws IOException {
         ownDirectory = Paths.get(System.getProperty("user.home"),".radio3");
         initDirectory(ownDirectory);
-        initDirectory(Paths.get(ownDirectory.toString(),"log"));
+        //initDirectory(Paths.get(ownDirectory.toString(),"log"));
     }
 
     private void initDirectory(Path directory) throws IOException {
