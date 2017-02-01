@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  * Created by Robert Jaremczak
@@ -20,11 +21,11 @@ public class ConfigurationService {
     private Path ownDirectory;
     private Path configurationFile;
     private Configuration configuration;
+    private String buildId;
 
     private void initOwnDirectories() throws IOException {
         ownDirectory = Paths.get(System.getProperty("user.home"),".radio3");
         initDirectory(ownDirectory);
-        //initDirectory(Paths.get(ownDirectory.toString(),"log"));
     }
 
     private void initDirectory(Path directory) throws IOException {
@@ -35,6 +36,7 @@ public class ConfigurationService {
     }
 
     public void init() throws IOException {
+        loadCommonProperties();
         initOwnDirectories();
         configurationFile = Paths.get(ownDirectory.toString(),"configuration.json");
         if(Files.exists(configurationFile, LinkOption.NOFOLLOW_LINKS)) {
@@ -43,6 +45,12 @@ public class ConfigurationService {
             loadDefaults();
             save();
         }
+    }
+
+    private void loadCommonProperties() throws IOException {
+        Properties properties = new Properties();
+        properties.load(getClass().getResourceAsStream("common.properties"));
+        buildId = properties.getProperty("buildId");
     }
 
     public void load() throws IOException {
@@ -58,7 +66,13 @@ public class ConfigurationService {
         configuration = new ObjectMapper().readValue(is, Configuration.class);
     }
 
+
+
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    public String getBuildId() {
+        return buildId;
     }
 }

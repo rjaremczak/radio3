@@ -1,8 +1,10 @@
 package com.mindpart.utils;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Tab;
 
 import java.io.IOException;
 
@@ -45,4 +47,21 @@ public final class FxUtils {
         return number!=null ? number.doubleValue() : 0;
     }
 
+    public static void setDisabledOf(boolean flag, Object... items) {
+        for (Object item : items) {
+            if (item instanceof Node) {
+                ((Node) item).setDisable(flag);
+            } else if (item instanceof Tab) {
+                ((Tab) item).setDisable(flag);
+            }
+        }
+    }
+
+    public static void disableItems(Object... items) {
+        setDisabledOf(true, items);
+    }
+
+    public static void enableItems(Object... items) {
+        FxUtils.setDisabledOf(false, items);
+    }
 }

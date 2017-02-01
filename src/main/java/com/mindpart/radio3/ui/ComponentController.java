@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public abstract class ComponentController implements Initializable {
+public abstract class ComponentController {
 
     @FXML
     protected Pane pane;
@@ -39,10 +39,8 @@ public abstract class ComponentController implements Initializable {
     @FXML
     protected Button mainButton;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        initialize();
-    }
+    @FXML
+    abstract protected void initialize();
 
     protected void setUpAsProbe(String title, String name) {
         setUp(title, name, false, "Get");
@@ -71,8 +69,6 @@ public abstract class ComponentController implements Initializable {
     public String getValue() {
         return valueField.getText();
     }
-
-    abstract protected void initialize();
 
     abstract public void onMainButton(ActionEvent actionEvent);
 }

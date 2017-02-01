@@ -28,7 +28,8 @@ public class DeviceService {
     private DataLink dataLink;
     private Map<FrameParser, BiConsumer<FrameParser, Frame>> bindings = new HashMap<>();
     private Consumer<AnalyserData> analyserDataHandler;
-    private long framesReceived;
+    private long framesReceived = 0;
+    private long framesRecognized = 0;
 
     public <T extends FrameParser<U>, U> void registerBinding(T parser, BiConsumer<FrameParser, Frame> handler) {
         bindings.put(parser, handler);
@@ -40,6 +41,7 @@ public class DeviceService {
         for(Map.Entry<FrameParser, BiConsumer<FrameParser, Frame>> binding : bindings.entrySet()) {
             FrameParser parser = binding.getKey();
             if(parser.recognizes(frame)) {
+                framesRecognized++;
                 binding.getValue().accept(parser, frame);
                 return;
             }
@@ -49,6 +51,7 @@ public class DeviceService {
 
     public Status connect(String portName) {
         framesReceived = 0;
+        framesRecognized = 0;
         logger.debug("connecting to "+portName);
         dataLink = new DataLink(portName, this::frameHandler);
         try {
@@ -101,5 +104,9 @@ public class DeviceService {
 
     public long getFramesReceived() {
         return framesReceived;
+    }
+
+    public long getFramesRecognized() {
+        return framesRecognized;
     }
 }

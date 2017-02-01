@@ -3,6 +3,8 @@ package com.mindpart.ui;
 import com.mindpart.types.Frequency;
 import com.mindpart.utils.FxUtils;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Supplier;

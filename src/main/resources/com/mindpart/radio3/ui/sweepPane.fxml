@@ -37,7 +37,7 @@
                         <Label text="input probe" />
                         <ChoiceBox fx:id="sourceProbe" focusTraversable="false" prefHeight="27.0" prefWidth="194.0" GridPane.rowIndex="1" />
                         <Label fx:id="statusLabel" text="Label......" GridPane.columnIndex="3" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="1" />
-                        <ToggleButton fx:id="btnNormalize" mnemonicParsing="false" text="Normalize" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <ToggleButton fx:id="btnCalibrate" mnemonicParsing="false" text="Calibrate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
                </children>

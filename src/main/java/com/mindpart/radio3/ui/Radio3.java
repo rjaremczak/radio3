@@ -42,7 +42,6 @@ public class Radio3 extends Application {
     private SweepController sweepController;
     private VnaController vnaController;
 
-
     private Radio3State state = DISCONNECTED;
 
     private <T extends FrameParser<U>, U> void bind(T parser, Consumer<U> handler) {
@@ -107,24 +106,16 @@ public class Radio3 extends Application {
             sweepController.updateAnalyserState(deviceState.getAnalyserState());
         });
 
+
         bind(new LogMessageParser(), this::dumpDeviceLog);
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
-        loader.setControllerFactory(clazz -> mainController);
-        Parent root = loader.load();
-        primaryStage.setTitle("radio3 by SQ6DGT");
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setTitle("radio3 by SQ6DGT ("+configurationService.getBuildId()+")");
+        primaryStage.setScene(new Scene(loadPane(mainController, "main.fxml")));
         primaryStage.show();
-        mainController.postDisplayInit();
 
-        loader = new FXMLLoader(getClass().getResource("sweepPane.fxml"));
-        loader.setControllerFactory(clazz -> sweepController);
-        mainController.sweepTab.setContent(loader.load());
-
-        loader = new FXMLLoader(getClass().getResource("vnaPane.fxml"));
-        loader.setControllerFactory(clazz -> vnaController);
-        mainController.vnaTab.setContent(loader.load());
+        mainController.sweepTab.setContent(loadPane(sweepController, "sweepPane.fxml"));
+        mainController.vnaTab.setContent(loadPane(vnaController, "vnaPane.fxml"));
 
         addFeatureBox(vfoController);
         addFeatureBox(fMeterController);
@@ -133,11 +124,20 @@ public class Radio3 extends Application {
         addFeatureBox(vnaProbeController);
     }
 
+    private Parent loadPane(Object controller, String resourceName) {
+        FXMLLoader loader  = new FXMLLoader(getClass().getResource(resourceName));
+        loader.setControllerFactory(clazz -> controller);
+        try {
+            return loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void stop() throws Exception {
         super.stop();
         disconnect();
-        mainController.shutdown();
         logger.debug("stopped");
     }
 
@@ -186,15 +186,21 @@ public class Radio3 extends Application {
 
     public void connect(String portName) {
         state = CONNECTING;
+        deviceInfoSource.resetDeviceInfo();
         if(deviceService.connect(portName).isOk()) {
             sleep(200);
             deviceInfoSource.requestData();
             sleep(200);
-            if(deviceService.getFramesReceived() > 0) {
+            if(deviceInfoSource.isDeviceInfo()) {
                 state = CONNECTED;
             } else {
-                deviceService.disconnect();
-                state = CONNECTION_TIMEOUT;
+                if(deviceService.getFramesReceived() > 0) {
+                    deviceService.disconnect();
+                    state = DEVICE_ERROR;
+                } else {
+                    deviceService.disconnect();
+                    state = CONNECTION_TIMEOUT;
+                }
             }
         } else {
             state = DEVICE_ERROR;
@@ -203,6 +209,7 @@ public class Radio3 extends Application {
 
     public void disconnect() {
         deviceService.disconnect();
+        deviceInfoSource.resetDeviceInfo();
         state = DISCONNECTED;
     }
 
@@ -217,7 +224,6 @@ public class Radio3 extends Application {
     public void startProbesSampling() {
         multipleProbes.startSampling();
     }
-
 
     public void stopProbesSampling() {
         multipleProbes.stopSampling();

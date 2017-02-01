@@ -1,7 +1,3 @@
-@font-face {
-    src: url('Cousine-Bold.ttf');
-}
-
 .root {
 }
 
@@ -34,7 +30,7 @@
 }
 
 .value-field {
-    -fx-font-family: "Cousine";
+    -fx-font-family: monospace;
     -fx-font-weight: bold;
     -fx-font-size: 15;
 }

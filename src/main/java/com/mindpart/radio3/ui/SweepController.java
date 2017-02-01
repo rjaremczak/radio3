@@ -55,7 +55,7 @@ public class SweepController {
     ChoiceBox<AnalyserDataSource> sourceProbe;
 
     @FXML
-    ToggleButton btnNormalize;
+    ToggleButton btnCalibrate;
 
     @FXML
     Button startButton;
@@ -135,7 +135,7 @@ public class SweepController {
 
         hBox.getChildren().add(0, sweepSettings);
 
-        btnNormalize.selectedProperty().addListener(this::onNormalizeChanged);
+        btnCalibrate.selectedProperty().addListener(this::onNormalizeChanged);
     }
 
     private void onNormalizeChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean relative) {
@@ -201,7 +201,7 @@ public class SweepController {
     }
 
     public void doStart() {
-        btnNormalize.setDisable(true);
+        btnCalibrate.setDisable(true);
         long fStart = sweepSettings.getStartFrequency().toHz();
         long fEnd = sweepSettings.getEndFrequency().toHz();
         int steps = sweepSettings.getSteps();
@@ -247,6 +247,6 @@ public class SweepController {
 
         signalAxisY.setAutoRanging(true);
         signalAxisY.setForceZeroInRange(false);
-        btnNormalize.setDisable(false);
+        btnCalibrate.setDisable(false);
     }
 }

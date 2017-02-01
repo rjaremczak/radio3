@@ -11,81 +11,90 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.RadialGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.shape.Circle?>
 
-<VBox prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.MainController">
+<VBox prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.MainController">
     <children>
-        <ToolBar>
-            <items>
-                <Button fx:id="deviceSelectionRefresh" focusTraversable="false" mnemonicParsing="false" onAction="#updateAvailablePorts" text="Refresh" />
-                <ChoiceBox fx:id="deviceSelection" minWidth="212.0" prefHeight="27.0" prefWidth="212.0" />
-                <Button fx:id="deviceConnect" defaultButton="true" mnemonicParsing="false" onAction="#doConnectDisconnect" text="Connect" />
-            <Label fx:id="deviceConnectionStatus" text="Label" />
-            </items>
-        </ToolBar>
-          <AnchorPane fx:id="mainPane" VBox.vgrow="ALWAYS">
-         <children>
-            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <tabs>
-                <Tab fx:id="manualControlTab" text="Components">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+        <AnchorPane fx:id="mainPane" VBox.vgrow="ALWAYS">
+            <children>
+                <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <tabs>
+                  <Tab fx:id="deviceTab" text="Device">
+                     <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
                            <children>
-                              <VBox fx:id="componentsBox" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                    <HBox spacing="5.0">
                                        <children>
-                                          <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#doSampleAllProbes" text="Get All" />
-                                          <ToggleButton fx:id="continuousSamplingOfAllProbesBtn" mnemonicParsing="false" onAction="#doContinuousSamplingOfAllProbes" text="Continuous Sampling">
+                                          <GridPane hgap="5.0" vgap="5.0">
+                                             <columnConstraints>
+                                                <ColumnConstraints hgrow="NEVER" />
+                                                <ColumnConstraints />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                             </rowConstraints>
+                                             <children>
+                                                <Label text="Hardware Revision" GridPane.rowIndex="1" />
+                                                <ChoiceBox fx:id="hardwareRevisions" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label text="VFO Type" GridPane.rowIndex="2" />
+                                                <ChoiceBox fx:id="vfoTypes" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="Serial Port" />
+                                                <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1">
+                                                   <children>
+                                                          <ChoiceBox fx:id="serialPorts" minWidth="212.0" prefHeight="27.0" prefWidth="212.0" />
+                                                          <Button fx:id="serialPortsRefresh" focusTraversable="false" mnemonicParsing="false" text="Refresh" />
+                                                   </children>
+                                                </HBox>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </padding>
+                                          </GridPane>
+                                          <Separator orientation="VERTICAL">
+                                             <padding>
+                                                <Insets left="5.0" right="5.0" />
+                                             </padding>
+                                          </Separator>
+                                              <Button fx:id="deviceConnect" defaultButton="true" mnemonicParsing="false" text="Connect">
                                              <HBox.margin>
-                                                <Insets />
+                                                <Insets top="8.0" />
                                              </HBox.margin>
-                                          </ToggleButton>
-                                          <Separator prefWidth="200.0" visible="false" />
-                                          <Label text="DDS out:" />
-                                          <ChoiceBox fx:id="ddsOutput" />
+                                          </Button>
                                        </children>
-                                       <padding>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </padding>
                                     </HBox>
-                                 </children>
-                              </VBox>
-                           </children>
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </padding>
-                        </AnchorPane>
-                  </content>
-                </Tab>
-                <Tab fx:id="deviceInfoTab" text="Configuration">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <VBox layoutX="211.0" layoutY="50.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <children>
+                                    <Separator prefWidth="200.0" />
+                                    <Label text="Device Properties" />
                                     <TableView fx:id="devicePropertiesTable">
-                                      <columns>
-                                        <TableColumn editable="false" prefWidth="75.0" text="Property">
-                                            <cellValueFactory>
+                                       <columns>
+                                          <TableColumn editable="false" prefWidth="75.0" text="Property">
+                                             <cellValueFactory>
                                                 <PropertyValueFactory property="name" />
-                                            </cellValueFactory>
-                                        </TableColumn>
-                                        <TableColumn editable="false" sortable="false" text="Value">
-                                            <cellValueFactory>
+                                             </cellValueFactory>
+                                          </TableColumn>
+                                          <TableColumn editable="false" sortable="false" text="Value">
+                                             <cellValueFactory>
                                                 <PropertyValueFactory property="value" />
-                                            </cellValueFactory>
-                                        </TableColumn>
-                                      </columns>
+                                             </cellValueFactory>
+                                          </TableColumn>
+                                       </columns>
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
                                     </TableView>
-                                    <Button fx:id="deviceInfoBtn" mnemonicParsing="false" onAction="#doDeviceInfo" text="Get Info &amp; State" />
+                                    <Button fx:id="devicePropertiesRefresh" mnemonicParsing="false" text="Refresh" />
                                  </children>
                                  <padding>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -93,14 +102,70 @@
                               </VBox>
                            </children>
                         </AnchorPane>
-                  </content>
-                </Tab>
-                  <Tab fx:id="sweepTab" text="Sweep Generator" />
-                  <Tab fx:id="vnaTab" text="VNA" />
-              </tabs>
-            </TabPane>
+                     </content></Tab>
+                        <Tab fx:id="sweepTab" text="Sweep Generator" />
+                        <Tab fx:id="vnaTab" text="VNA" />
+                        <Tab fx:id="componentsTab" text="Components">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox fx:id="componentsBox" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                    <children>
+                                                        <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#doSampleAllProbes" text="Get All" />
+                                                        <ToggleButton fx:id="continuousSamplingOfAllProbesBtn" mnemonicParsing="false" onAction="#doContinuousSamplingOfAllProbes" text="Continuous Sampling">
+                                                            <HBox.margin>
+                                                                <Insets />
+                                                            </HBox.margin>
+                                                        </ToggleButton>
+                                                        <Separator prefWidth="200.0" visible="false" />
+                                                        <Label text="DDS out:" />
+                                                        <ChoiceBox fx:id="ddsOutput" />
+                                                    </children>
+                                                    <padding>
+                                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                    </padding>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                    </padding>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </children>
+        </AnchorPane>
+      <Separator prefWidth="200.0" />
+      <HBox alignment="CENTER_LEFT" spacing="5.0">
+         <children>
+            <Circle fx:id="mainIndicator" radius="8.0" stroke="#00000055" strokeType="INSIDE" HBox.hgrow="NEVER">
+               <fill>
+                  <RadialGradient centerX="0.5" centerY="0.5" focusAngle="-36.87" focusDistance="-0.19047619047619058" radius="0.33333333333333337">
+                     <stops>
+                        <Stop color="WHITE" />
+                        <Stop color="WHITE" offset="0.26765799256505574" />
+                        <Stop color="#979696" offset="1.0" />
+                     </stops>
+                  </RadialGradient>
+               </fill>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Circle>
+                <Label fx:id="deviceConnectionStatus" maxWidth="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS" />
          </children>
-      </AnchorPane>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </HBox>
     </children>
     <stylesheets>
         <URL value="@main.css" />

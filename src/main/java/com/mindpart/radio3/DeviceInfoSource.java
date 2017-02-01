@@ -16,6 +16,7 @@ public class DeviceInfoSource implements FrameParser<DeviceInfo> {
     static final Frame GET = new Frame(DEVICE_GET_INFO);
 
     private DeviceService deviceService;
+    private DeviceInfo deviceInfo = null;
 
     public DeviceInfoSource(DeviceService deviceService) {
         this.deviceService = deviceService;
@@ -35,10 +36,23 @@ public class DeviceInfoSource implements FrameParser<DeviceInfo> {
         di.vfo.type = DeviceInfo.Vfo.Type.values()[bi.nextUInt8()];
         di.vfo.minFrequency = bi.nextUInt32();
         di.vfo.maxFrequency = bi.nextUInt32();
+        deviceInfo = di;
         return di;
     }
 
     public void requestData() {
         deviceService.performRequest(DeviceInfoSource.GET);
+    }
+
+    public DeviceInfo getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public void resetDeviceInfo() {
+        deviceInfo = null;
+    }
+
+    public boolean isDeviceInfo() {
+        return deviceInfo != null;
     }
 }
