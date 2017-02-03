@@ -13,15 +13,7 @@ import static com.mindpart.radio3.device.FrameCommand.LOGPROBE_GET;
  * Date: 2016.09.23
  */
 public class LogarithmicProbe implements FrameParser<Double> {
-    private static final Frame SAMPLE = new Frame(LOGPROBE_GET);
-
-    private DeviceService deviceService;
-    private Adc adc;
-
-    public LogarithmicProbe(DeviceService deviceService) {
-        this.deviceService = deviceService;
-        this.adc = Adc.getDefault();
-    }
+    private Adc adc = Adc.getDefault();
 
     @Override
     public boolean recognizes(Frame frame) {
@@ -36,9 +28,4 @@ public class LogarithmicProbe implements FrameParser<Double> {
     public Double parse(Frame frame) {
         return parse(Binary.toUInt16(frame.getPayload()));
     }
-
-    public void requestData() {
-        deviceService.performRequest(SAMPLE);
-    }
-
 }

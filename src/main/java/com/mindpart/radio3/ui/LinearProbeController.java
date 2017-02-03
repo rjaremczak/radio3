@@ -1,6 +1,5 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.LinearProbe;
 import javafx.event.ActionEvent;
 
 import java.text.DecimalFormat;
@@ -12,15 +11,16 @@ import java.text.NumberFormat;
  */
 public class LinearProbeController extends ComponentController {
     private static final NumberFormat fmtPower = new DecimalFormat("0.000");
-    private LinearProbe linearProbe;
 
-    public LinearProbeController(LinearProbe linearProbe) {
-        this.linearProbe = linearProbe;
+    private Radio3 radio3;
+
+    public LinearProbeController(Radio3 radio3) {
+        this.radio3 = radio3;
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        linearProbe.requestData();
+        radio3.requestLinearProbeSample();
     }
 
     @Override

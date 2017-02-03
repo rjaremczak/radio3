@@ -12,18 +12,12 @@ import static com.mindpart.radio3.device.FrameCommand.PROBES_START_SAMPLING;
  * Date: 2016.04.09
  */
 public class MultipleProbes implements FrameParser<ProbeValues> {
-    static final Frame SAMPLE = new Frame(PROBES_GET);
-    static final Frame START_SAMPLING = new Frame(PROBES_START_SAMPLING);
-    static final Frame STOP_SAMPLING = new Frame(PROBES_STOP_SAMPLING);
-
-    private DeviceService deviceService;
     private LogarithmicProbe logarithmicProbe;
     private LinearProbe linearProbe;
     private VnaProbe vnaProbe;
     private FMeterProbe fMeterProbe;
 
-    public MultipleProbes(DeviceService deviceService, LogarithmicProbe logarithmicProbe, LinearProbe linearProbe, VnaProbe vnaProbe, FMeterProbe fMeterProbe) {
-        this.deviceService = deviceService;
+    public MultipleProbes(LogarithmicProbe logarithmicProbe, LinearProbe linearProbe, VnaProbe vnaProbe, FMeterProbe fMeterProbe) {
         this.logarithmicProbe = logarithmicProbe;
         this.linearProbe = linearProbe;
         this.vnaProbe = vnaProbe;
@@ -53,17 +47,5 @@ public class MultipleProbes implements FrameParser<ProbeValues> {
                 Binary.toUInt16(payload, 6),
                 Binary.toUInt32(payload, 8)
         );
-    }
-
-    public void requestData() {
-        deviceService.performRequest(MultipleProbes.SAMPLE);
-    }
-
-    public void startSampling() {
-        deviceService.performRequest(MultipleProbes.START_SAMPLING);
-    }
-
-    public void stopSampling() {
-        deviceService.performRequest(MultipleProbes.STOP_SAMPLING);
     }
 }

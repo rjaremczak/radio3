@@ -1,6 +1,5 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.LogarithmicProbe;
 import javafx.event.ActionEvent;
 
 import java.text.DecimalFormat;
@@ -13,15 +12,15 @@ import java.text.NumberFormat;
 public class LogarithmicProbeController extends ComponentController {
     private static final NumberFormat fmtPower = new DecimalFormat("0.000");
 
-    private LogarithmicProbe logarithmicProbe;
+    private Radio3 radio3;
 
-    public LogarithmicProbeController(LogarithmicProbe logarithmicProbe) {
-        this.logarithmicProbe = logarithmicProbe;
+    public LogarithmicProbeController(Radio3 radio3) {
+        this.radio3 = radio3;
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        logarithmicProbe.requestData();
+        radio3.requestLogarithmicProbeSample();
     }
 
     @Override

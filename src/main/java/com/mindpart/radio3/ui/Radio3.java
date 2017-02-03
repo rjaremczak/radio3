@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -24,9 +25,9 @@ public class Radio3 extends Application {
     private LogarithmicProbe logarithmicProbe;
     private LinearProbe linearProbe;
     private VnaProbe vnaProbe;
-    private VfoUnit vfoUnit;
-    private DeviceInfoSource deviceInfoSource;
-    private DeviceStateSource deviceStateSource;
+    private VfoParser vfoParser;
+    private DeviceInfoParser deviceInfoParser;
+    private DeviceStateParser deviceStateParser;
     private Sweeper sweeper;
     private FMeterProbe fMeterProbe;
     private MultipleProbes multipleProbes;
@@ -43,6 +44,7 @@ public class Radio3 extends Application {
     private VnaController vnaController;
 
     private Radio3State state = DISCONNECTED;
+    private Configuration configuration;
 
     private <T extends FrameParser<U>, U> void bind(T parser, Consumer<U> handler) {
         deviceService.registerBinding(parser, (frameParser, frame) -> {
@@ -62,28 +64,28 @@ public class Radio3 extends Application {
         logger.debug("started");
         configurationService = new ConfigurationService();
         configurationService.init();
-        Configuration configuration = configurationService.getConfiguration();
+        configuration = configurationService.load();
 
         deviceService = new DeviceService();
         vfoController = new VfoController(deviceService);
 
-        fMeterProbe = new FMeterProbe(deviceService, configuration.fMeter);
-        fMeterController = new FMeterController(fMeterProbe);
+        fMeterProbe = new FMeterProbe(configuration.fMeter);
+        fMeterController = new FMeterController(this);
         bind(fMeterProbe, fMeterController::setFrequency);
 
-        logarithmicProbe = new LogarithmicProbe(deviceService);
-        logarithmicProbeController = new LogarithmicProbeController(logarithmicProbe);
+        logarithmicProbe = new LogarithmicProbe();
+        logarithmicProbeController = new LogarithmicProbeController(this);
         bind(logarithmicProbe, logarithmicProbeController::update);
 
-        linearProbe = new LinearProbe(deviceService);
-        linearProbeController = new LinearProbeController(linearProbe);
+        linearProbe = new LinearProbe();
+        linearProbeController = new LinearProbeController(this);
         bind(linearProbe, linearProbeController::update);
 
-        vnaProbe = new VnaProbe(deviceService);
-        vnaProbeController = new VnaProbeController(vnaProbe);
+        vnaProbe = new VnaProbe();
+        vnaProbeController = new VnaProbeController(this);
         bind(vnaProbe, vnaProbeController::update);
 
-        multipleProbes = new MultipleProbes(deviceService, logarithmicProbe, linearProbe, vnaProbe, fMeterProbe);
+        multipleProbes = new MultipleProbes(logarithmicProbe, linearProbe, vnaProbe, fMeterProbe);
         bind(multipleProbes, this::updateAllProbes);
 
         sweeper = new Sweeper(deviceService);
@@ -91,21 +93,20 @@ public class Radio3 extends Application {
         sweepController = new SweepController(sweeper, logarithmicProbe, linearProbe, configuration.sweepProfiles);
         bind(sweeper, deviceService::handleAnalyserData);
 
-        vfoUnit = new VfoUnit(deviceService);
-        bind(vfoUnit, vfoController::setFrequency);
+        vfoParser = new VfoParser();
+        bind(vfoParser, vfoController::setFrequency);
 
         mainController = new MainController(this);
 
-        deviceInfoSource = new DeviceInfoSource(deviceService);
-        bind(deviceInfoSource, mainController::updateDeviceInfo);
+        deviceInfoParser = new DeviceInfoParser();
+        bind(deviceInfoParser, mainController::updateDeviceInfo);
 
-        deviceStateSource = new DeviceStateSource(deviceService);
-        bind(deviceStateSource, deviceState -> {
+        deviceStateParser = new DeviceStateParser();
+        bind(deviceStateParser, deviceState -> {
             mainController.updateDeviceState(deviceState);
-            vnaController.updateAnalyserState(deviceState.getAnalyserState());
-            sweepController.updateAnalyserState(deviceState.getAnalyserState());
+            vnaController.updateAnalyserState(deviceState.analyserState);
+            sweepController.updateAnalyserState(deviceState.analyserState);
         });
-
 
         bind(new LogMessageParser(), this::dumpDeviceLog);
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
@@ -122,6 +123,10 @@ public class Radio3 extends Application {
         addFeatureBox(logarithmicProbeController);
         addFeatureBox(linearProbeController);
         addFeatureBox(vnaProbeController);
+    }
+
+    public void saveConfiguration() throws IOException {
+        configurationService.save(configuration);
     }
 
     private Parent loadPane(Object controller, String resourceName) {
@@ -155,19 +160,6 @@ public class Radio3 extends Application {
         fMeterController.disableMainButton(disable);
     }
 
-    public VfoUnit getVfoUnit() {
-        return vfoUnit;
-    }
-
-    public DeviceInfoSource getDeviceInfoSource() {
-        return deviceInfoSource;
-    }
-
-    public DeviceStateSource getDeviceStateSource() {
-        return deviceStateSource;
-    }
-
-
     private void dumpDeviceLog(LogMessage logMessage) {
         logger.info("DEVICE: "+ logMessage.getMessage());
     }
@@ -186,13 +178,18 @@ public class Radio3 extends Application {
 
     public void connect(String portName) {
         state = CONNECTING;
-        deviceInfoSource.resetDeviceInfo();
+        deviceInfoParser.resetDeviceInfo();
         if(deviceService.connect(portName).isOk()) {
             sleep(200);
-            deviceInfoSource.requestData();
+            deviceService.setHardwareRevision(configuration.hardwareRevision);
+            deviceService.setVfoType(configuration.vfoType);
+            deviceService.requestDeviceInfo();
             sleep(200);
-            if(deviceInfoSource.isDeviceInfo()) {
+            if(deviceInfoParser.isDeviceInfo()) {
                 state = CONNECTED;
+
+                // TODO: check if HW revision and VFO type are properly set
+
             } else {
                 if(deviceService.getFramesReceived() > 0) {
                     deviceService.disconnect();
@@ -209,7 +206,7 @@ public class Radio3 extends Application {
 
     public void disconnect() {
         deviceService.disconnect();
-        deviceInfoSource.resetDeviceInfo();
+        deviceInfoParser.resetDeviceInfo();
         state = DISCONNECTED;
     }
 
@@ -218,15 +215,15 @@ public class Radio3 extends Application {
     }
 
     public void getProbes() {
-        multipleProbes.requestData();
+        deviceService.requestMultipleProbesSample();
     }
 
     public void startProbesSampling() {
-        multipleProbes.startSampling();
+        deviceService.startMultipleProbesSampling();
     }
 
     public void stopProbesSampling() {
-        multipleProbes.stopSampling();
+        deviceService.stopMultipleProbesSampling();
     }
 
     public Radio3State getState() {
@@ -237,11 +234,67 @@ public class Radio3 extends Application {
         launch(args);
     }
 
-    public void ddsOutVfo() {
-        deviceService.performRequest(new Frame(FrameCommand.DDS_RELAY_SET_VFO));
+    public void setVfoOutput(VfoOut vfoOut) {
+        if(vfoOut != null) {
+            deviceService.setVfoOutput(vfoOut);
+            deviceService.requestDeviceState();
+        }
     }
 
-    public void ddsOutVna() {
-        deviceService.performRequest(new Frame(FrameCommand.DDS_RELAY_SET_VNA));
+    public void setVfoAttenuator(VfoAttenuator vfoAttenuator) {
+        if(vfoAttenuator != null) {
+            deviceService.setVfoAttenuator(vfoAttenuator);
+            deviceService.requestDeviceState();
+        }
+    }
+
+    public VfoType getVfoType() {
+        return configuration.vfoType;
+    }
+
+    public void setVfoType(VfoType vfoType) {
+        if(vfoType != null) {
+            configuration.vfoType = vfoType;
+            configurationService.save(configuration);
+        }
+    }
+
+    public HardwareRevision getHardwareRevision() {
+        return configuration.hardwareRevision;
+    }
+
+    public void setHardwareRevision(HardwareRevision hardwareRevision) {
+        if(hardwareRevision != null) {
+            configuration.hardwareRevision = hardwareRevision;
+            configurationService.save(configuration);
+        }
+    }
+
+    public void requestDeviceState() {
+        deviceService.requestDeviceState();
+    }
+
+    public void requestVfoFrequency() {
+        deviceService.requestVfoFrequency();
+    }
+
+    public void requestDeviceInfo() {
+        deviceService.requestDeviceInfo();
+    }
+
+    public void requestFMeterSample() {
+        deviceService.requestFMeterSample();
+    }
+
+    public void requestLogarithmicProbeSample() {
+        deviceService.requestLogarithmicProbeSample();
+    }
+
+    public void requestLinearProbeSample() {
+        deviceService.requestLinearProbeSample();
+    }
+
+    public void requestVnaProbeSample() {
+        deviceService.requestVnaProbeSample();
     }
 }

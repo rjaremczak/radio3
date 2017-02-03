@@ -1,6 +1,5 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.VnaProbe;
 import com.mindpart.radio3.device.Complex;
 import javafx.event.ActionEvent;
 
@@ -15,15 +14,15 @@ public class VnaProbeController extends ComponentController {
     private static final NumberFormat fmtGain = new DecimalFormat("0.000");
     private static final NumberFormat fmtPhase = new DecimalFormat("0.000");
 
-    private VnaProbe vnaProbe;
+    private Radio3 radio3;
 
-    public VnaProbeController(VnaProbe vnaProbe) {
-        this.vnaProbe = vnaProbe;
+    public VnaProbeController(Radio3 radio3) {
+        this.radio3 = radio3;
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        vnaProbe.requestData();
+        radio3.requestVnaProbeSample();
     }
 
     @Override

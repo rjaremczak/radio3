@@ -13,15 +13,7 @@ import static com.mindpart.radio3.device.FrameCommand.LINPROBE_GET;
  * Date: 2016.03.13
  */
 public class LinearProbe implements FrameParser<Double> {
-    static final Frame SAMPLE = new Frame(LINPROBE_GET);
-
-    private DeviceService deviceService;
-    private Adc adc;
-
-    public LinearProbe(DeviceService deviceService) {
-        this.deviceService = deviceService;
-        this.adc = Adc.getDefault();
-    }
+    private Adc adc = Adc.getDefault();
 
     @Override
     public boolean recognizes(Frame frame) {
@@ -35,9 +27,5 @@ public class LinearProbe implements FrameParser<Double> {
     @Override
     public Double parse(Frame frame) {
         return parse(Binary.toUInt16(frame.getPayload()));
-    }
-
-    public void requestData() {
-        deviceService.performRequest(LinearProbe.SAMPLE);
     }
 }

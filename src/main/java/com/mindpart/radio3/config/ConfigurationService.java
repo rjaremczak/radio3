@@ -1,6 +1,7 @@
 package com.mindpart.radio3.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -20,7 +21,6 @@ public class ConfigurationService {
 
     private Path ownDirectory;
     private Path configurationFile;
-    private Configuration configuration;
     private String buildId;
 
     private void initOwnDirectories() throws IOException {
@@ -39,11 +39,8 @@ public class ConfigurationService {
         loadCommonProperties();
         initOwnDirectories();
         configurationFile = Paths.get(ownDirectory.toString(),"configuration.json");
-        if(Files.exists(configurationFile, LinkOption.NOFOLLOW_LINKS)) {
-            load();
-        } else {
-            loadDefaults();
-            save();
+        if(!Files.exists(configurationFile, LinkOption.NOFOLLOW_LINKS)) {
+            save(loadDefaults());
         }
     }
 
@@ -53,23 +50,21 @@ public class ConfigurationService {
         buildId = properties.getProperty("buildId");
     }
 
-    public void load() throws IOException {
-        configuration = new ObjectMapper().readValue(configurationFile.toFile(), Configuration.class);
+    public Configuration load() throws IOException {
+        return new ObjectMapper().readValue(configurationFile.toFile(), Configuration.class);
     }
 
-    public void save() throws IOException {
-        new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(configurationFile.toFile(), configuration);
+    public void save(Configuration configuration) {
+        try {
+            new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(configurationFile.toFile(), configuration);
+        } catch (IOException e) {
+            logger.error(e,e);
+        }
     }
 
-    public void loadDefaults() throws IOException {
+    public Configuration loadDefaults() throws IOException {
         InputStream is = getClass().getResourceAsStream("default-configuration.json");
-        configuration = new ObjectMapper().readValue(is, Configuration.class);
-    }
-
-
-
-    public Configuration getConfiguration() {
-        return configuration;
+        return new ObjectMapper().readValue(is, Configuration.class);
     }
 
     public String getBuildId() {

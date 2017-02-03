@@ -1,6 +1,6 @@
 package com.mindpart.radio3.device;
 
-import com.mindpart.radio3.Status;
+import com.mindpart.radio3.*;
 import com.mindpart.utils.Binary;
 import com.mindpart.utils.BinaryBuilder;
 import jssc.SerialPortException;
@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 
 import static com.mindpart.radio3.Status.OK;
 import static com.mindpart.radio3.Status.error;
+import static com.mindpart.radio3.device.FrameCommand.*;
 
 /**
  * Created by Robert Jaremczak
@@ -70,8 +71,13 @@ public class DeviceService {
         }
     }
 
-    public void setVfoFrequency(int frequency) {
-        performRequest(new Frame(FrameCommand.VFO_SET_FREQ, Binary.fromUInt32(frequency)));
+    private void performRequest(Frame request) {
+        try {
+            dataLink.writeFrame(request);
+            Thread.sleep(100);
+        } catch (Exception e) {
+            logger.error(e,e);
+        }
     }
 
     public void startAnalyser(long freqStart, long freqStep, int numSteps, AnalyserDataSource source,
@@ -85,13 +91,24 @@ public class DeviceService {
         performRequest(new Frame(FrameCommand.ANALYSER_REQUEST, builder.getBytes()));
     }
 
-    public void performRequest(Frame request) {
-        try {
-            dataLink.writeFrame(request);
-            Thread.sleep(100);
-        } catch (Exception e) {
-            logger.error(e,e);
-        }
+    public void setVfoFrequency(int frequency) {
+        performRequest(new Frame(FrameCommand.VFO_SET_FREQ, Binary.fromUInt32(frequency)));
+    }
+
+    public void setHardwareRevision(HardwareRevision hardwareRevision) {
+        performRequest(new Frame(FrameCommand.DEVICE_HARDWARE_REVISION, Binary.fromUInt8(hardwareRevision.getCode())));
+    }
+
+    public void setVfoType(VfoType vfoType) {
+        performRequest(new Frame(FrameCommand.VFO_TYPE, Binary.fromUInt8(vfoType.getCode())));
+    }
+
+    public void setVfoAttenuator(VfoAttenuator vfoAttenuator) {
+        performRequest(new Frame(FrameCommand.VFO_ATTENUATOR, Binary.fromUInt8(vfoAttenuator.getCode())));
+    }
+
+    public void setVfoOutput(VfoOut vfoOut) {
+        performRequest(new Frame(vfoOut.getFrameCommand()));
     }
 
     public List<String> availableSerialPorts() {
@@ -109,4 +126,45 @@ public class DeviceService {
     public long getFramesRecognized() {
         return framesRecognized;
     }
+
+    public void requestDeviceState() {
+        performRequest(new Frame(FrameCommand.DEVICE_GET_STATE));
+    }
+
+    public void requestVfoFrequency() {
+        performRequest(new Frame(VFO_GET_FREQ));
+    }
+
+    public void requestDeviceInfo() {
+        performRequest(new Frame(DEVICE_GET_INFO));
+    }
+
+    public void requestLogarithmicProbeSample() {
+        performRequest(new Frame(LOGPROBE_GET));
+    }
+
+    public void requestLinearProbeSample() {
+        performRequest(new Frame(LINPROBE_GET));
+    }
+
+    public void requestVnaProbeSample() {
+        performRequest(new Frame(CMPPROBE_GET));
+    }
+
+    public void requestFMeterSample() {
+        performRequest(new Frame(FMETER_GET));
+    }
+
+    public void requestMultipleProbesSample() {
+        performRequest(new Frame(PROBES_GET));
+    }
+
+    public void startMultipleProbesSampling() {
+        performRequest(new Frame(PROBES_START_SAMPLING));
+    }
+
+    public void stopMultipleProbesSampling() {
+        performRequest(new Frame(PROBES_STOP_SAMPLING));
+    }
+
 }

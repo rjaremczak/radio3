@@ -4,15 +4,20 @@ package com.mindpart.radio3.device;
  * Created by Robert Jaremczak
  * Date: 2017.01.30
  */
-public enum HardwareRevision {
-    UNKNOWN(0, "Unknown"),
-    PROTOTYPE_1(1, "Prototype 1"),
-    PROTOTYPE_2(2, "Prototype 2");
+public enum VfoAttenuator {
+    LEVEL_0(0, "Level 0 (None)"),
+    LEVEL_1(1, "Level 1"),
+    LEVEL_2(2, "Level 2"),
+    LEVEL_3(3, "Level 3"),
+    LEVEL_4(4, "Level 4"),
+    LEVEL_5(5, "Level 5"),
+    LEVEL_6(6, "Level 6"),
+    LEVEL_7(7, "Level 7");
 
     private int code;
     private String name;
 
-    HardwareRevision(int code, String name) {
+    VfoAttenuator(int code, String name) {
         this.code = code;
         this.name = name;
     }

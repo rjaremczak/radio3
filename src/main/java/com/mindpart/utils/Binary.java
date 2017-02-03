@@ -67,6 +67,10 @@ public class Binary {
         };
     }
 
+    public static byte[] fromUInt8(int val) {
+        return new byte[] { (byte) (val & 0xff) };
+    }
+
     public static void storeUInt32(byte[] bytes, int offset, long val) {
         bytes[offset++] = (byte) (val & 0xff);
         bytes[offset++] = (byte) ((val >> 8) & 0xff);

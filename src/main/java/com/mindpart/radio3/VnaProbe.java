@@ -10,15 +10,7 @@ import static com.mindpart.radio3.device.FrameCommand.CMPPROBE_GET;
  * Date: 2016.03.13
  */
 public class VnaProbe implements FrameParser<Complex> {
-    private static final Frame SAMPLE = new Frame(CMPPROBE_GET);
-
-    private DeviceService deviceService;
-    private Adc adc;
-
-    public VnaProbe(DeviceService deviceService) {
-        this.deviceService = deviceService;
-        this.adc = Adc.getDefault();
-    }
+    private Adc adc = Adc.getDefault();
 
     @Override
     public boolean recognizes(Frame frame) {
@@ -46,9 +38,5 @@ public class VnaProbe implements FrameParser<Complex> {
     public Complex parse(Frame frame) {
         byte[] payload = frame.getPayload();
         return parse(Binary.toUInt16(payload, 0), Binary.toUInt16(payload, 2));
-    }
-
-    public void requestData() {
-        deviceService.performRequest(VnaProbe.SAMPLE);
     }
 }

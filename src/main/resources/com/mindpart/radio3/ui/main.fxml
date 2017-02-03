@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -32,74 +33,111 @@
                      <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
                            <children>
-                              <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <children>
-                                    <HBox spacing="5.0">
+                              <SplitPane dividerPositions="0.5" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                        <children>
-                                          <GridPane hgap="5.0" vgap="5.0">
-                                             <columnConstraints>
-                                                <ColumnConstraints hgrow="NEVER" />
-                                                <ColumnConstraints />
-                                             </columnConstraints>
-                                             <rowConstraints>
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                             </rowConstraints>
+                                          <VBox alignment="TOP_CENTER" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <Label text="Hardware Revision" GridPane.rowIndex="1" />
-                                                <ChoiceBox fx:id="hardwareRevisions" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <Label text="VFO Type" GridPane.rowIndex="2" />
-                                                <ChoiceBox fx:id="vfoTypes" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                <Label text="Serial Port" />
-                                                <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1">
+                                                <GridPane hgap="5.0" vgap="5.0">
+                                                   <columnConstraints>
+                                                      <ColumnConstraints hgrow="NEVER" />
+                                                      <ColumnConstraints />
+                                                   </columnConstraints>
+                                                   <rowConstraints>
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   </rowConstraints>
                                                    <children>
-                                                          <ChoiceBox fx:id="serialPorts" minWidth="212.0" prefHeight="27.0" prefWidth="212.0" />
-                                                          <Button fx:id="serialPortsRefresh" focusTraversable="false" mnemonicParsing="false" text="Refresh" />
+                                                      <Label text="Hardware Revision" GridPane.rowIndex="1" />
+                                                      <ChoiceBox fx:id="hardwareRevisions" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <Label text="VFO Type" GridPane.rowIndex="2" />
+                                                      <ChoiceBox fx:id="vfoType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                      <Label text="Serial Port" />
+                                                      <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1">
+                                                         <children>
+                                                                <ChoiceBox fx:id="serialPorts" minWidth="212.0" prefHeight="27.0" prefWidth="212.0" />
+                                                                <Button fx:id="serialPortsRefresh" focusTraversable="false" mnemonicParsing="false" text="Refresh" />
+                                                         </children>
+                                                      </HBox>
                                                    </children>
-                                                </HBox>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </GridPane>
+                                                <Separator prefWidth="200.0">
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </VBox.margin>
+                                                </Separator>
+                                                    <Button fx:id="deviceConnect" defaultButton="true" mnemonicParsing="false" text="Connect">
+                                                   <VBox.margin>
+                                                      <Insets />
+                                                   </VBox.margin>
+                                                </Button>
                                              </children>
                                              <padding>
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                              </padding>
-                                          </GridPane>
-                                          <Separator orientation="VERTICAL">
-                                             <padding>
-                                                <Insets left="5.0" right="5.0" />
-                                             </padding>
-                                          </Separator>
-                                              <Button fx:id="deviceConnect" defaultButton="true" mnemonicParsing="false" text="Connect">
-                                             <HBox.margin>
-                                                <Insets top="8.0" />
-                                             </HBox.margin>
-                                          </Button>
+                                          </VBox>
                                        </children>
-                                    </HBox>
-                                    <Separator prefWidth="200.0" />
-                                    <Label text="Device Properties" />
-                                    <TableView fx:id="devicePropertiesTable">
-                                       <columns>
-                                          <TableColumn editable="false" prefWidth="75.0" text="Property">
-                                             <cellValueFactory>
-                                                <PropertyValueFactory property="name" />
-                                             </cellValueFactory>
-                                          </TableColumn>
-                                          <TableColumn editable="false" sortable="false" text="Value">
-                                             <cellValueFactory>
-                                                <PropertyValueFactory property="value" />
-                                             </cellValueFactory>
-                                          </TableColumn>
-                                       </columns>
-                                       <columnResizePolicy>
-                                          <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                       </columnResizePolicy>
-                                    </TableView>
-                                    <Button fx:id="devicePropertiesRefresh" mnemonicParsing="false" text="Refresh" />
-                                 </children>
-                                 <padding>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                 </padding>
-                              </VBox>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                          <VBox fx:id="deviceRuntimePane" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <GridPane hgap="5.0" vgap="5.0">
+                                                  <columnConstraints>
+                                                    <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                   <children>
+                                                      <Label text="VFO output" />
+                                                      <Label text="VFO Attenuator" GridPane.rowIndex="1" />
+                                                      <ChoiceBox fx:id="vfoAttenuator" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <ChoiceBox fx:id="vfoOutput" prefWidth="150.0" GridPane.columnIndex="1" />
+                                                   </children>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </GridPane>
+                                                <Separator prefWidth="200.0">
+                                                   <VBox.margin>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </VBox.margin></Separator>
+                                                <Label text="Device Properties" />
+                                                <TableView fx:id="devicePropertiesTable">
+                                                   <columns>
+                                                      <TableColumn editable="false" prefWidth="75.0" text="Property">
+                                                         <cellValueFactory>
+                                                            <PropertyValueFactory property="name" />
+                                                         </cellValueFactory>
+                                                      </TableColumn>
+                                                      <TableColumn editable="false" sortable="false" text="Value">
+                                                         <cellValueFactory>
+                                                            <PropertyValueFactory property="value" />
+                                                         </cellValueFactory>
+                                                      </TableColumn>
+                                                   </columns>
+                                                   <columnResizePolicy>
+                                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                   </columnResizePolicy>
+                                                </TableView>
+                                                <Button fx:id="devicePropertiesRefresh" mnemonicParsing="false" text="Refresh" />
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </padding>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
                            </children>
                         </AnchorPane>
                      </content></Tab>
@@ -120,8 +158,6 @@
                                                             </HBox.margin>
                                                         </ToggleButton>
                                                         <Separator prefWidth="200.0" visible="false" />
-                                                        <Label text="DDS out:" />
-                                                        <ChoiceBox fx:id="ddsOutput" />
                                                     </children>
                                                     <padding>
                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

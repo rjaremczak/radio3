@@ -1,6 +1,5 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.FMeterProbe;
 import com.mindpart.types.Frequency;
 import javafx.event.ActionEvent;
 
@@ -9,10 +8,10 @@ import javafx.event.ActionEvent;
  * Date: 2016.03.24
  */
 public class FMeterController extends ComponentController {
-    private FMeterProbe fMeterProbe;
+    private Radio3 radio3;
 
-    public FMeterController(FMeterProbe fMeterProbe) {
-        this.fMeterProbe = fMeterProbe;
+    public FMeterController(Radio3 radio3) {
+        this.radio3 = radio3;
     }
 
     @Override
@@ -22,7 +21,7 @@ public class FMeterController extends ComponentController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        fMeterProbe.requestData();
+        radio3.requestFMeterSample();
     }
 
     public void setFrequency(Frequency frequency) {
