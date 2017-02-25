@@ -2,7 +2,7 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.Sweeper;
-import com.mindpart.radio3.VnaProbe;
+import com.mindpart.radio3.VnaParser;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserDataSource;
 import com.mindpart.radio3.device.AnalyserState;
@@ -73,13 +73,13 @@ public class VnaController {
     private ObservableList<XYChart.Series<Number, Number>> swrDataSeries;
     private ObservableList<XYChart.Series<Number, Number>> phaseDataSeries;
     private Sweeper sweeper;
-    private VnaProbe vnaProbe;
+    private VnaParser vnaParser;
     private SweepSettings sweepSettings;
     private ChartMarker chartMarker = new ChartMarker();
 
-    public VnaController(Sweeper sweeper, VnaProbe vnaProbe, List<SweepProfile> sweepProfiles) {
+    public VnaController(Sweeper sweeper, VnaParser vnaParser, List<SweepProfile> sweepProfiles) {
         this.sweeper = sweeper;
-        this.vnaProbe = vnaProbe;
+        this.vnaParser = vnaParser;
         this.sweepSettings = new SweepSettings(sweepProfiles);
     }
 
@@ -153,13 +153,13 @@ public class VnaController {
 
         swrAxisY.setAutoRanging(false);
         Range swrRange = updateChart(swrChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[0],
-                adcValue -> Math.min(MAX_SWR, vnaProbe.calculateSWR(adcValue)));
+                adcValue -> Math.min(MAX_SWR, vnaParser.calculateSWR(adcValue)));
 
         swrAxisY.setLowerBound(Math.min(1.0, swrRange.getMin()));
         swrAxisY.setUpperBound(Math.max(2.0, swrRange.getMax()));
         swrAxisY.setTickUnit(swrRange.span() < 5 ? 0.2 : (swrRange.span() < 20 ? 1.0 : 10.0));
 
-        updateChart(phaseChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[1], vnaProbe::calculatePhaseAngle);
+        updateChart(phaseChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[1], vnaParser::calculatePhaseAngle);
     }
 
     private Range updateChart(LineChart<Number, Number> chart, long freqStart, long freqStep, int numSteps, int samples[], IntToDoubleFunction translate) {

@@ -4,30 +4,29 @@
 <?import java.net.URL?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<fx:root hgap="5.0" type="javafx.scene.layout.GridPane" vgap="3.0" xmlns="http://javafx.com/javafx/8.0.112-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepSettings">
+<fx:root hgap="5.0" type="javafx.scene.layout.GridPane" vgap="3.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepSettings">
    <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="60.0" />
+      <ColumnConstraints hgrow="SOMETIMES" />
+      <ColumnConstraints hgrow="SOMETIMES" />
+      <ColumnConstraints hgrow="SOMETIMES" />
+      <ColumnConstraints hgrow="SOMETIMES" />
    </columnConstraints>
    <rowConstraints>
-      <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
       <FrequencyField fx:id="startFrequencyField" alignment="CENTER_RIGHT" label="start frequency" promptText="from" styleClass="value-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <FrequencyField fx:id="endFrequencyField" alignment="CENTER_RIGHT" label="end frequency" promptText="to" styleClass="value-field" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <TextField fx:id="stepsField" alignment="CENTER_RIGHT" promptText="num" styleClass="value-field" GridPane.columnIndex="3" GridPane.rowIndex="1" />
       <Label text="frequency range" GridPane.columnIndex="1" GridPane.columnSpan="2" />
       <Label text="steps" GridPane.columnIndex="3" />
       <Label text="presets" />
       <ChoiceBox fx:id="presetsChoiceBox" prefWidth="200" GridPane.rowIndex="1" />
+      <ChoiceBox fx:id="sweepSteps" GridPane.columnIndex="3" GridPane.rowIndex="1" />
    </children>
    <stylesheets>
       <URL value="@main.css" />

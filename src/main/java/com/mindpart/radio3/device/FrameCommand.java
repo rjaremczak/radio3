@@ -33,6 +33,8 @@ public enum FrameCommand {
     VFO_OUT_VNA(0x034),
     VFO_TYPE(0x035),
     VFO_ATTENUATOR(0x036),
+    VFO_AMPLIFIER(0x037),
+    VNA_MODE(0x038),
 
     ANALYSER_REQUEST(0x040),
     ANALYSER_STOP(0x041),

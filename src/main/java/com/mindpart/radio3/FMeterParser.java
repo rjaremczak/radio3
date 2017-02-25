@@ -12,10 +12,10 @@ import static com.mindpart.radio3.device.FrameCommand.FMETER_GET;
  * Created by Robert Jaremczak
  * Date: 2016.02.22
  */
-public class FMeterProbe implements FrameParser<Frequency> {
+public class FMeterParser implements FrameParser<Frequency> {
     private FMeterConfig config;
 
-    public FMeterProbe(FMeterConfig config) {
+    public FMeterParser(FMeterConfig config) {
         this.config = config;
     }
 

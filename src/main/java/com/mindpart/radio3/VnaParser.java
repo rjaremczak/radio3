@@ -9,7 +9,7 @@ import static com.mindpart.radio3.device.FrameCommand.CMPPROBE_GET;
  * Created by Robert Jaremczak
  * Date: 2016.03.13
  */
-public class VnaProbe implements FrameParser<Complex> {
+public class VnaParser implements FrameParser<Complex> {
     private Adc adc = Adc.getDefault();
 
     @Override

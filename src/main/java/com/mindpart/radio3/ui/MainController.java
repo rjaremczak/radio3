@@ -14,6 +14,9 @@ import javafx.scene.layout.VBox;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -65,13 +68,19 @@ public class MainController {
     Button sampleAllProbesBtn;
 
     @FXML
-    ChoiceBox<VfoOut> vfoOutput;
-
-    @FXML
     ChoiceBox<VfoType> vfoType;
 
     @FXML
+    ChoiceBox<VnaMode> vnaMode;
+
+    @FXML
+    ChoiceBox<VfoAmplifier> vfoAmplifier;
+
+    @FXML
     ChoiceBox<VfoAttenuator> vfoAttenuator;
+
+    @FXML
+    ChoiceBox<VfoOut> vfoOutput;
 
     @FXML
     TableView<Property> devicePropertiesTable;
@@ -79,10 +88,14 @@ public class MainController {
     @FXML
     ChoiceBox<HardwareRevision> hardwareRevisions;
 
+
     private Radio3 radio3;
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
     private Map<String, String> devicePropertiesMap = new LinkedHashMap<>();
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
+    private ScheduledExecutorService continuousSampling = Executors.newSingleThreadScheduledExecutor();
+
+    private volatile boolean continuousSamplingEnabled = false;
 
     public MainController(Radio3 radio3) {
         this.radio3 = radio3;
@@ -156,23 +169,37 @@ public class MainController {
     }
 
     private void initVfoType() {
-        vfoType.getItems().addAll(VfoType.values());
+        vfoType.getItems().addAll(VfoType.DDS_AD9850, VfoType.DDS_AD9851);
         vfoType.getSelectionModel().select(radio3.getVfoType());
         vfoType.getSelectionModel().selectedItemProperty()
-                .addListener(((observable, oldValue, newValue) -> radio3.setVfoType(newValue)));
+                .addListener((observable, oldValue, newValue) -> radio3.setVfoType(newValue));
     }
 
     private void initVfoAttenuator() {
         vfoAttenuator.setDisable(true);
         vfoAttenuator.getSelectionModel().selectedItemProperty()
-                .addListener(((observable, oldValue, newValue) -> radio3.setVfoAttenuator(newValue)));
+                .addListener((observable, oldValue, newValue) -> radio3.setVfoAttenuator(newValue));
     }
 
     private void initHardwareRevision() {
         hardwareRevisions.getItems().addAll(HardwareRevision.values());
         hardwareRevisions.getSelectionModel().select(radio3.getHardwareRevision());
         hardwareRevisions.getSelectionModel().selectedItemProperty()
-                .addListener(((observable, oldValue, newValue) -> radio3.setHardwareRevision(newValue)));
+                .addListener((observable, oldValue, newValue) -> radio3.setHardwareRevision(newValue));
+    }
+
+    private void initVnaMode() {
+        vnaMode.getItems().addAll(VnaMode.values());
+        vnaMode.getSelectionModel().selectFirst();
+        vnaMode.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> radio3.setVnaMode(newValue));
+    }
+
+    private void initVfoAmplifier() {
+        vfoAmplifier.getItems().addAll(VfoAmplifier.values());
+        vfoAmplifier.getSelectionModel().selectFirst();
+        vfoAmplifier.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> radio3.setVfoAmplifier(newValue));
     }
 
     public void initialize() {
@@ -186,8 +213,15 @@ public class MainController {
         updateAvailablePorts();
         initVfoOutput();
         initHardwareRevision();
+        initVnaMode();
         initVfoType();
+        initVfoAmplifier();
         initVfoAttenuator();
+        continuousSampling.scheduleWithFixedDelay(() -> { if(continuousSamplingEnabled) { radio3.getProbes(); } }, 200, 200, TimeUnit.MILLISECONDS);
+    }
+
+    public void shutdown() {
+        continuousSampling.shutdown();
     }
 
     public void onDevicePropertiesRefresh() {
@@ -211,13 +245,15 @@ public class MainController {
     public void doContinuousSamplingOfAllProbes() {
         if (continuousSamplingOfAllProbesBtn.isSelected()) {
             FxUtils.disableItems(sampleAllProbesBtn, deviceConnect, sweepTab, vnaTab);
-            radio3.startProbesSampling();
+            //radio3.startProbesSampling();
             radio3.disableGetOnAllProbes(true);
+            continuousSamplingEnabled = true;
 
         } else {
-            radio3.stopProbesSampling();
+            //radio3.stopProbesSampling();
             FxUtils.enableItems(sampleAllProbesBtn, deviceConnect, sweepTab, vnaTab);
             radio3.disableGetOnAllProbes(false);
+            continuousSamplingEnabled = false;
         }
     }
 
@@ -253,7 +289,7 @@ public class MainController {
     }
 
     public void updateVfoAttenuator(HardwareRevision hardwareRevision) {
-        if(hardwareRevision == HardwareRevision.PROTOTYPE_2) {
+        if(hardwareRevision == HardwareRevision.VERSION_2) {
             vfoAttenuator.setDisable(false);
             vfoAttenuator.getItems().setAll(VfoAttenuator.values());
         } else {

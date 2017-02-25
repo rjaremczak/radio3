@@ -12,7 +12,7 @@ import static com.mindpart.radio3.device.FrameCommand.LOGPROBE_GET;
  * Created by Robert Jaremczak
  * Date: 2016.09.23
  */
-public class LogarithmicProbe implements FrameParser<Double> {
+public class LogarithmicParser implements FrameParser<Double> {
     private Adc adc = Adc.getDefault();
 
     @Override

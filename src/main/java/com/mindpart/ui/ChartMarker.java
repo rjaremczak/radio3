@@ -102,6 +102,8 @@ public class ChartMarker {
         chart.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> updateChartBounds());
         chart.setOnMouseClicked(this::onMouseClicked);
         chart.setOnMouseExited(this::onMouseExited);
+
+        reset();
     }
 
     public void reset() {

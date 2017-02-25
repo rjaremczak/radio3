@@ -19,6 +19,6 @@ public class Configuration {
     public LogarithmicProbeConfig logarithmicProbe;
     public VnaConfig vna;
     public List<SweepProfile> sweepProfiles;
-    public HardwareRevision hardwareRevision;
-    public VfoType vfoType;
+    public HardwareRevision hardwareRevision = HardwareRevision.AUTODETECT;
+    public VfoType vfoType = VfoType.NONE;
 }

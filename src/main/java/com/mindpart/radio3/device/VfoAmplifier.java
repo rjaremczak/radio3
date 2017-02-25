@@ -2,27 +2,25 @@ package com.mindpart.radio3.device;
 
 /**
  * Created by Robert Jaremczak
- * Date: 2017.01.30
+ * Date: 2017.02.21
  */
-public enum HardwareRevision {
-    AUTODETECT(0, "Autodetect"),
-    VERSION_1(1, "Version 1"),
-    VERSION_2(2, "Version 2");
+public enum VfoAmplifier {
+    OFF(0, "Off"), ON(1, "On");
 
     private int code;
     private String name;
 
-    HardwareRevision(int code, String name) {
+    VfoAmplifier(int code, String name) {
         this.code = code;
         this.name = name;
+    }
+
+    public int getCode() {
+        return code;
     }
 
     @Override
     public String toString() {
         return name;
-    }
-
-    public int getCode() {
-        return code;
     }
 }

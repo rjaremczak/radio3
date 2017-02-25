@@ -12,7 +12,7 @@ import static com.mindpart.radio3.device.FrameCommand.LINPROBE_GET;
  * Created by Robert Jaremczak
  * Date: 2016.03.13
  */
-public class LinearProbe implements FrameParser<Double> {
+public class LinearParser implements FrameParser<Double> {
     private Adc adc = Adc.getDefault();
 
     @Override

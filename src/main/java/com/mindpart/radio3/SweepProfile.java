@@ -16,6 +16,10 @@ public class SweepProfile {
     public String freqMax;
     public int steps = DEFAULT_STEPS;
 
+    public String dump() {
+        return name+" - freq: "+freqMin+" - "+freqMin+", steps: "+steps;
+    }
+
     @Override
     public String toString() {
         return name;

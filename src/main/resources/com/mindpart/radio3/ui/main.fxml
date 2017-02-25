@@ -42,7 +42,7 @@
                                                 <GridPane hgap="5.0" vgap="5.0">
                                                    <columnConstraints>
                                                       <ColumnConstraints hgrow="NEVER" />
-                                                      <ColumnConstraints />
+                                                      <ColumnConstraints hgrow="ALWAYS" />
                                                    </columnConstraints>
                                                    <rowConstraints>
                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -50,17 +50,18 @@
                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
-                                                      <Label text="Hardware Revision" GridPane.rowIndex="1" />
-                                                      <ChoiceBox fx:id="hardwareRevisions" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                      <Label text="VFO Type" GridPane.rowIndex="2" />
-                                                      <ChoiceBox fx:id="vfoType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                      <Label text="Serial Port" />
-                                                      <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1">
+                                                      <Label text="Hardware Revision" />
+                                                      <ChoiceBox fx:id="hardwareRevisions" prefWidth="150.0" GridPane.columnIndex="1" />
+                                                      <Label text="VFO Type" GridPane.rowIndex="1" />
+                                                      <ChoiceBox fx:id="vfoType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                                          <children>
                                                                 <ChoiceBox fx:id="serialPorts" minWidth="212.0" prefHeight="27.0" prefWidth="212.0" />
                                                                 <Button fx:id="serialPortsRefresh" focusTraversable="false" mnemonicParsing="false" text="Refresh" />
+                                                                <Button fx:id="deviceConnect" defaultButton="true" mnemonicParsing="false" text="Connect" />
                                                          </children>
                                                       </HBox>
+                                                      <Label text="Serial Port" GridPane.rowIndex="2" />
                                                    </children>
                                                    <padding>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -71,46 +72,6 @@
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                    </VBox.margin>
                                                 </Separator>
-                                                    <Button fx:id="deviceConnect" defaultButton="true" mnemonicParsing="false" text="Connect">
-                                                   <VBox.margin>
-                                                      <Insets />
-                                                   </VBox.margin>
-                                                </Button>
-                                             </children>
-                                             <padding>
-                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                             </padding>
-                                          </VBox>
-                                       </children>
-                                    </AnchorPane>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                       <children>
-                                          <VBox fx:id="deviceRuntimePane" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <children>
-                                                <GridPane hgap="5.0" vgap="5.0">
-                                                  <columnConstraints>
-                                                    <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
-                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                  </columnConstraints>
-                                                  <rowConstraints>
-                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                  </rowConstraints>
-                                                   <children>
-                                                      <Label text="VFO output" />
-                                                      <Label text="VFO Attenuator" GridPane.rowIndex="1" />
-                                                      <ChoiceBox fx:id="vfoAttenuator" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                      <ChoiceBox fx:id="vfoOutput" prefWidth="150.0" GridPane.columnIndex="1" />
-                                                   </children>
-                                                   <padding>
-                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                                   </padding>
-                                                </GridPane>
-                                                <Separator prefWidth="200.0">
-                                                   <VBox.margin>
-                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                                   </VBox.margin></Separator>
-                                                <Label text="Device Properties" />
                                                 <TableView fx:id="devicePropertiesTable">
                                                    <columns>
                                                       <TableColumn editable="false" prefWidth="75.0" text="Property">
@@ -136,6 +97,15 @@
                                           </VBox>
                                        </children>
                                     </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                          <VBox fx:id="deviceRuntimePane" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </padding>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
                                 </items>
                               </SplitPane>
                            </children>
@@ -147,24 +117,77 @@
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                     <children>
-                                        <VBox fx:id="componentsBox" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <children>
-                                                <HBox alignment="CENTER_LEFT" spacing="5.0">
-                                                    <children>
-                                                        <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#doSampleAllProbes" text="Get All" />
-                                                        <ToggleButton fx:id="continuousSamplingOfAllProbesBtn" mnemonicParsing="false" onAction="#doContinuousSamplingOfAllProbes" text="Continuous Sampling">
-                                                            <HBox.margin>
-                                                                <Insets />
-                                                            </HBox.margin>
-                                                        </ToggleButton>
-                                                        <Separator prefWidth="200.0" visible="false" />
-                                                    </children>
-                                                    <padding>
-                                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                                    </padding>
-                                                </HBox>
-                                            </children>
-                                        </VBox>
+                              <SplitPane dividerPositions="0.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                                    <VBox fx:id="componentsBox" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                        <children>
+                                                <Label text="Probes and sampling">
+                                                   <VBox.margin>
+                                                      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                   </VBox.margin>
+                                                </Label>
+                                                <Separator prefWidth="200.0" />
+                                                            <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                                <children>
+                                                                    <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#doSampleAllProbes" text="Get All" />
+                                                                    <ToggleButton fx:id="continuousSamplingOfAllProbesBtn" mnemonicParsing="false" onAction="#doContinuousSamplingOfAllProbes" text="Continuous Sampling">
+                                                                        <HBox.margin>
+                                                                            <Insets />
+                                                                        </HBox.margin>
+                                                                    </ToggleButton>
+                                                                    <Separator prefWidth="200.0" visible="false" />
+                                                                </children>
+                                                                <padding>
+                                                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                                </padding>
+                                                            </HBox>
+                                                        </children>
+                                                    </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                          <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <Label text="Configuration">
+                                                   <VBox.margin>
+                                                      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                   </VBox.margin>
+                                                </Label>
+                                                <Separator prefWidth="200.0" />
+                                                <GridPane hgap="5.0" vgap="5.0">
+                                                  <columnConstraints>
+                                                    <ColumnConstraints hgrow="NEVER" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                   <children>
+                                                      <Label text="VFO output" GridPane.rowIndex="3" />
+                                                      <Label text="VFO attenuator" GridPane.rowIndex="2" />
+                                                      <ChoiceBox fx:id="vfoAttenuator" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                      <ChoiceBox fx:id="vfoOutput" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                      <Label text="VFO amplifier" GridPane.rowIndex="1" />
+                                                      <Label text="VNA mode" />
+                                                      <ChoiceBox fx:id="vfoAmplifier" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <ChoiceBox fx:id="vnaMode" prefWidth="150.0" GridPane.columnIndex="1" />
+                                                   </children>
+                                                   <padding>
+                                                      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                   </padding>
+                                                </GridPane>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
                                     </children>
                                     <padding>
                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

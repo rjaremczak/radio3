@@ -1,6 +1,6 @@
 {
-  "vfoType": "NONE",
-  "hardwareRevision": "UNKNOWN",
+  "vfoType": "DDS_AD9850",
+  "hardwareRevision": "AUTODETECT",
   "fMeter": {
     "multiplier": 4,
     "base": 0

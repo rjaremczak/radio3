@@ -111,6 +111,14 @@ public class DeviceService {
         performRequest(new Frame(vfoOut.getFrameCommand()));
     }
 
+    public void setVnaMode(VnaMode vnaMode) {
+        performRequest(new Frame(FrameCommand.VNA_MODE, Binary.fromUInt8(vnaMode.getCode())));
+    }
+
+    public void setVfoAmplifier(VfoAmplifier vfoAmplifier) {
+        performRequest(new Frame(FrameCommand.VFO_AMPLIFIER, Binary.fromUInt8(vfoAmplifier.getCode())));
+    }
+
     public List<String> availableSerialPorts() {
         return Arrays.asList(SerialPortList.getPortNames());
     }
@@ -166,5 +174,4 @@ public class DeviceService {
     public void stopMultipleProbesSampling() {
         performRequest(new Frame(PROBES_STOP_SAMPLING));
     }
-
 }

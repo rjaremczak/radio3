@@ -1,7 +1,7 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.LinearProbe;
-import com.mindpart.radio3.LogarithmicProbe;
+import com.mindpart.radio3.LinearParser;
+import com.mindpart.radio3.LogarithmicParser;
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.device.AnalyserData;
@@ -74,8 +74,8 @@ public class SweepController {
 
     private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
     private Sweeper sweeper;
-    private LogarithmicProbe logarithmicProbe;
-    private LinearProbe linearProbe;
+    private LogarithmicParser logarithmicParser;
+    private LinearParser linearParser;
     private Function<Integer, Double> probeAdcConverter;
     private SweepSettings sweepSettings;
     private ChartMarker chartMarker = new ChartMarker();
@@ -86,10 +86,10 @@ public class SweepController {
     private List<Double> referenceData = new ArrayList<>();
     private AnalyserDataInfo receivedDataInfo;
 
-    public SweepController(Sweeper sweeper, LogarithmicProbe logarithmicProbe, LinearProbe linearProbe, List<SweepProfile> sweepProfiles) {
+    public SweepController(Sweeper sweeper, LogarithmicParser logarithmicParser, LinearParser linearParser, List<SweepProfile> sweepProfiles) {
         this.sweeper = sweeper;
-        this.logarithmicProbe = logarithmicProbe;
-        this.linearProbe = linearProbe;
+        this.logarithmicParser = logarithmicParser;
+        this.linearParser = linearParser;
         this.sweepSettings = new SweepSettings(sweepProfiles);
     }
 
@@ -145,12 +145,12 @@ public class SweepController {
             referenceData = receivedData.stream().map(XYChart.Data::getYValue).collect(Collectors.toList());
             if(sourceProbe.getValue() == AnalyserDataSource.LOG_PROBE) {
                 signalAxisY.setLabel("Normalized Power [dBm]");
-                probeAdcConverter = logarithmicProbe::parse;
+                probeAdcConverter = logarithmicParser::parse;
                 probeValueFormatter = this::powerValueFormatter;
                 valueProcessor = this::fromLogarithmicToRelativeGain;
             } else {
                 signalAxisY.setLabel("Normalized Voltage [mV]");
-                probeAdcConverter = linearProbe::parse;
+                probeAdcConverter = linearParser::parse;
                 probeValueFormatter = this::voltageValueFormatter;
                 valueProcessor = this::fromLinearTo1mV;
             }
@@ -183,14 +183,14 @@ public class SweepController {
         switch (source) {
             case LOG_PROBE: {
                 signalAxisY.setLabel("Power [dBm]");
-                probeAdcConverter = logarithmicProbe::parse;
+                probeAdcConverter = logarithmicParser::parse;
                 probeValueFormatter = this::powerValueFormatter;
                 valueProcessor = this::originalValue;
                 break;
             }
             case LIN_PROBE: {
                 signalAxisY.setLabel("Voltage [mV]");
-                probeAdcConverter = linearProbe::parse;
+                probeAdcConverter = linearParser::parse;
                 probeValueFormatter = this::voltageValueFormatter;
                 valueProcessor = this::originalValue;
                 break;
