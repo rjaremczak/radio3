@@ -7,10 +7,16 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -88,6 +94,11 @@ public class MainController {
     @FXML
     ChoiceBox<HardwareRevision> hardwareRevisions;
 
+    @FXML
+    Circle mainIndicator;
+
+    @FXML
+    VBox deviceLogBox;
 
     private Radio3 radio3;
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
@@ -113,12 +124,21 @@ public class MainController {
         }
     }
 
+    private void updateMainIndicator(MainIndicatorState state) {
+        mainIndicator.setFill(new RadialGradient(-36.87, -0.19, 0.44, 0.41, 0.333, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.WHITE),
+                new Stop(0.175, Color.WHITE),
+                new Stop(0.65, state.getColor()),
+                new Stop(1.0, state.getColor())));
+
+    }
+
     private void updateOnConnect() {
         FxUtils.disableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         FxUtils.enableItems(componentsTab, sweepTab, vnaTab, deviceConnect, deviceRuntimePane);
         updateConnectionStatus();
         deviceConnect.setText("Disconnect");
-
+        updateMainIndicator(MainIndicatorState.CONNECTED);
     }
 
     private void updateOnDisconnect() {
@@ -128,10 +148,12 @@ public class MainController {
         deviceConnect.setText("Connect");
         deviceProperties.clear();
         devicePropertiesMap.clear();
+        updateMainIndicator(MainIndicatorState.DISCONNECTED);
     }
 
     private void doConnect() {
         deviceConnectionStatus.setText("connecting...");
+        updateMainIndicator(MainIndicatorState.PROCESSING);
         FxUtils.disableItems(deviceConnect, serialPortsRefresh, serialPorts);
         Platform.runLater(() -> {
             radio3.connect(serialPorts.getValue());
@@ -139,8 +161,10 @@ public class MainController {
                 updateOnConnect();
                 radio3.requestDeviceState();
                 radio3.requestVfoFrequency();
+                addDeviceLogEntry("connected");
             } else {
                 updateOnDisconnect();
+                addDeviceLogEntry("connection error");
             }
         });
     }
@@ -152,6 +176,7 @@ public class MainController {
     private void doDisconnect() {
         radio3.disconnect();
         updateOnDisconnect();
+        addDeviceLogEntry("disconnected");
     }
 
     public void doConnectDisconnect() {
@@ -202,7 +227,15 @@ public class MainController {
                 .addListener((observable, oldValue, newValue) -> radio3.setVfoAmplifier(newValue));
     }
 
+    private void addDeviceLogEntry(String msg) {
+        ObservableList<Node> entries = deviceLogBox.getChildren();
+        if(entries.size() >= 200) { entries.remove(0); }
+        entries.add(new Label(msg));
+    }
+
     public void initialize() {
+        radio3.bindLogMessageHandler(logMessage -> addDeviceLogEntry(logMessage.getMessage()));
+
         devicePropertiesTable.setItems(deviceProperties);
         devicePropertiesRefresh.setOnAction(event -> onDevicePropertiesRefresh());
         serialPortsRefresh.setOnAction(event -> updateAvailablePorts());
@@ -245,12 +278,10 @@ public class MainController {
     public void doContinuousSamplingOfAllProbes() {
         if (continuousSamplingOfAllProbesBtn.isSelected()) {
             FxUtils.disableItems(sampleAllProbesBtn, deviceConnect, sweepTab, vnaTab);
-            //radio3.startProbesSampling();
             radio3.disableGetOnAllProbes(true);
             continuousSamplingEnabled = true;
 
         } else {
-            //radio3.stopProbesSampling();
             FxUtils.enableItems(sampleAllProbesBtn, deviceConnect, sweepTab, vnaTab);
             radio3.disableGetOnAllProbes(false);
             continuousSamplingEnabled = false;

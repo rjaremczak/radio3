@@ -41,6 +41,7 @@ public class SweepSettings extends GridPane {
 
     private void initSweepSteps() {
         sweepSteps.getItems().addAll(100, 200, 500, 1000);
+        sweepSteps.getSelectionModel().select((Integer) 200);
     }
 
     public void initialize() {
@@ -59,16 +60,12 @@ public class SweepSettings extends GridPane {
 
                 startFrequencyField.setFrequency(Frequency.parse(newProfile.freqMin));
                 endFrequencyField.setFrequency(Frequency.parse(newProfile.freqMax));
-                sweepSteps.getSelectionModel().select((Integer)newProfile.steps);
 
                 startFrequencyField.setOnChangeHandler(() -> presetsChoiceBox.getSelectionModel().clearSelection());
                 endFrequencyField.setOnChangeHandler(() -> presetsChoiceBox.getSelectionModel().clearSelection());
             }
         });
         presetsChoiceBox.getSelectionModel().selectFirst();
-        if(sweepSteps.getSelectionModel().getSelectedItem()==null) {
-            sweepSteps.getSelectionModel().selectFirst();
-        }
     }
 
     public Frequency getStartFrequency() {

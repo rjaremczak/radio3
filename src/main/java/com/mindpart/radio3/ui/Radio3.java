@@ -30,6 +30,7 @@ public class Radio3 extends Application {
     private Sweeper sweeper;
     private FMeterParser fMeterParser;
     private MultipleProbesParser multipleProbesParser;
+    private LogMessageParser logMessageParser;
 
     private ConfigurationService configurationService;
     private DeviceService deviceService;
@@ -107,7 +108,9 @@ public class Radio3 extends Application {
             sweepController.updateAnalyserState(deviceState.analyserState);
         });
 
-        bind(new LogMessageParser(), this::dumpDeviceLog);
+        logMessageParser = new LogMessageParser();
+        bind(logMessageParser, this::dumpDeviceLog);
+
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
 
         primaryStage.setTitle("radio3 by SQ6DGT ("+configurationService.getBuildId()+")");
@@ -122,6 +125,10 @@ public class Radio3 extends Application {
         addFeatureBox(logarithmicProbeController);
         addFeatureBox(linearProbeController);
         addFeatureBox(vnaProbeController);
+    }
+
+    public void bindLogMessageHandler(Consumer<LogMessage> handler) {
+        bind(logMessageParser, handler);
     }
 
     public void saveConfiguration() throws IOException {

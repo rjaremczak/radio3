@@ -81,7 +81,6 @@ public class SweepController {
     private ChartMarker chartMarker = new ChartMarker();
     private Function<Double, String> probeValueFormatter;
     private BiFunction<Integer, Double, Double> valueProcessor = this::originalValue;
-
     private List<XYChart.Data<Double, Double>> receivedData = new ArrayList<>();
     private List<Double> referenceData = new ArrayList<>();
     private AnalyserDataInfo receivedDataInfo;
