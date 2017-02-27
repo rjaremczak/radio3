@@ -7,6 +7,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.function.Supplier;
 
 /**
@@ -14,6 +17,8 @@ import java.util.function.Supplier;
  * Date: 2016.11.03
  */
 public class FrequencyField extends TextField {
+    private static final NumberFormat FORMAT = new DecimalFormat("0.###");
+
     private Runnable onChangeHandler = null;
     private Supplier<Frequency> minSupplier = () -> Frequency.ZERO;
     private Supplier<Frequency> maxSupplier = () -> Frequency.ofHz(Long.MAX_VALUE);
@@ -74,8 +79,8 @@ public class FrequencyField extends TextField {
         Frequency parsed;
 
         try {
-            parsed = Frequency.parse(str);
-        } catch (NumberFormatException e) {
+            parsed = Frequency.ofMHz((double)FORMAT.parse(str));
+        } catch (NumberFormatException|ParseException e) {
             FxUtils.alertInputError(getLabel(), "malformed value", "must be a valid frequency");
             setText(lastValue);
             return false;
@@ -111,8 +116,7 @@ public class FrequencyField extends TextField {
     }
 
     private void format() {
-        lastValue = frequency.format();
-        setText(lastValue);
+        setText(FORMAT.format(frequency.toMHz()));
     }
 
     public void setMinSupplier(Supplier<Frequency> minSupplier) {

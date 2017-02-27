@@ -106,7 +106,7 @@
                                              </padding>
                                              <children>
                                                 <Label text="Device log:" />
-                                                <ScrollPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
+                                                <ScrollPane fx:id="deviceLogScrollPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
                                                    <content>
                                                       <VBox fx:id="deviceLogBox" />
                                                    </content>

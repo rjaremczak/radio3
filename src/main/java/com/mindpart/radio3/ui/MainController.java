@@ -98,6 +98,9 @@ public class MainController {
     Circle mainIndicator;
 
     @FXML
+    ScrollPane deviceLogScrollPane;
+
+    @FXML
     VBox deviceLogBox;
 
     private Radio3 radio3;
@@ -231,6 +234,7 @@ public class MainController {
         ObservableList<Node> entries = deviceLogBox.getChildren();
         if(entries.size() >= 200) { entries.remove(0); }
         entries.add(new Label(msg));
+        deviceLogScrollPane.setVvalue(deviceLogScrollPane.getVmax());
     }
 
     public void initialize() {
