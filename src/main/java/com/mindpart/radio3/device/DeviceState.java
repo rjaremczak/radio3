@@ -5,10 +5,9 @@ package com.mindpart.radio3.device;
  * Date: 2016.04.10
  */
 public class DeviceState {
-    public boolean probesSampling;
-    public int samplingPeriodMs;
     public long timeMs;
     public AnalyserState analyserState;
     public VfoOut vfoOut;
+    public VfoAmplifier vfoAmplifier;
     public VfoAttenuator vfoAttenuator;
 }

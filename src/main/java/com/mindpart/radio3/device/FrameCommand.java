@@ -27,8 +27,6 @@ public enum FrameCommand {
     FMETER_ERROR(0x02f),
 
     PROBES_GET(0x030),
-    PROBES_START_SAMPLING(0x031),
-    PROBES_STOP_SAMPLING(0x032),
     VFO_OUT_DIRECT(0x033),
     VFO_OUT_VNA(0x034),
     VFO_TYPE(0x035),

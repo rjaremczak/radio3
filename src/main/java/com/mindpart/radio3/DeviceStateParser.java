@@ -17,11 +17,10 @@ public class DeviceStateParser implements FrameParser<DeviceState> {
     public DeviceState parse(Frame frame) {
         BinaryIterator bi = frame.binaryIterator();
         DeviceState ds = new DeviceState();
-        ds.probesSampling = bi.nextBool();
-        ds.samplingPeriodMs = bi.nextInt16();
         ds.timeMs = bi.nextUInt32();
         ds.analyserState = AnalyserState.values()[bi.nextUInt8()];
         ds.vfoOut = VfoOut.values()[bi.nextUInt8()];
+        ds.vfoAmplifier = VfoAmplifier.values()[bi.nextUInt8()];
         ds.vfoAttenuator = VfoAttenuator.values()[bi.nextUInt8()];
         return ds;
     }

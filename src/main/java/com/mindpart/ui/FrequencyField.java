@@ -3,8 +3,6 @@ package com.mindpart.ui;
 import com.mindpart.types.Frequency;
 import com.mindpart.utils.FxUtils;
 import javafx.scene.control.TextField;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
@@ -17,7 +15,8 @@ import java.util.function.Supplier;
  * Date: 2016.11.03
  */
 public class FrequencyField extends TextField {
-    private static final NumberFormat FORMAT = new DecimalFormat("0.###");
+    private static final NumberFormat IN_FORMAT = new DecimalFormat("0.###");
+    private static final NumberFormat OUT_FORMAT = new DecimalFormat("0.000");
 
     private Runnable onChangeHandler = null;
     private Supplier<Frequency> minSupplier = () -> Frequency.ZERO;
@@ -79,7 +78,7 @@ public class FrequencyField extends TextField {
         Frequency parsed;
 
         try {
-            parsed = Frequency.ofMHz((double)FORMAT.parse(str));
+            parsed = Frequency.ofMHz((double) IN_FORMAT.parse(str));
         } catch (NumberFormatException|ParseException e) {
             FxUtils.alertInputError(getLabel(), "malformed value", "must be a valid frequency");
             setText(lastValue);
@@ -111,12 +110,13 @@ public class FrequencyField extends TextField {
     }
 
     public void setFrequency(Frequency frequency) {
+        lastValue = getText();
         this.frequency = frequency;
         format();
     }
 
     private void format() {
-        setText(FORMAT.format(frequency.toMHz()));
+        setText(OUT_FORMAT.format(frequency.toMHz()));
     }
 
     public void setMinSupplier(Supplier<Frequency> minSupplier) {

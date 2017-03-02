@@ -19,8 +19,6 @@ import java.util.function.Consumer;
 import static com.mindpart.radio3.ui.Radio3State.*;
 
 public class Radio3 extends Application {
-    private static Logger logger = Logger.getLogger(Radio3.class);
-
     private LogarithmicParser logarithmicParser;
     private LinearParser linearParser;
     private VnaParser vnaParser;
@@ -31,6 +29,7 @@ public class Radio3 extends Application {
     private FMeterParser fMeterParser;
     private MultipleProbesParser multipleProbesParser;
     private LogMessageParser logMessageParser;
+    private Consumer<String> logMessageHandler = msg -> {};
 
     private ConfigurationService configurationService;
     private DeviceService deviceService;
@@ -61,7 +60,6 @@ public class Radio3 extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        logger.debug("started");
         configurationService = new ConfigurationService();
         configurationService.init();
         configuration = configurationService.load();
@@ -109,7 +107,7 @@ public class Radio3 extends Application {
         });
 
         logMessageParser = new LogMessageParser();
-        bind(logMessageParser, this::dumpDeviceLog);
+        bind(logMessageParser, logMessage -> log(logMessage.getMessage()));
 
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
 
@@ -131,6 +129,10 @@ public class Radio3 extends Application {
         bind(logMessageParser, handler);
     }
 
+    public void log(String msg) {
+        logMessageHandler.accept(msg);
+    }
+
     public void saveConfiguration() throws IOException {
         configurationService.save(configuration);
     }
@@ -150,7 +152,6 @@ public class Radio3 extends Application {
         super.stop();
         disconnect();
         mainController.shutdown();
-        logger.debug("stopped");
     }
 
     public void updateAllProbes(ProbeValues probeValues) {
@@ -165,10 +166,6 @@ public class Radio3 extends Application {
         linearProbeController.disableMainButton(disable);
         vnaProbeController.disableMainButton(disable);
         fMeterController.disableMainButton(disable);
-    }
-
-    private void dumpDeviceLog(LogMessage logMessage) {
-        logger.info("DEVICE: "+ logMessage.getMessage());
     }
 
     public List<String> availableSerialPorts() {
@@ -223,14 +220,6 @@ public class Radio3 extends Application {
 
     public void getProbes() {
         deviceService.requestMultipleProbesSample();
-    }
-
-    public void startProbesSampling() {
-        deviceService.startMultipleProbesSampling();
-    }
-
-    public void stopProbesSampling() {
-        deviceService.stopMultipleProbesSampling();
     }
 
     public Radio3State getState() {
@@ -317,5 +306,9 @@ public class Radio3 extends Application {
 
     public void requestVnaProbeSample() {
         deviceService.requestVnaProbeSample();
+    }
+
+    public void resetDevice() {
+        deviceService.requestDeviceReset();
     }
 }

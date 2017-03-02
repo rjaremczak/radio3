@@ -90,7 +90,12 @@
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                    </columnResizePolicy>
                                                 </TableView>
-                                                <Button fx:id="devicePropertiesRefresh" mnemonicParsing="false" text="Refresh" />
+                                                <HBox fx:id="deviceControlPane" alignment="CENTER" spacing="5.0">
+                                                   <children>
+                                                      <Button fx:id="deviceReset" mnemonicParsing="false" text="Reset" />
+                                                      <Button fx:id="devicePropertiesRefresh" mnemonicParsing="false" text="Refresh" />
+                                                   </children>
+                                                </HBox>
                                              </children>
                                              <padding>
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

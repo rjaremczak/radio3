@@ -167,11 +167,7 @@ public class DeviceService {
         performRequest(new Frame(PROBES_GET));
     }
 
-    public void startMultipleProbesSampling() {
-        performRequest(new Frame(PROBES_START_SAMPLING));
-    }
-
-    public void stopMultipleProbesSampling() {
-        performRequest(new Frame(PROBES_STOP_SAMPLING));
+    public void requestDeviceReset() {
+        performRequest(new Frame(DEVICE_RESET));
     }
 }
