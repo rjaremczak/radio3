@@ -78,7 +78,7 @@ public class FrequencyField extends TextField {
         Frequency parsed;
 
         try {
-            parsed = Frequency.ofMHz((double) IN_FORMAT.parse(str));
+            parsed = Frequency.ofMHz(IN_FORMAT.parse(str).doubleValue());
         } catch (NumberFormatException|ParseException e) {
             FxUtils.alertInputError(getLabel(), "malformed value", "must be a valid frequency");
             setText(lastValue);

@@ -27,7 +27,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.apache.commons.math3.util.Precision;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,7 +80,7 @@ public class SweepController {
     private SweepSettings sweepSettings;
     private ChartMarker chartMarker = new ChartMarker();
     private Function<Double, String> probeValueFormatter;
-    private BiFunction<Integer, Double, Double> valueProcessor = (index, value) -> Precision.round(value,1);
+    private BiFunction<Integer, Double, Double> valueProcessor = this::originalValue;
     private List<XYChart.Data<Double, Double>> receivedData = new ArrayList<>();
     private List<Double> referenceData = new ArrayList<>();
     private AnalyserDataInfo receivedDataInfo;
@@ -100,6 +99,10 @@ public class SweepController {
 
     private Point2D valueToRefPos(double value) {
         return anchorPane.sceneToLocal(signalAxisY.localToScene(0, signalAxisY.getDisplayPosition(value)));
+    }
+
+    private Double originalValue(int index, Double value) {
+        return value;
     }
 
     private Double fromLogarithmicToRelativeGain(int index, Double value) {
@@ -181,14 +184,14 @@ public class SweepController {
                 signalAxisY.setLabel("Power [dBm]");
                 probeAdcConverter = logarithmicParser::parse;
                 probeValueFormatter = this::powerValueFormatter;
-                valueProcessor = (index, value) -> Precision.round(value, 1);
+                valueProcessor = this::originalValue;
                 break;
             }
             case LIN_PROBE: {
                 signalAxisY.setLabel("Voltage [mV]");
                 probeAdcConverter = linearParser::parse;
                 probeValueFormatter = this::voltageValueFormatter;
-                valueProcessor = (index, value) -> Precision.round(value, 1);
+                valueProcessor = this::originalValue;
                 break;
             }
             default:
@@ -217,7 +220,7 @@ public class SweepController {
         int samples[] = ad.getData()[0];
         long freq = ad.getFreqStart();
         for (int step = 0; step <= ad.getNumSteps(); step++) {
-            receivedData.add(new XYChart.Data<>(Precision.round(Frequency.toMHz(freq),1), probeAdcConverter.apply(samples[step])));
+            receivedData.add(new XYChart.Data<>(Frequency.toMHz(freq), probeAdcConverter.apply(samples[step])));
             freq += ad.getFreqStep();
         }
 

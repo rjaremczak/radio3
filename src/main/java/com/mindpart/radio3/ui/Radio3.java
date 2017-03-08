@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 import static com.mindpart.radio3.ui.Radio3State.*;
@@ -60,6 +61,8 @@ public class Radio3 extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        Locale.setDefault(Locale.US);
+
         configurationService = new ConfigurationService();
         configurationService.init();
         configuration = configurationService.load();

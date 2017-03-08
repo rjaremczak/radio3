@@ -1,6 +1,9 @@
 package com.mindpart.types;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Locale;
 
 import static org.junit.Assert.*;
 
@@ -10,6 +13,11 @@ import static org.junit.Assert.*;
  */
 public class VoltageTest {
     double accuracy = 0.0000001;
+
+    @Before
+    public void setUp() {
+        Locale.setDefault(Locale.US);
+    }
 
     @Test
     public void testConstructors() {

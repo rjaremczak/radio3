@@ -22,7 +22,7 @@
    <children>
       <FrequencyField fx:id="startFrequencyField" alignment="CENTER_RIGHT" label="start frequency" promptText="from" styleClass="value-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <FrequencyField fx:id="endFrequencyField" alignment="CENTER_RIGHT" label="end frequency" promptText="to" styleClass="value-field" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <Label text="frequency range" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+      <Label text="frequency range [MHz]" GridPane.columnIndex="1" GridPane.columnSpan="2" />
       <Label text="steps" GridPane.columnIndex="3" />
       <Label text="presets" />
       <ChoiceBox fx:id="presetsChoiceBox" prefWidth="200" GridPane.rowIndex="1" />

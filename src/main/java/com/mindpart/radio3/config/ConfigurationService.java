@@ -1,6 +1,7 @@
 package com.mindpart.radio3.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.log4j.Logger;
 
@@ -51,7 +52,15 @@ public class ConfigurationService {
     }
 
     public Configuration load() throws IOException {
-        return new ObjectMapper().readValue(configurationFile.toFile(), Configuration.class);
+        try {
+            return new ObjectMapper().readValue(configurationFile.toFile(), Configuration.class);
+        } catch (InvalidFormatException e) {
+            logger.error("error parsing configuration file, delete and replace with defaults");
+            Files.delete(configurationFile);
+            Configuration defaults = loadDefaults();
+            save(defaults);
+            return defaults;
+        }
     }
 
     public void save(Configuration configuration) {
