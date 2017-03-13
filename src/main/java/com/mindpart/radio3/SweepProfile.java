@@ -14,7 +14,7 @@ public class SweepProfile {
     public String freqMax;
 
     public String dump() {
-        return name+" - freq: "+freqMin+" - "+freqMin;
+        return name+" - freq: "+freqMin+" - "+freqMax;
     }
 
     @Override

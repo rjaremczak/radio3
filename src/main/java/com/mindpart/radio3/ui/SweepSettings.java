@@ -54,7 +54,6 @@ public class SweepSettings extends GridPane {
         presetsChoiceBox.setItems(presets);
         presetsChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newProfile) -> {
             if(newProfile!=null) {
-                logger.debug("sweep profile selected: "+newProfile.dump());
                 startFrequencyField.clearOnChangeHandler();
                 endFrequencyField.clearOnChangeHandler();
 

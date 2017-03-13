@@ -21,6 +21,6 @@ public class Adc {
     }
 
     public static Adc getDefault() {
-        return new Adc(0, 4035, 0.0, 3.45);
+        return new Adc(0, 4095, 0.0, 3.3);
     }
 }

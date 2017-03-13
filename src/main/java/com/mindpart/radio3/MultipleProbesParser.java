@@ -31,7 +31,7 @@ public class MultipleProbesParser implements FrameParser<ProbeValues> {
         return new ProbeValues(
                 logarithmicParser.parse(logarithmic),
                 linearParser.parse(linear),
-                vnaParser.parse(complexGain, complexPhase),
+                vnaParser.calculateVnaResult(complexGain, complexPhase),
                 fMeterParser.parse(fMeter)
         );
     }

@@ -10,7 +10,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -160,7 +159,7 @@ public class Radio3 extends Application {
     public void updateAllProbes(ProbeValues probeValues) {
         logarithmicProbeController.update(probeValues.getLogarithmic());
         linearProbeController.update(probeValues.getLinear());
-        vnaProbeController.update(probeValues.getComplex());
+        vnaProbeController.update(probeValues.getVnaResult());
         fMeterController.setFrequency(probeValues.getFMeter());
     }
 

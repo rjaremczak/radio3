@@ -3,6 +3,7 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.VnaParser;
+import com.mindpart.radio3.VnaResult;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserDataSource;
 import com.mindpart.radio3.device.AnalyserState;
@@ -10,7 +11,6 @@ import com.mindpart.types.Frequency;
 import com.mindpart.types.Phase;
 import com.mindpart.types.SWR;
 import com.mindpart.ui.ChartMarker;
-import com.mindpart.utils.Range;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,7 +26,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
-import java.util.function.IntToDoubleFunction;
 
 import static com.mindpart.utils.FxUtils.valueFromSeries;
 
@@ -62,13 +61,13 @@ public class VnaController {
     NumberAxis swrAxisY;
 
     @FXML
-    LineChart<Number, Number> phaseChart;
+    LineChart<Number, Number> impedanceChart;
 
     @FXML
-    NumberAxis phaseAxisY;
+    NumberAxis impedanceAxisX;
 
     @FXML
-    NumberAxis phaseAxisX;
+    NumberAxis impedanceAxisY;
 
     private ObservableList<XYChart.Series<Number, Number>> swrDataSeries;
     private ObservableList<XYChart.Series<Number, Number>> phaseDataSeries;
@@ -111,13 +110,16 @@ public class VnaController {
                 data -> sweepSettings.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
 
         phaseDataSeries = FXCollections.observableArrayList();
-        phaseChart.setData(phaseDataSeries);
-        phaseChart.setCreateSymbols(false);
+        impedanceChart.setData(phaseDataSeries);
+        impedanceChart.setCreateSymbols(false);
 
         setUpAxis(swrAxisX, 1, 55, 2.5);
-        setUpAxis(swrAxisY, 1, 5, 0.25);
-        setUpAxis(phaseAxisX, 1, 55, 2.5);
-        setUpAxis(phaseAxisY, 0, 180, 45);
+        //setUpAxis(swrAxisY, -30, +30, 10);
+        swrAxisY.setAutoRanging(true);
+
+        setUpAxis(impedanceAxisX, 1, 55, 2.5);
+        impedanceAxisY.setAutoRanging(true);
+        //setUpAxis(phaseAxisY, 0, 180, 30);
 
         hBox.getChildren().add(0, sweepSettings);
     }
@@ -149,35 +151,40 @@ public class VnaController {
         int samples[][] = ad.getData();
 
         FrequencyAxisUtils.setupFrequencyAxis(swrAxisX, ad.getFreqStart(), freqEnd);
-        FrequencyAxisUtils.setupFrequencyAxis(phaseAxisX, ad.getFreqStart(), freqEnd);
+        FrequencyAxisUtils.setupFrequencyAxis(impedanceAxisX, ad.getFreqStart(), freqEnd);
 
-        swrAxisY.setAutoRanging(false);
-        Range swrRange = updateChart(swrChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[0],
-                adcValue -> Math.min(MAX_SWR, vnaParser.calculateSWR(adcValue)));
-
-        swrAxisY.setLowerBound(Math.min(1.0, swrRange.getMin()));
-        swrAxisY.setUpperBound(Math.max(2.0, swrRange.getMax()));
-        swrAxisY.setTickUnit(swrRange.span() < 5 ? 0.2 : (swrRange.span() < 20 ? 1.0 : 10.0));
-
-        updateChart(phaseChart, ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples[1], vnaParser::calculatePhaseAngle);
+        updateCharts(ad.getFreqStart(), ad.getFreqStep(), ad.getNumSteps(), samples);
     }
 
-    private Range updateChart(LineChart<Number, Number> chart, long freqStart, long freqStep, int numSteps, int samples[], IntToDoubleFunction translate) {
-        chart.getData().clear();
-        XYChart.Series<Number, Number> chartSeries = new XYChart.Series<>();
-        ObservableList<XYChart.Data<Number, Number>> data = chartSeries.getData();
+    private XYChart.Series<Number,Number> createSeries(String name) {
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName(name);
+        return series;
+    }
+
+    private void updateCharts(long freqStart, long freqStep, int numSteps, int samples[][]) {
+        swrChart.getData().clear();
+        impedanceChart.getData().clear();
+
+        XYChart.Series<Number, Number> swrSeries = createSeries("SWR");
+        XYChart.Series<Number, Number> rSeries = createSeries("R - resistance");
+        XYChart.Series<Number, Number> xSeries = createSeries("X - reactance");
+
+        ObservableList<XYChart.Data<Number, Number>> swrData = swrSeries.getData();
+        ObservableList<XYChart.Data<Number, Number>> rData = rSeries.getData();
+        ObservableList<XYChart.Data<Number, Number>> xData = xSeries.getData();
+
         long freq = freqStart;
-        double minValue = Double.MAX_VALUE;
-        double maxValue = Double.MIN_VALUE;
         for (int num = 0; num <= numSteps; num++) {
-            double value = translate.applyAsDouble(samples[num]);
-            minValue = Math.min(minValue, value);
-            maxValue = Math.max(maxValue, value);
-            XYChart.Data item = new XYChart.Data(Frequency.toMHz(freq), value);
-            data.add(item);
+            VnaResult vnaResult = vnaParser.calculateVnaResult(samples[0][num], samples[1][num]);
+            double fMHz = Frequency.toMHz(freq);
+            swrData.add(new XYChart.Data<>(fMHz, vnaResult.getSwr()));
+            rData.add(new XYChart.Data<>(fMHz, vnaResult.getR()));
+            xData.add(new XYChart.Data<>(fMHz, vnaResult.getX()));
             freq += freqStep;
         }
-        chart.getData().add(chartSeries);
-        return new Range(minValue, maxValue);
+
+        swrChart.getData().add(swrSeries);
+        impedanceChart.getData().addAll(rSeries, xSeries);
     }
 }

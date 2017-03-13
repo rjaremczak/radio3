@@ -1,5 +1,6 @@
 package com.mindpart.radio3.device;
 
+import com.mindpart.radio3.VnaResult;
 import com.mindpart.types.Frequency;
 
 /**
@@ -9,13 +10,13 @@ import com.mindpart.types.Frequency;
 public class ProbeValues {
     private double logarithmic;
     private double linear;
-    private Complex complex;
+    private VnaResult vnaResult;
     private Frequency fMeter;
 
-    public ProbeValues(double logarithmic, double linear, Complex complex, Frequency fMeter) {
+    public ProbeValues(double logarithmic, double linear, VnaResult vnaResult, Frequency fMeter) {
         this.logarithmic = logarithmic;
         this.linear = linear;
-        this.complex = complex;
+        this.vnaResult = vnaResult;
         this.fMeter = fMeter;
     }
 
@@ -27,8 +28,8 @@ public class ProbeValues {
         return linear;
     }
 
-    public Complex getComplex() {
-        return complex;
+    public VnaResult getVnaResult() {
+        return vnaResult;
     }
 
     public Frequency getFMeter() {
