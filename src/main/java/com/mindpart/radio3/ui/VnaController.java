@@ -25,6 +25,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 import static com.mindpart.utils.FxUtils.valueFromSeries;
@@ -35,6 +37,7 @@ import static com.mindpart.utils.FxUtils.valueFromSeries;
  */
 public class VnaController {
     private static final double MAX_SWR = 5.0;
+    private static final NumberFormat RX_FORMAT = new DecimalFormat("0.0");
 
     @FXML
     AnchorPane anchorPane;
@@ -70,7 +73,7 @@ public class VnaController {
     NumberAxis impedanceAxisY;
 
     private ObservableList<XYChart.Series<Number, Number>> swrDataSeries;
-    private ObservableList<XYChart.Series<Number, Number>> phaseDataSeries;
+    private ObservableList<XYChart.Series<Number, Number>> impedanceDataSeries;
     private Sweeper sweeper;
     private VnaParser vnaParser;
     private SweepSettings sweepSettings;
@@ -100,17 +103,18 @@ public class VnaController {
         chartMarker.initialize(anchorPane, swrChart, scenePos -> {
             Frequency freq = scenePosToFrequency(scenePos);
             SWR swr = new SWR(valueFromSeries(swrDataSeries.get(0), freq.toMHz()));
-            Phase phase = new Phase(valueFromSeries(phaseDataSeries.get(0), freq.toMHz()));
+            double r = valueFromSeries(impedanceDataSeries.get(0), freq.toMHz());
+            double x = valueFromSeries(impedanceDataSeries.get(1), freq.toMHz());
             Point2D selectionPos = new Point2D(scenePos.getX(), swrToLocalPos(swr).getY());
-            return new ChartMarker.SelectionData(selectionPos , "freq: "+freq+"\nswr: "+swr+"\nphase: "+phase);
+            return new ChartMarker.SelectionData(selectionPos , "f = "+freq+"\nSWR = "+swr+"\nZ = "+RX_FORMAT.format(r)+" + j"+RX_FORMAT.format(x)+" Ω");
         });
 
         chartMarker.setupRangeSelection(
                 data -> sweepSettings.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
                 data -> sweepSettings.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
 
-        phaseDataSeries = FXCollections.observableArrayList();
-        impedanceChart.setData(phaseDataSeries);
+        impedanceDataSeries = FXCollections.observableArrayList();
+        impedanceChart.setData(impedanceDataSeries);
         impedanceChart.setCreateSymbols(false);
 
         setUpAxis(swrAxisX, 1, 55, 2.5);

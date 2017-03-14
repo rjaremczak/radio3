@@ -14,13 +14,12 @@ public class VnaResult {
     private Complex impedance;
 
     public VnaResult(double returnLoss, double phaseDiff) {
-        double gammaRe = Math.pow(10, -returnLoss / 20);
-        double gammaIm = Math.toRadians(phaseDiff);
-        Complex gamma = ComplexUtils.polar2Complex(gammaRe, gammaIm);
+        double gammaMagnitude = Math.pow(10, - returnLoss / 20);
+        double gammaTheta = Math.toRadians(phaseDiff);
+        Complex gamma = ComplexUtils.polar2Complex(gammaMagnitude, gammaTheta);
 
-        double gmod = Math.abs(gamma.getReal());
-        swr = (1+gmod)/(1-gmod);
-        impedance = sourceImpedance.multiply(Complex.ONE.subtract(gamma).divide(Complex.ONE.add(gamma)));
+        swr = (1+gammaMagnitude)/(1-gammaMagnitude);
+        impedance = sourceImpedance.multiply(Complex.ONE.add(gamma).divide(Complex.ONE.subtract(gamma)));
     }
 
     public double getSwr() {

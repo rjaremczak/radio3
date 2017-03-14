@@ -39,7 +39,7 @@ public class VnaParser implements FrameParser<VnaResult> {
         }
 
 
-        return 180 - (v * 100);
+        return (v * 100);
     }
 
     public VnaResult calculateVnaResult(int gain, int phase) {
