@@ -38,6 +38,9 @@ import static com.mindpart.utils.FxUtils.valueFromSeries;
 public class VnaController {
     private static final double MAX_SWR = 5.0;
     private static final NumberFormat RX_FORMAT = new DecimalFormat("0.0");
+    private static final int DEFAULT_AVG_PASSES = 3;
+    private static final int DEFAULT_AVG_SAMPLES = 3;
+
 
     @FXML
     AnchorPane anchorPane;
@@ -141,7 +144,7 @@ public class VnaController {
         long fEnd = sweepSettings.getEndFrequency ().toHz();
         int steps = sweepSettings.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
-        sweeper.startAnalyser(fStart, fStep, steps, AnalyserDataSource.VNA, this::updateAnalyserData);
+        sweeper.startAnalyser(fStart, fStep, steps, DEFAULT_AVG_PASSES, DEFAULT_AVG_SAMPLES, AnalyserDataSource.VNA, this::updateAnalyserData);
         statusLabel.setText("started");
     }
 

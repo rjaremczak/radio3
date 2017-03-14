@@ -33,12 +33,4 @@ public class VnaResult {
     public double getX() {
         return impedance.getImaginary();
     }
-
-    public double getZ() {
-        return Math.sqrt(impedance.getReal()*impedance.getReal() + impedance.getImaginary()*impedance.getImaginary());
-    }
-
-    public Complex getImpedance() {
-        return impedance;
-    }
 }

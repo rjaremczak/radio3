@@ -20,11 +20,13 @@ public class VnaParser implements FrameParser<VnaResult> {
     public double calculateReturnLoss(int adcValue) {
         double v = adc.convert(adcValue);
 
+        /*
         if (v <= 0.3) {
             v = 0;
         } else if (v > 1.8) {
             v = 1.8;
         }
+        */
 
         return (v * 100/3) - 30;
     }
@@ -32,11 +34,13 @@ public class VnaParser implements FrameParser<VnaResult> {
     public double calculatePhaseDiff(int adcValue) {
         double v = adc.convert(adcValue);
 
+        /*
         if (v <= 0.03) {
             v = 0;
         } else if (v > 1.8) {
             v = 1.8;
         }
+        */
 
 
         return (v * 100);

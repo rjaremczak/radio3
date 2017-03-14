@@ -80,7 +80,11 @@ public class DeviceService {
         }
     }
 
-    public void startAnalyser(long freqStart, long freqStep, int numSteps, AnalyserDataSource source,
+    static int buildAvgMode(int avgPasses, int avgSamples) {
+        return ((avgPasses - 1) & 0x0f) << 4 | ((avgSamples - 1) & 0x0f);
+    }
+
+    public void startAnalyser(long freqStart, long freqStep, int numSteps, int avgPasses, int avgSamples, AnalyserDataSource source,
                               Consumer<AnalyserData> analyserDataHandler) {
         this.analyserDataHandler = analyserDataHandler;
         BinaryBuilder builder = new BinaryBuilder(14);
@@ -88,6 +92,8 @@ public class DeviceService {
         builder.addUInt32(freqStep);
         builder.addUInt16(numSteps);
         builder.addUInt8(source.ordinal());
+        builder.addUInt8(buildAvgMode(avgPasses, avgSamples));
+
         performRequest(new Frame(FrameCommand.ANALYSER_REQUEST, builder.getBytes()));
     }
 

@@ -10,8 +10,8 @@ import java.text.NumberFormat;
  * Date: 2016.03.24
  */
 public class VnaProbeController extends ComponentController {
-    private static final NumberFormat fmtSwr = new DecimalFormat("0.0 Ω");
-    private static final NumberFormat fmtRX = new DecimalFormat("0.0 Ω");
+    private static final NumberFormat FORMAT_SWR = new DecimalFormat("0.0");
+    private static final NumberFormat FORMAT_RX = new DecimalFormat("0.0");
 
     private Radio3 radio3;
 
@@ -26,10 +26,10 @@ public class VnaProbeController extends ComponentController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("VNA Probe", "SWR / R / X");
+        setUpAsProbe("VNA Probe", "Impedance");
     }
 
     public void update(VnaResult vnaResult) {
-        valueField.setText(fmtSwr.format(vnaResult.getSwr()) + " / "+fmtRX.format(vnaResult.getR()) + " / "+fmtRX.format(vnaResult.getX()));
+        valueField.setText(FORMAT_RX.format(vnaResult.getR())+" + j"+FORMAT_RX.format(vnaResult.getX())+" Ω");
     }
 }

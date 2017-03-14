@@ -42,6 +42,9 @@ import static com.mindpart.utils.FxUtils.valueFromSeries;
  * Date: 2016.04.15
  */
 public class SweepController {
+    private static final int DEFAULT_AVG_PASSES = 3;
+    private static final int DEFAULT_AVG_SAMPLES = 3;
+
     @FXML
     AnchorPane anchorPane;
 
@@ -205,7 +208,7 @@ public class SweepController {
         long fEnd = sweepSettings.getEndFrequency().toHz();
         int steps = sweepSettings.getSteps();
         int fStep = (int) ((fEnd - fStart) / steps);
-        sweeper.startAnalyser(fStart, fStep, steps, sourceProbe.getValue(), this::updateAnalyserData);
+        sweeper.startAnalyser(fStart, fStep, steps, DEFAULT_AVG_PASSES, DEFAULT_AVG_SAMPLES, sourceProbe.getValue(), this::updateAnalyserData);
         statusLabel.setText(AnalyserState.PROCESSING.toString());
     }
 
