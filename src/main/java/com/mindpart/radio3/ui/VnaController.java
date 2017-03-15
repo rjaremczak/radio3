@@ -8,7 +8,6 @@ import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserDataSource;
 import com.mindpart.radio3.device.AnalyserState;
 import com.mindpart.types.Frequency;
-import com.mindpart.types.Phase;
 import com.mindpart.types.SWR;
 import com.mindpart.ui.ChartMarker;
 import javafx.collections.FXCollections;
@@ -79,13 +78,13 @@ public class VnaController {
     private ObservableList<XYChart.Series<Number, Number>> impedanceDataSeries;
     private Sweeper sweeper;
     private VnaParser vnaParser;
-    private SweepSettings sweepSettings;
+    private SweepSettingsController sweepSettingsController;
     private ChartMarker chartMarker = new ChartMarker();
 
     public VnaController(Sweeper sweeper, VnaParser vnaParser, List<SweepProfile> sweepProfiles) {
         this.sweeper = sweeper;
         this.vnaParser = vnaParser;
-        this.sweepSettings = new SweepSettings(sweepProfiles);
+        this.sweepSettingsController = new SweepSettingsController(sweepProfiles);
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -113,8 +112,8 @@ public class VnaController {
         });
 
         chartMarker.setupRangeSelection(
-                data -> sweepSettings.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
-                data -> sweepSettings.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
+                data -> sweepSettingsController.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
+                data -> sweepSettingsController.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
 
         impedanceDataSeries = FXCollections.observableArrayList();
         impedanceChart.setData(impedanceDataSeries);
@@ -128,7 +127,7 @@ public class VnaController {
         impedanceAxisY.setAutoRanging(true);
         //setUpAxis(phaseAxisY, 0, 180, 30);
 
-        hBox.getChildren().add(0, sweepSettings);
+        hBox.getChildren().add(0, sweepSettingsController);
     }
 
     private void setUpAxis(Axis<Number> axis, double min, double max, double tickUnit) {
@@ -140,11 +139,12 @@ public class VnaController {
     }
 
     public void doStart() {
-        long fStart = sweepSettings.getStartFrequency().toHz();
-        long fEnd = sweepSettings.getEndFrequency ().toHz();
-        int steps = sweepSettings.getSteps();
-        int fStep = (int) ((fEnd - fStart) / steps);
-        sweeper.startAnalyser(fStart, fStep, steps, DEFAULT_AVG_PASSES, DEFAULT_AVG_SAMPLES, AnalyserDataSource.VNA, this::updateAnalyserData);
+        SweepQuality quality = sweepSettingsController.getQuality();
+        long fStart = sweepSettingsController.getStartFrequency().toHz();
+        long fEnd = sweepSettingsController.getEndFrequency ().toHz();
+        int fStep = (int) ((fEnd - fStart) / quality.getSteps());
+
+        sweeper.startAnalyser(fStart, fStep, quality, AnalyserDataSource.VNA, this::updateAnalyserData);
         statusLabel.setText("started");
     }
 

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<fx:root hgap="5.0" type="javafx.scene.layout.GridPane" vgap="3.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepSettings">
+<fx:root hgap="5.0" type="javafx.scene.layout.GridPane" vgap="3.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepSettingsController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" />
       <ColumnConstraints hgrow="SOMETIMES" />
@@ -23,10 +23,10 @@
       <FrequencyField fx:id="startFrequencyField" alignment="CENTER_RIGHT" label="start frequency" promptText="from" styleClass="value-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <FrequencyField fx:id="endFrequencyField" alignment="CENTER_RIGHT" label="end frequency" promptText="to" styleClass="value-field" GridPane.columnIndex="2" GridPane.rowIndex="1" />
       <Label text="frequency range [MHz]" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-      <Label text="steps" GridPane.columnIndex="3" />
+      <Label text="quality" GridPane.columnIndex="3" />
       <Label text="presets" />
       <ChoiceBox fx:id="presetsChoiceBox" prefWidth="200" GridPane.rowIndex="1" />
-      <ChoiceBox fx:id="sweepSteps" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+      <ChoiceBox fx:id="sweepQuality" GridPane.columnIndex="3" GridPane.rowIndex="1" />
    </children>
    <stylesheets>
       <URL value="@main.css" />

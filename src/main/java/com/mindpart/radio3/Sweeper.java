@@ -1,6 +1,7 @@
 package com.mindpart.radio3;
 
 import com.mindpart.radio3.device.*;
+import com.mindpart.radio3.ui.SweepQuality;
 import com.mindpart.utils.BinaryIterator;
 
 import java.util.function.Consumer;
@@ -39,7 +40,7 @@ public class Sweeper implements FrameParser<AnalyserData> {
         return ad;
     }
 
-    public void startAnalyser(long fStart, int fStep, int steps, int avgPasses, int avgSamples, AnalyserDataSource source,  Consumer<AnalyserData> dataHandler) {
-        deviceService.startAnalyser(fStart, fStep, steps, avgPasses, avgSamples, source, dataHandler);
+    public void startAnalyser(long fStart, int fStep, SweepQuality quality, AnalyserDataSource source, Consumer<AnalyserData> dataHandler) {
+        deviceService.startAnalyser(fStart, fStep, quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(), source, dataHandler);
     }
 }

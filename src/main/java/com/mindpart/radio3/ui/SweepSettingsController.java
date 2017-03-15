@@ -17,8 +17,8 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2016.10.31
  */
-public class SweepSettings extends GridPane {
-    private static Logger logger = Logger.getLogger(SweepSettings.class);
+public class SweepSettingsController extends GridPane {
+    private static Logger logger = Logger.getLogger(SweepSettingsController.class);
 
     @FXML
     FrequencyField startFrequencyField;
@@ -27,21 +27,21 @@ public class SweepSettings extends GridPane {
     FrequencyField endFrequencyField;
 
     @FXML
-    ChoiceBox<Integer> sweepSteps;
+    ChoiceBox<SweepQuality> sweepQuality;
 
     @FXML
     ChoiceBox<SweepProfile> presetsChoiceBox;
 
     private ObservableList<SweepProfile> presets = FXCollections.observableArrayList();
 
-    public SweepSettings(List<SweepProfile> presets) {
+    public SweepSettingsController(List<SweepProfile> presets) {
         this.presets.addAll(presets);
         FxUtils.loadFxml(this, "sweepConfigControl.fxml");
     }
 
     private void initSweepSteps() {
-        sweepSteps.getItems().addAll(100, 200, 500, 1000);
-        sweepSteps.getSelectionModel().select((Integer) 200);
+        sweepQuality.getItems().addAll(SweepQuality.values());
+        sweepQuality.getSelectionModel().select(SweepQuality.BALANCED);
     }
 
     public void initialize() {
@@ -83,14 +83,14 @@ public class SweepSettings extends GridPane {
         endFrequencyField.setFrequency(frequency);
     }
 
-    public int getSteps() {
-        return sweepSteps.getSelectionModel().getSelectedItem();
+    public SweepQuality getQuality() {
+        return sweepQuality.getSelectionModel().getSelectedItem();
     }
 
     public void setEditable(boolean editable) {
         startFrequencyField.setEditable(editable);
         endFrequencyField.setEditable(editable);
-        sweepSteps.setDisable(!editable);
+        sweepQuality.setDisable(!editable);
         presetsChoiceBox.setDisable(!editable);
     }
 }

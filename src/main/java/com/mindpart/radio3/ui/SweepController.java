@@ -80,7 +80,7 @@ public class SweepController {
     private LogarithmicParser logarithmicParser;
     private LinearParser linearParser;
     private Function<Integer, Double> probeAdcConverter;
-    private SweepSettings sweepSettings;
+    private SweepSettingsController sweepSettingsController;
     private ChartMarker chartMarker = new ChartMarker();
     private Function<Double, String> probeValueFormatter;
     private BiFunction<Integer, Double, Double> valueProcessor = this::originalValue;
@@ -92,7 +92,7 @@ public class SweepController {
         this.sweeper = sweeper;
         this.logarithmicParser = logarithmicParser;
         this.linearParser = linearParser;
-        this.sweepSettings = new SweepSettings(sweepProfiles);
+        this.sweepSettingsController = new SweepSettingsController(sweepProfiles);
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -127,21 +127,21 @@ public class SweepController {
         });
 
         chartMarker.setupRangeSelection(
-                data -> sweepSettings.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
-                data -> sweepSettings.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
+                data -> sweepSettingsController.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
+                data -> sweepSettingsController.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
 
         statusLabel.setText("ready");
         signalDataSeries = FXCollections.observableArrayList();
         signalChart.setData(signalDataSeries);
         signalChart.setCreateSymbols(false);
 
-        hBox.getChildren().add(0, sweepSettings);
+        hBox.getChildren().add(0, sweepSettingsController);
 
         btnCalibrate.selectedProperty().addListener(this::onNormalizeChanged);
     }
 
     private void onNormalizeChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean relative) {
-        sweepSettings.setEditable(!relative);
+        sweepSettingsController.setEditable(!relative);
         sourceProbe.setDisable(relative);
         if(relative) {
             referenceData = receivedData.stream().map(XYChart.Data::getYValue).collect(Collectors.toList());
@@ -204,11 +204,11 @@ public class SweepController {
 
     public void doStart() {
         btnCalibrate.setDisable(true);
-        long fStart = sweepSettings.getStartFrequency().toHz();
-        long fEnd = sweepSettings.getEndFrequency().toHz();
-        int steps = sweepSettings.getSteps();
-        int fStep = (int) ((fEnd - fStart) / steps);
-        sweeper.startAnalyser(fStart, fStep, steps, DEFAULT_AVG_PASSES, DEFAULT_AVG_SAMPLES, sourceProbe.getValue(), this::updateAnalyserData);
+        SweepQuality quality = sweepSettingsController.getQuality();
+        long fStart = sweepSettingsController.getStartFrequency().toHz();
+        long fEnd = sweepSettingsController.getEndFrequency().toHz();
+        int fStep = (int) ((fEnd - fStart) / quality.getSteps());
+        sweeper.startAnalyser(fStart, fStep, quality, sourceProbe.getValue(), this::updateAnalyserData);
         statusLabel.setText(AnalyserState.PROCESSING.toString());
     }
 
