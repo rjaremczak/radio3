@@ -223,8 +223,12 @@ public class SweepController {
             sweepOnce(SweepQuality.FAST, this::displayDataAndSweepAgain);
             btnContinuous.setText("Stop");
         } else {
-            FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
-            sweepSettingsPane.disableControls(false);
+            if(btnNormalize.isSelected()) {
+                FxUtils.enableItems(btnOnce, btnNormalize);
+            } else {
+                FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
+                sweepSettingsPane.disableControls(false);
+            }
             mainController.disableAllExcept(false, mainController.sweepTab);
             btnContinuous.setText("Continuous");
         }

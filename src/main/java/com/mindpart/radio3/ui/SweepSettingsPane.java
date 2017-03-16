@@ -72,7 +72,7 @@ public class SweepSettingsPane extends GridPane {
     }
 
     public void setStartFrequency(Frequency frequency) {
-        startFrequencyField.setFrequency(frequency);
+        if(!startFrequencyField.isDisabled()) { startFrequencyField.setFrequency(frequency); }
     }
 
     public Frequency getEndFrequency() {
@@ -80,7 +80,7 @@ public class SweepSettingsPane extends GridPane {
     }
 
     public void setEndFrequency(Frequency frequency) {
-        endFrequencyField.setFrequency(frequency);
+        if(!endFrequencyField.isDisabled()) { endFrequencyField.setFrequency(frequency); }
     }
 
     public SweepQuality getQuality() {
