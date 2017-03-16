@@ -12,7 +12,7 @@ public class Voltage {
     private static final double VALUE_V = 1;
     private static final double VALUE_mV = 0.001;
     private static final NumberFormat FORMAT_V = new DecimalFormat("0.### V");
-    private static final NumberFormat FORMAT_mV = new DecimalFormat("0 mV");
+    private static final NumberFormat FORMAT_mV = new DecimalFormat("0.### mV");
 
     private double volt;
 

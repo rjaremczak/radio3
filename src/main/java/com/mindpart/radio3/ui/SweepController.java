@@ -12,6 +12,7 @@ import com.mindpart.types.Frequency;
 import com.mindpart.types.Power;
 import com.mindpart.types.Voltage;
 import com.mindpart.ui.ChartMarker;
+import com.mindpart.utils.FxUtils;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,10 +21,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -32,9 +30,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.mindpart.utils.FxUtils.alert;
 import static com.mindpart.utils.FxUtils.valueFromSeries;
 
 /**
@@ -42,9 +42,6 @@ import static com.mindpart.utils.FxUtils.valueFromSeries;
  * Date: 2016.04.15
  */
 public class SweepController {
-    private static final int DEFAULT_AVG_PASSES = 3;
-    private static final int DEFAULT_AVG_SAMPLES = 3;
-
     @FXML
     AnchorPane anchorPane;
 
@@ -58,13 +55,13 @@ public class SweepController {
     ChoiceBox<AnalyserDataSource> sourceProbe;
 
     @FXML
-    ToggleButton btnCalibrate;
+    ToggleButton btnNormalize;
 
     @FXML
-    Button startButton;
+    Button btnOnce;
 
     @FXML
-    Label statusLabel;
+    ToggleButton btnContinuous;
 
     @FXML
     LineChart<Number, Number> signalChart;
@@ -80,19 +77,21 @@ public class SweepController {
     private LogarithmicParser logarithmicParser;
     private LinearParser linearParser;
     private Function<Integer, Double> probeAdcConverter;
-    private SweepSettingsController sweepSettingsController;
+    private SweepSettingsPane sweepSettingsPane;
     private ChartMarker chartMarker = new ChartMarker();
     private Function<Double, String> probeValueFormatter;
     private BiFunction<Integer, Double, Double> valueProcessor = this::originalValue;
     private List<XYChart.Data<Double, Double>> receivedData = new ArrayList<>();
     private List<Double> referenceData = new ArrayList<>();
     private AnalyserDataInfo receivedDataInfo;
+    private MainController mainController;
 
-    public SweepController(Sweeper sweeper, LogarithmicParser logarithmicParser, LinearParser linearParser, List<SweepProfile> sweepProfiles) {
+    public SweepController(MainController mainController, Sweeper sweeper, LogarithmicParser logarithmicParser, LinearParser linearParser, List<SweepProfile> sweepProfiles) {
+        this.mainController = mainController;
         this.sweeper = sweeper;
         this.logarithmicParser = logarithmicParser;
         this.linearParser = linearParser;
-        this.sweepSettingsController = new SweepSettingsController(sweepProfiles);
+        this.sweepSettingsPane = new SweepSettingsPane(sweepProfiles);
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -124,26 +123,32 @@ public class SweepController {
             double value = valueFromSeries(signalDataSeries.get(0), freq.toMHz());
             Point2D selectionPos = new Point2D(scenePos.getX(), valueToRefPos(value).getY());
             return new ChartMarker.SelectionData(selectionPos, "freq: "+freq+"\n"+probeValueFormatter.apply(value));
-        });
+        }, () -> !btnContinuous.isSelected());
 
         chartMarker.setupRangeSelection(
-                data -> sweepSettingsController.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
-                data -> sweepSettingsController.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
+                data -> sweepSettingsPane.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
+                data -> sweepSettingsPane.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
 
-        statusLabel.setText("ready");
+        mainController.setDeviceStatus("ready");
         signalDataSeries = FXCollections.observableArrayList();
         signalChart.setData(signalDataSeries);
         signalChart.setCreateSymbols(false);
 
-        hBox.getChildren().add(0, sweepSettingsController);
+        hBox.getChildren().add(0, sweepSettingsPane);
 
-        btnCalibrate.selectedProperty().addListener(this::onNormalizeChanged);
+        btnNormalize.selectedProperty().addListener(this::onNormalizeChanged);
+        btnContinuous.selectedProperty().addListener(this::onContinuousChanged);
     }
 
-    private void onNormalizeChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean relative) {
-        sweepSettingsController.setEditable(!relative);
-        sourceProbe.setDisable(relative);
-        if(relative) {
+    private void onNormalizeChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean normalized) {
+        if(receivedData.isEmpty()) {
+            btnNormalize.setSelected(false);
+            return;
+        }
+
+        sweepSettingsPane.disableControls(normalized);
+        sourceProbe.setDisable(normalized);
+        if(normalized) {
             referenceData = receivedData.stream().map(XYChart.Data::getYValue).collect(Collectors.toList());
             if(sourceProbe.getValue() == AnalyserDataSource.LOG_PROBE) {
                 signalAxisY.setLabel("Normalized Power [dBm]");
@@ -169,7 +174,6 @@ public class SweepController {
         sourceProbe.getItems().add(AnalyserDataSource.LIN_PROBE);
         sourceProbe.getSelectionModel().selectFirst();
         sourceProbe.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> updateInputSource(newValue)));
-
         updateInputSource(sourceProbe.getValue());
     }
 
@@ -202,18 +206,43 @@ public class SweepController {
         }
     }
 
-    public void doStart() {
-        btnCalibrate.setDisable(true);
-        SweepQuality quality = sweepSettingsController.getQuality();
-        long fStart = sweepSettingsController.getStartFrequency().toHz();
-        long fEnd = sweepSettingsController.getEndFrequency().toHz();
-        int fStep = (int) ((fEnd - fStart) / quality.getSteps());
-        sweeper.startAnalyser(fStart, fStep, quality, sourceProbe.getValue(), this::updateAnalyserData);
-        statusLabel.setText(AnalyserState.PROCESSING.toString());
+    public void onSweepOnce() {
+        btnNormalize.setDisable(true);
+        sweepOnce(sweepSettingsPane.getQuality(), (analyserData) -> {
+            updateAnalyserData(analyserData);
+            btnNormalize.setDisable(false);
+        });
+        mainController.setDeviceStatus(AnalyserState.PROCESSING.toString());
     }
 
-    public void updateAnalyserState(AnalyserState state) {
-        statusLabel.setText(state.toString());
+    private void onContinuousChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {
+        if(continuous) {
+            FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
+            sweepSettingsPane.disableControls(true);
+            mainController.disableAllExcept(true, mainController.sweepTab);
+            sweepOnce(SweepQuality.FAST, this::displayDataAndSweepAgain);
+            btnContinuous.setText("Stop");
+        } else {
+            FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
+            sweepSettingsPane.disableControls(false);
+            mainController.disableAllExcept(false, mainController.sweepTab);
+            btnContinuous.setText("Continuous");
+        }
+    }
+
+    private void displayDataAndSweepAgain(AnalyserData analyserData) {
+        if(btnContinuous.isSelected()) {
+            updateAnalyserData(analyserData);
+            sweepOnce(SweepQuality.FAST, this::displayDataAndSweepAgain);
+            mainController.setDeviceStatus("continuous sweep...");
+        }
+    }
+
+    private void sweepOnce(SweepQuality quality, Consumer<AnalyserData> dataHandler) {
+        long fStart = sweepSettingsPane.getStartFrequency().toHz();
+        long fEnd = sweepSettingsPane.getEndFrequency().toHz();
+        int fStep = (int) ((fEnd - fStart) / quality.getSteps());
+        sweeper.startAnalyser(fStart, fStep, quality, sourceProbe.getValue(), dataHandler);
     }
 
     public void updateAnalyserData(AnalyserData ad) {
@@ -233,6 +262,7 @@ public class SweepController {
     private void updateChart() {
         chartMarker.reset();
         signalDataSeries.clear();
+        if(receivedDataInfo==null) { return; }
 
         XYChart.Series<Number, Number> chartSeries = new XYChart.Series<>();
         chartSeries.setName(receivedDataInfo.getSource().getSeriesTitle(0));
@@ -249,6 +279,5 @@ public class SweepController {
 
         signalAxisY.setAutoRanging(true);
         signalAxisY.setForceZeroInRange(false);
-        btnCalibrate.setDisable(false);
     }
 }

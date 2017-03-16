@@ -21,6 +21,7 @@ public class LogarithmicParser implements FrameParser<Double> {
     }
 
     public Double parse(int adc) {
+        // return -80 + Math.max(0, this.adc.convert(adc) - 0.25) / 0.025;
         return -89.7 + this.adc.convert(adc) / 0.025;
     }
 

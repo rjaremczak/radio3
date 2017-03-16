@@ -22,6 +22,7 @@ public class DeviceStateParser implements FrameParser<DeviceState> {
         ds.vfoOut = VfoOut.values()[bi.nextUInt8()];
         ds.vfoAmplifier = VfoAmplifier.values()[bi.nextUInt8()];
         ds.vfoAttenuator = VfoAttenuator.values()[bi.nextUInt8()];
+        ds.logLevel = LogLevel.values()[bi.nextUInt8()];
         return ds;
     }
 

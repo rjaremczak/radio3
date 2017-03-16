@@ -88,15 +88,15 @@ public class Radio3 extends Application {
         multipleProbesParser = new MultipleProbesParser(logarithmicParser, linearParser, vnaParser, fMeterParser);
         bind(multipleProbesParser, this::updateAllProbes);
 
+        mainController = new MainController(this);
+
         sweeper = new Sweeper(deviceService);
-        vnaController = new VnaController(sweeper, vnaParser, configuration.sweepProfiles);
-        sweepController = new SweepController(sweeper, logarithmicParser, linearParser, configuration.sweepProfiles);
+        vnaController = new VnaController(mainController, sweeper, vnaParser, configuration.sweepProfiles);
+        sweepController = new SweepController(mainController, sweeper, logarithmicParser, linearParser, configuration.sweepProfiles);
         bind(sweeper, deviceService::handleAnalyserData);
 
         vfoParser = new VfoParser();
         bind(vfoParser, vfoController::setFrequency);
-
-        mainController = new MainController(this);
 
         deviceInfoParser = new DeviceInfoParser();
         bind(deviceInfoParser, mainController::updateDeviceInfo);
@@ -105,7 +105,7 @@ public class Radio3 extends Application {
         bind(deviceStateParser, deviceState -> {
             mainController.updateDeviceState(deviceState);
             vnaController.updateAnalyserState(deviceState.analyserState);
-            sweepController.updateAnalyserState(deviceState.analyserState);
+            mainController.setDeviceStatus(deviceState.analyserState.toString());
         });
 
         logMessageParser = new LogMessageParser();
@@ -282,6 +282,13 @@ public class Radio3 extends Application {
         }
     }
 
+    public void setLogLevel(LogLevel logLevel) {
+        if(logLevel != null) {
+            deviceService.setLogLevel(logLevel);
+            deviceService.requestDeviceState();
+        }
+    }
+
     public void requestDeviceState() {
         deviceService.requestDeviceState();
     }
@@ -308,9 +315,5 @@ public class Radio3 extends Application {
 
     public void requestVnaProbeSample() {
         deviceService.requestVnaProbeSample();
-    }
-
-    public void resetDevice() {
-        deviceService.requestDeviceReset();
     }
 }

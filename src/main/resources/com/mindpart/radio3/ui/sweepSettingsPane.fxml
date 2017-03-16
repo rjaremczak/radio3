@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<fx:root hgap="5.0" type="javafx.scene.layout.GridPane" vgap="3.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepSettingsController">
+<fx:root hgap="5.0" type="javafx.scene.layout.GridPane" vgap="3.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepSettingsPane">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" />
       <ColumnConstraints hgrow="SOMETIMES" />

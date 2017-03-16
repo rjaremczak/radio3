@@ -17,6 +17,7 @@ import javafx.stage.Popup;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created by Robert Jaremczak
@@ -38,6 +39,7 @@ public class ChartMarker {
     private Consumer<XYChart.Data<Number, Number>> rangeStartHandler = null;
     private Consumer<XYChart.Data<Number, Number>> rangeEndHandler = null;
     private volatile boolean rangeStarted = false;
+    private Supplier<Boolean> clickActive = () -> false;
 
     static public class SelectionData {
         Point2D pos;
@@ -86,12 +88,13 @@ public class ChartMarker {
         referencePane.getChildren().addAll(rangeStartRuler, rangeEndRuler);
     }
 
-    public void initialize(Pane referencePane, XYChart<Number, Number> chart, Function<Point2D, SelectionData> selectionFunction) {
+    public void initialize(Pane referencePane, XYChart<Number, Number> chart, Function<Point2D, SelectionData> selectionFunction, Supplier<Boolean> clickActive) {
         this.referencePane = referencePane;
         this.chart = chart;
         this.chartAxisX = (NumberAxis) chart.getXAxis();
         this.chartAxisY = (NumberAxis) chart.getYAxis();
         this.selectionHandler = selectionFunction;
+        this.clickActive = clickActive;
 
         initSelectionLabel();
         initSelectionPopup();
@@ -185,6 +188,7 @@ public class ChartMarker {
     }
 
     public void onMouseClicked(MouseEvent event) {
+        if(!clickActive.get()) { return; }
         if(chart.getData().isEmpty()) { return; }
 
         Point2D refPos = eventToRefPos(event);

@@ -5,12 +5,13 @@ package com.mindpart.utils;
  * Date: 2016.09.06
  */
 public class Range {
-    private double min;
-    private double max;
+    private double min = Double.MAX_VALUE;
+    private double max = Double.MIN_VALUE;
 
-    public Range(double min, double max) {
-        this.min = min;
-        this.max = max;
+    public double update(double v) {
+        min = Math.min(min, v);
+        max = Math.max(max, v);
+        return v;
     }
 
     public double getMin() {
@@ -27,5 +28,9 @@ public class Range {
 
     public boolean contains(double v) {
         return v >= min && v <= max;
+    }
+
+    public boolean isValid() {
+        return span() < Double.MAX_VALUE;
     }
 }

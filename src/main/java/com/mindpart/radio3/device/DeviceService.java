@@ -125,6 +125,10 @@ public class DeviceService {
         performRequest(new Frame(FrameCommand.VFO_AMPLIFIER, Binary.fromUInt8(vfoAmplifier.getCode())));
     }
 
+    public void setLogLevel(LogLevel logLevel) {
+        performRequest(new Frame(FrameCommand.LOG_LEVEL, Binary.fromUInt8(logLevel.getCode())));
+    }
+
     public List<String> availableSerialPorts() {
         return Arrays.asList(SerialPortList.getPortNames());
     }

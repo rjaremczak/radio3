@@ -10,4 +10,5 @@ public class DeviceState {
     public VfoOut vfoOut;
     public VfoAmplifier vfoAmplifier;
     public VfoAttenuator vfoAttenuator;
+    public LogLevel logLevel;
 }

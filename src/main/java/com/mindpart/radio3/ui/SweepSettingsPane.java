@@ -17,8 +17,8 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2016.10.31
  */
-public class SweepSettingsController extends GridPane {
-    private static Logger logger = Logger.getLogger(SweepSettingsController.class);
+public class SweepSettingsPane extends GridPane {
+    private static Logger logger = Logger.getLogger(SweepSettingsPane.class);
 
     @FXML
     FrequencyField startFrequencyField;
@@ -34,9 +34,9 @@ public class SweepSettingsController extends GridPane {
 
     private ObservableList<SweepProfile> presets = FXCollections.observableArrayList();
 
-    public SweepSettingsController(List<SweepProfile> presets) {
+    public SweepSettingsPane(List<SweepProfile> presets) {
         this.presets.addAll(presets);
-        FxUtils.loadFxml(this, "sweepConfigControl.fxml");
+        FxUtils.loadFxml(this, "sweepSettingsPane.fxml");
     }
 
     private void initSweepSteps() {
@@ -87,10 +87,10 @@ public class SweepSettingsController extends GridPane {
         return sweepQuality.getSelectionModel().getSelectedItem();
     }
 
-    public void setEditable(boolean editable) {
-        startFrequencyField.setEditable(editable);
-        endFrequencyField.setEditable(editable);
-        sweepQuality.setDisable(!editable);
-        presetsChoiceBox.setDisable(!editable);
+    public void disableControls(boolean disable) {
+        startFrequencyField.setDisable(disable);
+        endFrequencyField.setDisable(disable);
+        sweepQuality.setDisable(disable);
+        presetsChoiceBox.setDisable(disable);
     }
 }

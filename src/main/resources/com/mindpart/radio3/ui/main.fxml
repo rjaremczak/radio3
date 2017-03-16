@@ -52,12 +52,12 @@
                                                    </rowConstraints>
                                                    <children>
                                                       <Label text="Hardware Revision" />
-                                                      <ChoiceBox fx:id="hardwareRevisions" prefWidth="150.0" GridPane.columnIndex="1" />
+                                                      <ChoiceBox fx:id="hardwareRevisions" GridPane.columnIndex="1" />
                                                       <Label text="VFO Type" GridPane.rowIndex="1" />
-                                                      <ChoiceBox fx:id="vfoType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <ChoiceBox fx:id="vfoType" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                       <HBox alignment="CENTER_LEFT" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                                          <children>
-                                                                <ChoiceBox fx:id="serialPorts" minWidth="212.0" prefHeight="27.0" prefWidth="212.0" />
+                                                                <ChoiceBox fx:id="serialPorts" />
                                                                 <Button fx:id="serialPortsRefresh" focusTraversable="false" mnemonicParsing="false" text="Refresh" />
                                                                 <Button fx:id="deviceConnect" defaultButton="true" mnemonicParsing="false" text="Connect" />
                                                          </children>
@@ -92,7 +92,6 @@
                                                 </TableView>
                                                 <HBox fx:id="deviceControlPane" alignment="CENTER" spacing="5.0">
                                                    <children>
-                                                      <Button fx:id="deviceReset" mnemonicParsing="false" text="Reset" />
                                                       <Button fx:id="devicePropertiesRefresh" mnemonicParsing="false" text="Refresh" />
                                                    </children>
                                                 </HBox>
@@ -111,7 +110,7 @@
                                              </padding>
                                              <children>
                                                 <Label text="Device log:" />
-                                                <ScrollPane fx:id="deviceLogScrollPane" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
+                                                <ScrollPane fx:id="deviceLogScrollPane" VBox.vgrow="SOMETIMES">
                                                    <content>
                                                       <VBox fx:id="deviceLogBox" />
                                                    </content>
@@ -127,7 +126,7 @@
                      </content></Tab>
                         <Tab fx:id="sweepTab" text="Sweep Generator" />
                         <Tab fx:id="vnaTab" text="VNA" />
-                        <Tab fx:id="componentsTab" text="Components">
+                        <Tab fx:id="componentsTab" text="Direct Control">
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                     <children>
@@ -145,8 +144,8 @@
                                                 <Separator prefWidth="200.0" />
                                                             <HBox alignment="CENTER_LEFT" spacing="5.0">
                                                                 <children>
-                                                                    <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#doSampleAllProbes" text="Get All" />
-                                                                    <ToggleButton fx:id="continuousSamplingOfAllProbesBtn" mnemonicParsing="false" onAction="#doContinuousSamplingOfAllProbes" text="Continuous Sampling">
+                                                                    <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#doSampleAllProbes" text="Once" />
+                                                                    <ToggleButton fx:id="continuousSamplingOfAllProbesBtn" mnemonicParsing="false" onAction="#doContinuousSamplingOfAllProbes" text="Continuous">
                                                                         <HBox.margin>
                                                                             <Insets />
                                                                         </HBox.margin>
@@ -181,16 +180,19 @@
                                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                   </rowConstraints>
                                                    <children>
                                                       <Label text="VFO output" GridPane.rowIndex="3" />
                                                       <Label text="VFO attenuator" GridPane.rowIndex="2" />
-                                                      <ChoiceBox fx:id="vfoAttenuator" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                      <ChoiceBox fx:id="vfoOutput" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                      <ChoiceBox fx:id="vfoAttenuator" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                      <ChoiceBox fx:id="vfoOutput" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                       <Label text="VFO amplifier" GridPane.rowIndex="1" />
                                                       <Label text="VNA mode" />
-                                                      <ChoiceBox fx:id="vfoAmplifier" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                      <ChoiceBox fx:id="vnaMode" prefWidth="150.0" GridPane.columnIndex="1" />
+                                                      <ChoiceBox fx:id="vfoAmplifier" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <ChoiceBox fx:id="vnaMode" GridPane.columnIndex="1" />
+                                                      <Label text="Log level" GridPane.rowIndex="4" />
+                                                      <ChoiceBox fx:id="logLevel" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                                    </children>
                                                    <padding>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -231,7 +233,9 @@
                   <Insets />
                </HBox.margin>
             </Circle>
-                <Label fx:id="deviceConnectionStatus" maxWidth="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS" />
+                <Label fx:id="deviceConnectionStatus" text="Label" HBox.hgrow="ALWAYS" />
+            <Separator orientation="VERTICAL" />
+            <Label fx:id="deviceStatus" text="Label" />
          </children>
          <VBox.margin>
             <Insets />
