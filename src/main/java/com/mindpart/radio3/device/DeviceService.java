@@ -50,11 +50,11 @@ public class DeviceService {
         logger.warn("no binding for frame "+frame);
     }
 
-    public Status connect(String portName) {
+    public Status connect(String portName, int portBaudRate) {
         framesReceived = 0;
         framesRecognized = 0;
         logger.debug("connecting to "+portName);
-        dataLink = new DataLink(portName, this::frameHandler);
+        dataLink = new DataLink(portName, portBaudRate, this::frameHandler);
         try {
             dataLink.connect();
             return OK;
@@ -64,10 +64,9 @@ public class DeviceService {
     }
 
     public void disconnect() {
-        if(dataLink!=null) {
+        if(dataLink.isOpened()) {
             logger.debug("disconnect");
             dataLink.disconnect();
-            dataLink = null;
         }
     }
 
@@ -179,5 +178,9 @@ public class DeviceService {
 
     public void requestDeviceReset() {
         performRequest(new Frame(DEVICE_RESET));
+    }
+
+    public String getDevicePortInfo() {
+        return dataLink.getPortName() + " @ " + dataLink.getSpeed();
     }
 }

@@ -1,6 +1,16 @@
 .root {
 }
 
+.split-pane {
+    -fx-padding: 0;
+    -fx-box-border: transparent;
+}
+
+.split-pane *.split-pane-divider {
+    -fx-padding: 0 0 0 2;
+    -fx-box-border: lightgrey;
+}
+
 .vbox {
     -fx-padding: 0;
 }

@@ -1,7 +1,6 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.SweepProfile;
-import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.VnaParser;
 import com.mindpart.radio3.VnaResult;
 import com.mindpart.radio3.device.AnalyserData;
@@ -21,8 +20,8 @@ import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -40,7 +39,6 @@ import static com.mindpart.utils.FxUtils.valueFromSeries;
  * Date: 2016.04.15
  */
 public class VnaController {
-    private static final double MAX_SWR = 5.0;
     private static final NumberFormat RX_FORMAT = new DecimalFormat("0.0");
 
     @FXML
@@ -57,9 +55,6 @@ public class VnaController {
 
     @FXML
     ToggleButton btnContinuous;
-
-    @FXML
-    Label statusLabel;
 
     @FXML
     LineChart<Number, Number> swrChart;
@@ -79,17 +74,17 @@ public class VnaController {
     @FXML
     NumberAxis impedanceAxisY;
 
+    private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> swrDataSeries;
     private ObservableList<XYChart.Series<Number, Number>> impedanceDataSeries;
-    private Sweeper sweeper;
     private VnaParser vnaParser;
     private SweepSettingsPane sweepSettingsPane;
     private ChartMarker chartMarker = new ChartMarker();
     private MainController mainController;
 
-    public VnaController(MainController mainController, Sweeper sweeper, VnaParser vnaParser, List<SweepProfile> sweepProfiles) {
+    public VnaController(Radio3 radio3, MainController mainController, VnaParser vnaParser, List<SweepProfile> sweepProfiles) {
+        this.radio3 = radio3;
         this.mainController = mainController;
-        this.sweeper = sweeper;
         this.vnaParser = vnaParser;
         this.sweepSettingsPane = new SweepSettingsPane(sweepProfiles);
     }
@@ -104,7 +99,6 @@ public class VnaController {
     }
 
     public void initialize() {
-        statusLabel.setText("ready");
         swrDataSeries = FXCollections.observableArrayList();
         swrChart.setData(swrDataSeries);
         swrChart.setCreateSymbols(false);
@@ -141,6 +135,7 @@ public class VnaController {
 
     private void onContinuousChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {
         if(continuous) {
+            clear();
             FxUtils.disableItems(btnStart);
             sweepSettingsPane.disableControls(true);
             mainController.disableAllExcept(true, mainController.vnaTab);
@@ -170,23 +165,23 @@ public class VnaController {
     }
 
     public void onSweepOnce() {
+        clear();
         sweepOnce(sweepSettingsPane.getQuality(), this::updateAnalyserData);
-        statusLabel.setText("started");
     }
 
     private void sweepOnce(SweepQuality quality, Consumer<AnalyserData> dataHandler) {
         long fStart = sweepSettingsPane.getStartFrequency().toHz();
         long fEnd = sweepSettingsPane.getEndFrequency ().toHz();
         int fStep = (int) ((fEnd - fStart) / quality.getSteps());
-        sweeper.startAnalyser(fStart, fStep, quality, AnalyserDataSource.VNA, dataHandler);
+        radio3.startAnalyser(fStart, fStep, quality, AnalyserDataSource.VNA, dataHandler);
     }
 
-    public void updateAnalyserState(AnalyserState state) {
-        statusLabel.setText(state.toString());
+    public void updateAnalyserState(AnalyserState analyserState) {
+        mainController.setDeviceStatus(analyserState);
     }
 
     public void updateAnalyserData(AnalyserData ad) {
-        chartMarker.reset();
+        chartMarker.clear();
         long freqEnd = ad.getFreqStart() + (ad.getNumSteps() * ad.getFreqStep());
         int samples[][] = ad.getData();
 
@@ -203,8 +198,7 @@ public class VnaController {
     }
 
     private void updateCharts(long freqStart, long freqStep, int numSteps, int samples[][]) {
-        swrChart.getData().clear();
-        impedanceChart.getData().clear();
+        clear();
 
         XYChart.Series<Number, Number> swrSeries = createSeries("SWR");
         XYChart.Series<Number, Number> rSeries = createSeries("R - resistance");
@@ -232,16 +226,21 @@ public class VnaController {
         updateImpedanceAxis(impedanceRange);
     }
 
-    private void updateSwrAxis(Range swrRange) {
-        if(swrRange.isValid()) {
-            if(swrRange.span() < 1.95) {
-                setUpAxis(swrAxisY, 0, 2, 0.1);
-            } else if(swrRange.span() < 4.5) {
-                setUpAxis(swrAxisY, 0, 5, 0.5);
-            } else if(swrRange.span() < 490) {
-                setUpAxis(swrAxisY, 0, 500, 50);
-            } else if(swrRange.span() < 1999) {
-                setUpAxis(swrAxisY, 0, 2000, 200);
+    private void updateSwrAxis(Range range) {
+        double min = Math.min(0, range.getMin());
+        if(range.isValid()) {
+            if(range.getMax() < 1.95) {
+                setUpAxis(swrAxisY, min, 2, 0.1);
+            } else if(range.getMax() < 4.5) {
+                setUpAxis(swrAxisY, min, 5, 0.5);
+            } else if(range.getMax() < 19.5) {
+                setUpAxis(swrAxisY, min, 20, 1);
+            } else if(range.getMax() < 90) {
+                setUpAxis(swrAxisY, min, 100, 20);
+            } else if(range.getMax() < 490) {
+                setUpAxis(swrAxisY, min, 500, 50);
+            } else if(range.getMax() < 1999) {
+                setUpAxis(swrAxisY, min, 2000, 200);
             } else {
                 swrAxisY.setAutoRanging(true);
             }
@@ -250,16 +249,17 @@ public class VnaController {
         }
     }
 
-    private void updateImpedanceAxis(Range swrRange) {
-        if(swrRange.isValid()) {
-            if(swrRange.span() < 24) {
-                setUpAxis(impedanceAxisY, 0, 25, 1);
-            } else if(swrRange.span() < 99) {
-                setUpAxis(impedanceAxisY, 0, 100, 5);
-            } else if(swrRange.span() < 990) {
-                setUpAxis(impedanceAxisY, 0, 1000, 50);
-            } else if(swrRange.span() < 9900) {
-                setUpAxis(impedanceAxisY, 0, 10000, 500);
+    private void updateImpedanceAxis(Range range) {
+        double min = Math.min(0, range.getMin());
+        if(range.isValid()) {
+            if(range.getMax() < 24) {
+                setUpAxis(impedanceAxisY, min, 25, 1);
+            } else if(range.getMax() < 99) {
+                setUpAxis(impedanceAxisY, min, 100, 5);
+            } else if(range.getMax() < 990) {
+                setUpAxis(impedanceAxisY, min, 1000, 50);
+            } else if(range.getMax() < 9900) {
+                setUpAxis(impedanceAxisY, min, 10000, 500);
             } else {
                 impedanceAxisY.setAutoRanging(true);
             }
@@ -268,4 +268,9 @@ public class VnaController {
         }
     }
 
+    void clear() {
+        chartMarker.clear();
+        swrDataSeries.clear();
+        impedanceDataSeries.clear();
+    }
 }

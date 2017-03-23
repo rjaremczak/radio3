@@ -3,7 +3,6 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.LinearParser;
 import com.mindpart.radio3.LogarithmicParser;
 import com.mindpart.radio3.SweepProfile;
-import com.mindpart.radio3.Sweeper;
 import com.mindpart.radio3.device.AnalyserData;
 import com.mindpart.radio3.device.AnalyserDataInfo;
 import com.mindpart.radio3.device.AnalyserDataSource;
@@ -21,7 +20,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -34,7 +35,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.mindpart.utils.FxUtils.alert;
 import static com.mindpart.utils.FxUtils.valueFromSeries;
 
 /**
@@ -72,8 +72,8 @@ public class SweepController {
     @FXML
     NumberAxis signalAxisY;
 
+    private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
-    private Sweeper sweeper;
     private LogarithmicParser logarithmicParser;
     private LinearParser linearParser;
     private Function<Integer, Double> probeAdcConverter;
@@ -86,9 +86,9 @@ public class SweepController {
     private AnalyserDataInfo receivedDataInfo;
     private MainController mainController;
 
-    public SweepController(MainController mainController, Sweeper sweeper, LogarithmicParser logarithmicParser, LinearParser linearParser, List<SweepProfile> sweepProfiles) {
+    public SweepController(Radio3 radio3, MainController mainController, LogarithmicParser logarithmicParser, LinearParser linearParser, List<SweepProfile> sweepProfiles) {
+        this.radio3 = radio3;
         this.mainController = mainController;
-        this.sweeper = sweeper;
         this.logarithmicParser = logarithmicParser;
         this.linearParser = linearParser;
         this.sweepSettingsPane = new SweepSettingsPane(sweepProfiles);
@@ -129,7 +129,6 @@ public class SweepController {
                 data -> sweepSettingsPane.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
                 data -> sweepSettingsPane.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
 
-        mainController.setDeviceStatus("ready");
         signalDataSeries = FXCollections.observableArrayList();
         signalChart.setData(signalDataSeries);
         signalChart.setCreateSymbols(false);
@@ -212,7 +211,7 @@ public class SweepController {
             updateAnalyserData(analyserData);
             btnNormalize.setDisable(false);
         });
-        mainController.setDeviceStatus(AnalyserState.PROCESSING.toString());
+        mainController.setDeviceStatus(AnalyserState.PROCESSING);
     }
 
     private void onContinuousChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {
@@ -220,7 +219,7 @@ public class SweepController {
             FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
             sweepSettingsPane.disableControls(true);
             mainController.disableAllExcept(true, mainController.sweepTab);
-            sweepOnce(SweepQuality.FAST, this::displayDataAndSweepAgain);
+            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
             btnContinuous.setText("Stop");
         } else {
             if(btnNormalize.isSelected()) {
@@ -237,8 +236,7 @@ public class SweepController {
     private void displayDataAndSweepAgain(AnalyserData analyserData) {
         if(btnContinuous.isSelected()) {
             updateAnalyserData(analyserData);
-            sweepOnce(SweepQuality.FAST, this::displayDataAndSweepAgain);
-            mainController.setDeviceStatus("continuous sweep...");
+            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
         }
     }
 
@@ -246,7 +244,7 @@ public class SweepController {
         long fStart = sweepSettingsPane.getStartFrequency().toHz();
         long fEnd = sweepSettingsPane.getEndFrequency().toHz();
         int fStep = (int) ((fEnd - fStart) / quality.getSteps());
-        sweeper.startAnalyser(fStart, fStep, quality, sourceProbe.getValue(), dataHandler);
+        radio3.startAnalyser(fStart, fStep, quality, sourceProbe.getValue(), dataHandler);
     }
 
     public void updateAnalyserData(AnalyserData ad) {
@@ -264,8 +262,8 @@ public class SweepController {
     }
 
     private void updateChart() {
-        chartMarker.reset();
-        signalDataSeries.clear();
+        clear();
+
         if(receivedDataInfo==null) { return; }
 
         XYChart.Series<Number, Number> chartSeries = new XYChart.Series<>();
@@ -283,5 +281,10 @@ public class SweepController {
 
         signalAxisY.setAutoRanging(true);
         signalAxisY.setForceZeroInRange(false);
+    }
+
+    void clear() {
+        chartMarker.clear();
+        signalDataSeries.clear();
     }
 }

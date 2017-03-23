@@ -3,24 +3,24 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.device.*;
 import com.mindpart.utils.FxUtils;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
-import sun.rmi.runtime.Log;
+import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  * Date: 2016.02.04
  */
 public class MainController {
+    private static final Logger logger = Logger.getLogger(MainController.class);
 
     @FXML
     ChoiceBox<String> serialPorts;
@@ -45,10 +46,10 @@ public class MainController {
     Button deviceConnect;
 
     @FXML
-    Label deviceConnectionStatus;
+    AnchorPane mainPane;
 
     @FXML
-    AnchorPane mainPane;
+    TabPane tabPane;
 
     @FXML
     Tab deviceTab;
@@ -102,13 +103,13 @@ public class MainController {
     Circle mainIndicator;
 
     @FXML
-    ScrollPane deviceLogScrollPane;
-
-    @FXML
-    VBox deviceLogBox;
-
-    @FXML
     ChoiceBox<LogLevel> logLevel;
+
+    @FXML
+    VBox configurationBox;
+
+    @FXML
+    Label connectionStatus;
 
     @FXML
     Label deviceStatus;
@@ -130,7 +131,7 @@ public class MainController {
         availablePortNames.setAll(radio3.availableSerialPorts());
         if (availablePortNames.isEmpty()) {
             FxUtils.disableItems(serialPorts, deviceConnect);
-            deviceConnectionStatus.setText("");
+            connectionStatus.setText("");
         } else {
             FxUtils.enableItems(serialPorts, deviceConnect);
             serialPorts.getSelectionModel().selectFirst();
@@ -148,8 +149,8 @@ public class MainController {
     }
 
     private void updateOnConnect() {
+        FxUtils.enableItems(componentsTab, sweepTab, vnaTab, deviceConnect, deviceRuntimePane, deviceControlPane, configurationBox);
         FxUtils.disableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
-        FxUtils.enableItems(componentsTab, sweepTab, vnaTab, deviceConnect, deviceRuntimePane, deviceControlPane);
         updateConnectionStatus();
         deviceConnect.setText("Disconnect");
         updateMainIndicator(MainIndicatorState.CONNECTED);
@@ -157,7 +158,7 @@ public class MainController {
 
     private void updateOnDisconnect() {
         FxUtils.enableItems(serialPorts, serialPortsRefresh, deviceConnect, hardwareRevisions, vfoType);
-        FxUtils.disableItems(componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane);
+        FxUtils.disableItems(componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         updateConnectionStatus();
         deviceConnect.setText("Connect");
         deviceProperties.clear();
@@ -166,7 +167,7 @@ public class MainController {
     }
 
     private void doConnect() {
-        deviceConnectionStatus.setText("connecting...");
+        connectionStatus.setText("connecting...");
         updateMainIndicator(MainIndicatorState.PROCESSING);
         FxUtils.disableItems(deviceConnect, serialPortsRefresh, serialPorts);
         Platform.runLater(() -> {
@@ -175,22 +176,19 @@ public class MainController {
                 updateOnConnect();
                 radio3.requestDeviceState();
                 radio3.requestVfoFrequency();
-                addDeviceLogEntry("connected");
             } else {
                 updateOnDisconnect();
-                addDeviceLogEntry("connection error");
             }
         });
     }
 
     private void updateConnectionStatus() {
-        deviceConnectionStatus.setText(radio3.getState().getText());
+        connectionStatus.setText(radio3.getConnectionStatusStr());
     }
 
     private void doDisconnect() {
         radio3.disconnect();
         updateOnDisconnect();
-        addDeviceLogEntry("disconnected");
     }
 
     public void doConnectDisconnect() {
@@ -202,8 +200,6 @@ public class MainController {
     }
 
     public void initialize() {
-        radio3.bindLogMessageHandler(logMessage -> addDeviceLogEntry(logMessage.getMessage()));
-
         nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, componentsTab);
 
         devicePropertiesTable.setItems(deviceProperties);
@@ -211,9 +207,7 @@ public class MainController {
         serialPortsRefresh.setOnAction(event -> updateAvailablePorts());
         deviceConnect.setOnAction(event -> doConnectDisconnect());
         serialPorts.setItems(availablePortNames);
-        updateOnDisconnect();
-        updateConnectionStatus();
-        updateAvailablePorts();
+
         initVfoOutput();
         initHardwareRevision();
         initVnaMode();
@@ -221,7 +215,21 @@ public class MainController {
         initVfoAmplifier();
         initVfoAttenuator();
         initLogLevel();
+
+        updateOnDisconnect();
+        updateConnectionStatus();
+        updateAvailablePorts();
+
         continuousSampling.scheduleWithFixedDelay(() -> { if(continuousSamplingEnabled) { radio3.getProbes(); } }, 200, 200, TimeUnit.MILLISECONDS);
+
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue == componentsTab) {
+                radio3.requestVfoFrequency();
+                logger.info("enter components tab");
+            } else if(oldValue == componentsTab) {
+                logger.info("leave components tab");
+            }
+        });
     }
 
     private void initVfoOutput() {
@@ -238,9 +246,14 @@ public class MainController {
     }
 
     private void initVfoAttenuator() {
-        vfoAttenuator.setDisable(true);
         vfoAttenuator.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> radio3.setVfoAttenuator(newValue));
+    }
+
+    void updateVfoAttenuator(HardwareRevision hardwareRevision) {
+        vfoAttenuator.getItems().setAll(VfoAttenuator.values());
+        vfoAttenuator.getSelectionModel().select(VfoAttenuator.OFF);
+        vfoAttenuator.setDisable(hardwareRevision != HardwareRevision.VERSION_2);
     }
 
     private void initHardwareRevision() {
@@ -251,19 +264,25 @@ public class MainController {
     }
 
     private void initVnaMode() {
-        vnaMode.setDisable(true);
-        vnaMode.getItems().addAll(VnaMode.values());
-        vnaMode.getSelectionModel().selectFirst();
         vnaMode.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> radio3.setVnaMode(newValue));
     }
 
+    void updateVnaMode(HardwareRevision hardwareRevision) {
+        vnaMode.getItems().setAll(VnaMode.values());
+        vnaMode.getSelectionModel().select(VnaMode.DIRECTIONAL_COUPLER);
+        vnaMode.setDisable(hardwareRevision != HardwareRevision.VERSION_2);
+    }
+
     private void initVfoAmplifier() {
-        vfoAmplifier.setDisable(true);
-        vfoAmplifier.getItems().addAll(VfoAmplifier.values());
-        vfoAmplifier.getSelectionModel().selectFirst();
         vfoAmplifier.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> radio3.setVfoAmplifier(newValue));
+    }
+
+    void updateVfoAmplifier(HardwareRevision hardwareRevision) {
+        vfoAmplifier.getItems().setAll(VfoAmplifier.values());
+        vfoAmplifier.getSelectionModel().select(VfoAmplifier.OFF);
+        vfoAmplifier.setDisable(hardwareRevision != HardwareRevision.VERSION_2);
     }
 
     private void initLogLevel() {
@@ -271,13 +290,6 @@ public class MainController {
         logLevel.getSelectionModel().clearSelection();
         logLevel.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> radio3.setLogLevel(newValue));
-    }
-
-    private void addDeviceLogEntry(String msg) {
-        ObservableList<Node> entries = deviceLogBox.getChildren();
-        if(entries.size() >= 200) { entries.remove(0); }
-        entries.add(new Label(msg));
-        deviceLogScrollPane.setVvalue(deviceLogScrollPane.getVmax());
     }
 
     void shutdown() {
@@ -320,17 +332,6 @@ public class MainController {
         deviceProperties.setAll(devicePropertiesMap.entrySet().stream().map(e -> new Property(e.getKey(), e.getValue())).collect(Collectors.toList()));
     }
 
-    private void disableHeader(TableView tableView) {
-        Pane header = (Pane) tableView.lookup("TableHeaderRow");
-        if (header != null && header.isVisible()) {
-            header.setMaxHeight(0);
-            header.setMinHeight(0);
-            header.setPrefHeight(0);
-            header.setVisible(false);
-            header.setManaged(false);
-        }
-    }
-
     void updateDeviceInfo(DeviceInfo di) {
         devicePropertiesMap.put("Device", di.name);
         devicePropertiesMap.put("Build Id", di.buildId);
@@ -342,34 +343,7 @@ public class MainController {
         updateVfoAmplifier(di.hardwareRevision);
     }
 
-    void updateVfoAttenuator(HardwareRevision hardwareRevision) {
-        if(hardwareRevision == HardwareRevision.VERSION_2) {
-            vfoAttenuator.setDisable(false);
-        } else {
-            vfoAttenuator.getSelectionModel().select(VfoAttenuator.LEVEL_0);
-            vfoAttenuator.setDisable(true);
-        }
-    }
-
-    void updateVnaMode(HardwareRevision hardwareRevision) {
-        if(hardwareRevision == HardwareRevision.VERSION_2) {
-            vnaMode.setDisable(false);
-        } else {
-            vnaMode.setDisable(true);
-            vnaMode.getSelectionModel().select(VnaMode.DIRECTIONAL_COUPLER);
-        }
-    }
-
-    void updateVfoAmplifier(HardwareRevision hardwareRevision) {
-        if(hardwareRevision == HardwareRevision.VERSION_2) {
-            vfoAmplifier.setDisable(false);
-        } else {
-            vfoAmplifier.setDisable(true);
-            vfoAmplifier.getSelectionModel().select(VfoAmplifier.OFF);
-        }
-    }
-
-    void updateDeviceState(DeviceState ds) {
+    void updateDeviceProperties(DeviceState ds) {
         devicePropertiesMap.put("Time since reset", ds.timeMs + " ms");
         devicePropertiesMap.put("Analyser's state", ds.analyserState.toString());
         devicePropertiesMap.put("VFO output", ds.vfoOut.toString());
@@ -387,7 +361,7 @@ public class MainController {
         FxUtils.setDisabledOf(flag, nonModalNodes.stream().filter(e -> e!=element).toArray());
     }
 
-    void setDeviceStatus(String str) {
-        deviceStatus.setText(str);
+    void setDeviceStatus(Object o) {
+        deviceStatus.setText(o.toString());
     }
 }

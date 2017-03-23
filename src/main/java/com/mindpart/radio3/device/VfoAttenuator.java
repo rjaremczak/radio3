@@ -5,7 +5,7 @@ package com.mindpart.radio3.device;
  * Date: 2017.01.30
  */
 public enum VfoAttenuator {
-    LEVEL_0(0, "Level 0 (None)"),
+    OFF(0, "Off"),
     LEVEL_1(1, "Level 1"),
     LEVEL_2(2, "Level 2"),
     LEVEL_3(3, "Level 3"),

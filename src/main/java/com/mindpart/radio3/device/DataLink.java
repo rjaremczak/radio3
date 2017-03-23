@@ -17,25 +17,25 @@ import java.util.function.Consumer;
 
 public class DataLink {
     private static final Logger logger = Logger.getLogger(DataLink.class);
-
-    private SerialPort serialPort;
-    private Consumer<Frame> frameHandler;
-
     private static final int TIMEOUT_MS = 2000;
-    private static final int BAUD_RATE = SerialPort.BAUDRATE_115200;
     private static final int DATA_BITS = SerialPort.DATABITS_8;
     private static final int STOP_BITS = SerialPort.STOPBITS_1;
     private static final int PARITY = SerialPort.PARITY_NONE;
 
-    public DataLink(String portName, Consumer<Frame> frameHandler) {
+    private SerialPort serialPort;
+    private Consumer<Frame> frameHandler;
+    private int portBaudRate;
+
+    public DataLink(String portName, int portBaudRate, Consumer<Frame> frameHandler) {
         this.serialPort = new SerialPort(portName);
+        this.portBaudRate = portBaudRate;
         this.frameHandler = frameHandler;
     }
 
     public void connect() throws SerialPortException, SerialPortTimeoutException {
         if(serialPort.openPort()) {
             logger.debug("port opened");
-            serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY, false, false);
+            serialPort.setParams(portBaudRate, DATA_BITS, STOP_BITS, PARITY, false, false);
             serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
             flushReadBuffer();
             attachEventListener();
@@ -141,5 +141,18 @@ public class DataLink {
             crc8.addBytes(frame.getPayload());
         }
         serialPort.writeByte((byte)(crc8.getCrc() & 0xff));
+    }
+
+    public String getPortName() {
+        return serialPort.getPortName();
+    }
+
+
+    public int getSpeed() {
+        return portBaudRate;
+    }
+
+    public boolean isOpened() {
+        return serialPort.isOpened();
     }
 }

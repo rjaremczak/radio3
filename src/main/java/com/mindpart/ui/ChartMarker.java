@@ -106,10 +106,10 @@ public class ChartMarker {
         chart.setOnMouseClicked(this::onMouseClicked);
         chart.setOnMouseExited(this::onMouseExited);
 
-        reset();
+        clear();
     }
 
-    public void reset() {
+    public void clear() {
         rangeStarted = false;
         selectionRuler.setVisible(false);
         selectionPoint.setVisible(false);

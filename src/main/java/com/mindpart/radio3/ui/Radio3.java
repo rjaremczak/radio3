@@ -10,15 +10,19 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 
-import static com.mindpart.radio3.ui.Radio3State.*;
+import static com.mindpart.radio3.ui.ConnectionStatus.*;
+import static com.mindpart.radio3.ui.DeviceStatus.UNKNOWN;
 
 public class Radio3 extends Application {
+    private static final Logger logger = Logger.getLogger(Radio3.class);
+
     private LogarithmicParser logarithmicParser;
     private LinearParser linearParser;
     private VnaParser vnaParser;
@@ -29,7 +33,6 @@ public class Radio3 extends Application {
     private FMeterParser fMeterParser;
     private MultipleProbesParser multipleProbesParser;
     private LogMessageParser logMessageParser;
-    private Consumer<String> logMessageHandler = msg -> {};
 
     private ConfigurationService configurationService;
     private DeviceService deviceService;
@@ -42,7 +45,8 @@ public class Radio3 extends Application {
     private SweepController sweepController;
     private VnaController vnaController;
 
-    private Radio3State state = DISCONNECTED;
+    private ConnectionStatus connectionStatus = DISCONNECTED;
+    private DeviceStatus deviceStatus = UNKNOWN;
     private Configuration configuration;
 
     private <T extends FrameParser<U>, U> void bind(T parser, Consumer<U> handler) {
@@ -65,6 +69,11 @@ public class Radio3 extends Application {
         configurationService = new ConfigurationService();
         configurationService.init();
         configuration = configurationService.load();
+
+        if(configuration.logLevel != null) {
+            logger.info("root log level: "+configuration.logLevel);
+            Logger.getRootLogger().setLevel(configuration.logLevel);
+        }
 
         deviceService = new DeviceService();
         vfoController = new VfoController(deviceService);
@@ -91,8 +100,8 @@ public class Radio3 extends Application {
         mainController = new MainController(this);
 
         sweeper = new Sweeper(deviceService);
-        vnaController = new VnaController(mainController, sweeper, vnaParser, configuration.sweepProfiles);
-        sweepController = new SweepController(mainController, sweeper, logarithmicParser, linearParser, configuration.sweepProfiles);
+        vnaController = new VnaController(this, mainController, vnaParser, configuration.sweepProfiles);
+        sweepController = new SweepController(this, mainController, logarithmicParser, linearParser, configuration.sweepProfiles);
         bind(sweeper, deviceService::handleAnalyserData);
 
         vfoParser = new VfoParser();
@@ -103,13 +112,13 @@ public class Radio3 extends Application {
 
         deviceStateParser = new DeviceStateParser();
         bind(deviceStateParser, deviceState -> {
-            mainController.updateDeviceState(deviceState);
+            mainController.updateDeviceProperties(deviceState);
             vnaController.updateAnalyserState(deviceState.analyserState);
-            mainController.setDeviceStatus(deviceState.analyserState.toString());
+            mainController.setDeviceStatus(deviceState.analyserState);
         });
 
         logMessageParser = new LogMessageParser();
-        bind(logMessageParser, logMessage -> log(logMessage.getMessage()));
+        bind(logMessageParser, msg -> logger.info("DEV: "+msg));
 
         bind(new ErrorCodeParser(), mainController::handleErrorCode);
 
@@ -129,10 +138,6 @@ public class Radio3 extends Application {
 
     public void bindLogMessageHandler(Consumer<LogMessage> handler) {
         bind(logMessageParser, handler);
-    }
-
-    public void log(String msg) {
-        logMessageHandler.accept(msg);
     }
 
     public void saveConfiguration() throws IOException {
@@ -183,49 +188,56 @@ public class Radio3 extends Application {
     }
 
     public void connect(String portName) {
-        state = CONNECTING;
+        connectionStatus = CONNECTING;
         deviceInfoParser.resetDeviceInfo();
-        if(deviceService.connect(portName).isOk()) {
+        if(deviceService.connect(portName, configuration.portBaudRate).isOk()) {
             sleep(200);
             deviceService.setHardwareRevision(configuration.hardwareRevision);
             deviceService.setVfoType(configuration.vfoType);
             deviceService.requestDeviceInfo();
             sleep(200);
             if(deviceInfoParser.isDeviceInfo()) {
-                state = CONNECTED;
+                connectionStatus = CONNECTED;
 
                 // TODO: check if HW revision and VFO type are properly set
 
             } else {
                 if(deviceService.getFramesReceived() > 0) {
                     deviceService.disconnect();
-                    state = DEVICE_ERROR;
+                    connectionStatus = DEVICE_ERROR;
                 } else {
                     deviceService.disconnect();
-                    state = CONNECTION_TIMEOUT;
+                    connectionStatus = CONNECTION_TIMEOUT;
                 }
             }
         } else {
-            state = DEVICE_ERROR;
+            connectionStatus = DEVICE_ERROR;
         }
     }
 
     public void disconnect() {
+        connectionStatus = DISCONNECTED;
         deviceService.disconnect();
         deviceInfoParser.resetDeviceInfo();
-        state = DISCONNECTED;
+        sweepController.clear();
+        vnaController.clear();
+        mainController.setDeviceStatus("");
     }
 
     public boolean isConnected() {
-        return state == CONNECTED;
+        return connectionStatus == CONNECTED;
     }
 
     public void getProbes() {
         deviceService.requestMultipleProbesSample();
     }
 
-    public Radio3State getState() {
-        return state;
+    public String getConnectionStatusStr() {
+        return connectionStatus.getText() + (connectionStatus!=DISCONNECTED ? " ("+deviceService.getDevicePortInfo()+")" : "");
+    }
+
+    public DeviceStatus getDeviceStatus() {
+        return deviceStatus;
     }
 
     public static void main(String[] args) {
@@ -315,5 +327,10 @@ public class Radio3 extends Application {
 
     public void requestVnaProbeSample() {
         deviceService.requestVnaProbeSample();
+    }
+
+    public void startAnalyser(long fStart, int fStep, SweepQuality quality, AnalyserDataSource source, Consumer<AnalyserData> dataHandler) {
+        mainController.setDeviceStatus(DeviceStatus.PROCESSING);
+        deviceService.startAnalyser(fStart, fStep, quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(), source, dataHandler);
     }
 }

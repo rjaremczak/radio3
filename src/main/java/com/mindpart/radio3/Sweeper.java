@@ -39,8 +39,4 @@ public class Sweeper implements FrameParser<AnalyserData> {
         }
         return ad;
     }
-
-    public void startAnalyser(long fStart, int fStep, SweepQuality quality, AnalyserDataSource source, Consumer<AnalyserData> dataHandler) {
-        deviceService.startAnalyser(fStart, fStep, quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(), source, dataHandler);
-    }
 }

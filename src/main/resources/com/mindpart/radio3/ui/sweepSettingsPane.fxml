@@ -2,13 +2,14 @@
 
 <?import com.mindpart.ui.FrequencyField?>
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<fx:root hgap="5.0" type="javafx.scene.layout.GridPane" vgap="3.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepSettingsPane">
+<fx:root hgap="5.0" type="javafx.scene.layout.GridPane" vgap="5.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepSettingsPane">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" />
       <ColumnConstraints hgrow="SOMETIMES" />
@@ -25,10 +26,13 @@
       <Label text="frequency range [MHz]" GridPane.columnIndex="1" GridPane.columnSpan="2" />
       <Label text="quality" GridPane.columnIndex="3" />
       <Label text="presets" />
-      <ChoiceBox fx:id="presetsChoiceBox" prefWidth="200" GridPane.rowIndex="1" />
+      <ChoiceBox fx:id="presetsChoiceBox" GridPane.rowIndex="1" />
       <ChoiceBox fx:id="sweepQuality" GridPane.columnIndex="3" GridPane.rowIndex="1" />
    </children>
    <stylesheets>
       <URL value="@main.css" />
    </stylesheets>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
 </fx:root>

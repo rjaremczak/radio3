@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.device.HardwareRevision;
 import com.mindpart.radio3.device.VfoType;
+import jssc.SerialPort;
+import org.apache.log4j.Level;
 
 import java.util.List;
 
@@ -14,6 +16,8 @@ import java.util.List;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 public class Configuration {
+    public Level logLevel;
+    public Integer portBaudRate = SerialPort.BAUDRATE_115200;
     public FMeterConfig fMeter;
     public LinearProbeConfig linearProbe;
     public LogarithmicProbeConfig logarithmicProbe;
