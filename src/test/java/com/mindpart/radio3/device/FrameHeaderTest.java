@@ -16,8 +16,8 @@ public class FrameHeaderTest {
         assertTrue(header.isFormatA());
         assertFalse(header.isFormatB());
         assertFalse(header.isFormatC());
-        assertEquals(FrameCommand.DEVICE_RESET, header.getCommand());
-        assertEquals(6, header.getPayloadSize());
+        assertEquals(FrameCommand.PING, header.getCommand());
+        assertEquals(0, header.getPayloadSize());
     }
 
     @Test

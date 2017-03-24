@@ -4,12 +4,14 @@ import com.mindpart.radio3.*;
 import com.mindpart.radio3.config.Configuration;
 import com.mindpart.radio3.config.ConfigurationService;
 import com.mindpart.radio3.device.*;
+import com.mindpart.types.Frequency;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import jssc.SerialPortException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -23,6 +25,7 @@ import static com.mindpart.radio3.ui.DeviceStatus.UNKNOWN;
 public class Radio3 extends Application {
     private static final Logger logger = Logger.getLogger(Radio3.class);
 
+    private PingParser pingParser;
     private LogarithmicParser logarithmicParser;
     private LinearParser linearParser;
     private VnaParser vnaParser;
@@ -76,7 +79,10 @@ public class Radio3 extends Application {
         }
 
         deviceService = new DeviceService((f,b) -> Platform.runLater(() -> mainController.updateDeviceStatus(b ? DeviceStatus.READY : DeviceStatus.ERROR )));
-        vfoController = new VfoController(deviceService);
+        vfoController = new VfoController(this);
+
+        pingParser = new PingParser();
+        bind(pingParser, (v) -> {});
 
         fMeterParser = new FMeterParser(configuration.fMeter);
         fMeterController = new FMeterController(this);
@@ -111,11 +117,7 @@ public class Radio3 extends Application {
         bind(deviceInfoParser, mainController::updateDeviceInfo);
 
         deviceStateParser = new DeviceStateParser();
-        bind(deviceStateParser, deviceState -> {
-            mainController.updateDeviceProperties(deviceState);
-            vnaController.updateAnalyserState(deviceState.analyserState);
-            mainController.updateDeviceStatus(deviceState.analyserState);
-        });
+        bind(deviceStateParser, mainController::updateDeviceProperties);
 
         logMessageParser = new LogMessageParser();
         bind(logMessageParser, msg -> logger.info("DEV: "+msg));
@@ -242,15 +244,22 @@ public class Radio3 extends Application {
 
     public void setVfoOutput(VfoOut vfoOut) {
         if(vfoOut != null) {
+            mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
             deviceService.setVfoOutput(vfoOut);
-            deviceService.requestDeviceState();
         }
     }
 
     public void setVfoAttenuator(VfoAttenuator vfoAttenuator) {
         if(vfoAttenuator != null) {
+            mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
             deviceService.setVfoAttenuator(vfoAttenuator);
-            deviceService.requestDeviceState();
+        }
+    }
+
+    public void setVfoFrequency(Frequency frequency) {
+        if(frequency != null) {
+            mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
+            deviceService.setVfoFrequency((int) frequency.toHz());
         }
     }
 
@@ -280,7 +289,6 @@ public class Radio3 extends Application {
         if(vnaMode != null) {
             mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
             deviceService.setVnaMode(vnaMode);
-            deviceService.requestDeviceState();
         }
     }
 
@@ -288,7 +296,6 @@ public class Radio3 extends Application {
         if(vfoAmplifier != null) {
             mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
             deviceService.setVfoAmplifier(vfoAmplifier);
-            deviceService.requestDeviceState();
         }
     }
 
@@ -296,13 +303,17 @@ public class Radio3 extends Application {
         if(logLevel != null) {
             mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
             deviceService.setLogLevel(logLevel);
-            deviceService.requestDeviceState();
         }
     }
 
     public void requestDeviceState() {
         mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         deviceService.requestDeviceState();
+    }
+
+    public DeviceState getDeviceState() {
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
+        return deviceService.getDeviceState();
     }
 
     public void requestVfoFrequency() {

@@ -8,6 +8,12 @@ import jssc.SerialPortTimeoutException;
 import org.apache.log4j.Logger;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 /**
@@ -17,6 +23,7 @@ import java.util.function.Consumer;
 
 public class DataLink {
     private static final Logger logger = Logger.getLogger(DataLink.class);
+
     private static final int TIMEOUT_MS = 2000;
     private static final int DATA_BITS = SerialPort.DATABITS_8;
     private static final int STOP_BITS = SerialPort.STOPBITS_1;
@@ -26,13 +33,17 @@ public class DataLink {
     private Consumer<Frame> frameHandler;
     private int portBaudRate;
 
+    private volatile AtomicReference<Frame> receivedFrameRef = new AtomicReference<>();
+    private volatile CountDownLatch receivedFrameLatch;
+    private volatile boolean newHandling = false;
+
     public DataLink(String portName, int portBaudRate, Consumer<Frame> frameHandler) {
         this.serialPort = new SerialPort(portName);
         this.portBaudRate = portBaudRate;
         this.frameHandler = frameHandler;
     }
 
-    public void connect() throws SerialPortException, SerialPortTimeoutException {
+    public synchronized void connect() throws SerialPortException, SerialPortTimeoutException {
         if(serialPort.openPort()) {
             logger.debug("port opened");
             serialPort.setParams(portBaudRate, DATA_BITS, STOP_BITS, PARITY, false, false);
@@ -49,14 +60,22 @@ public class DataLink {
             try {
                 Frame frame = readFrame();
                 flushReadBuffer();
-                frameHandler.accept(frame);
+                if(newHandling) {
+                    receivedFrameRef.set(frame);
+                } else {
+                    frameHandler.accept(frame);
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage());
+            } finally {
+                if(newHandling) {
+                    receivedFrameLatch.countDown();
+                }
             }
         }, SerialPort.MASK_RXCHAR);
     }
 
-    public void disconnect() {
+    public synchronized void disconnect() {
         try {
             flushReadBuffer();
             serialPort.removeEventListener();
@@ -79,7 +98,7 @@ public class DataLink {
         return buf.array();
     }
 
-    public Frame readFrame() throws SerialPortException, SerialPortTimeoutException, Crc8.Error {
+    private Frame readFrame() throws SerialPortException, SerialPortTimeoutException, Crc8.Error {
         Crc8 crc8 = new Crc8();
         byte[] headerBytes = readBytes(2);
         crc8.addBytes(headerBytes);
@@ -102,7 +121,7 @@ public class DataLink {
         return new Frame(header.getCommand(), payload);
     }
 
-    public int flushReadBuffer() {
+    private int flushReadBuffer() {
         try {
             int flushed = 0;
             int remaining = serialPort.getInputBufferBytesCount();
@@ -126,7 +145,7 @@ public class DataLink {
         serialPort.writeByte((byte)Binary.toUInt8high(word));
     }
 
-    public void writeFrame(Frame frame) throws SerialPortException {
+    public synchronized void writeFrame(Frame frame) throws SerialPortException {
         serialPort.purgePort(SerialPort.PURGE_TXCLEAR|SerialPort.PURGE_RXCLEAR);
         FrameHeader header = new FrameHeader(frame);
         Crc8 crc8 = new Crc8();
@@ -147,12 +166,26 @@ public class DataLink {
         return serialPort.getPortName();
     }
 
-
     public int getSpeed() {
         return portBaudRate;
     }
 
     public boolean isOpened() {
         return serialPort.isOpened();
+    }
+
+    public synchronized Frame transaction(Frame request) {
+        try {
+            newHandling = true;
+            receivedFrameLatch = new CountDownLatch(1);
+            writeFrame(request);
+            receivedFrameLatch.await(10, TimeUnit.SECONDS);
+            return receivedFrameRef.getAndSet(null);
+        } catch (Exception e) {
+            logger.error("exception requesting "+request);
+            return null;
+        } finally {
+            newHandling = false;
+        }
     }
 }

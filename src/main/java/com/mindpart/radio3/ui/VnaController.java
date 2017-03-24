@@ -138,7 +138,7 @@ public class VnaController {
             FxUtils.disableItems(btnStart);
             sweepSettingsPane.disableControls(true);
             mainController.disableAllExcept(true, mainController.vnaTab);
-            sweepOnce(SweepQuality.FAST, this::displayDataAndSweepAgain);
+            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
             btnContinuous.setText("Stop");
         } else {
             FxUtils.enableItems(btnStart);
@@ -151,7 +151,7 @@ public class VnaController {
     private void displayDataAndSweepAgain(AnalyserData analyserData) {
         if(btnContinuous.isSelected()) {
             updateAnalyserData(analyserData);
-            sweepOnce(SweepQuality.FAST, this::displayDataAndSweepAgain);
+            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
         }
     }
 
@@ -164,7 +164,6 @@ public class VnaController {
     }
 
     public void onSweepOnce() {
-        clear();
         sweepOnce(sweepSettingsPane.getQuality(), this::updateAnalyserData);
     }
 
@@ -173,10 +172,6 @@ public class VnaController {
         long fEnd = sweepSettingsPane.getEndFrequency ().toHz();
         int fStep = (int) ((fEnd - fStart) / quality.getSteps());
         radio3.startAnalyser(fStart, fStep, quality, AnalyserDataSource.VNA, dataHandler);
-    }
-
-    public void updateAnalyserState(AnalyserState analyserState) {
-        mainController.updateDeviceStatus(analyserState);
     }
 
     public void updateAnalyserData(AnalyserData ad) {
@@ -233,7 +228,9 @@ public class VnaController {
             } else if(range.getMax() < 4.5) {
                 setUpAxis(swrAxisY, min, 5, 0.5);
             } else if(range.getMax() < 19.5) {
-                setUpAxis(swrAxisY, min, 20, 1);
+                setUpAxis(swrAxisY, min, 20, 2);
+            } else if(range.getMax() < 50) {
+                setUpAxis(swrAxisY, min, 50, 5);
             } else if(range.getMax() < 90) {
                 setUpAxis(swrAxisY, min, 100, 20);
             } else if(range.getMax() < 490) {
@@ -252,13 +249,17 @@ public class VnaController {
         double min = Math.min(0, range.getMin());
         if(range.isValid()) {
             if(range.getMax() < 24) {
-                setUpAxis(impedanceAxisY, min, 25, 1);
+                setUpAxis(impedanceAxisY, min, 25, 5);
             } else if(range.getMax() < 99) {
-                setUpAxis(impedanceAxisY, min, 100, 5);
+                setUpAxis(impedanceAxisY, min, 100, 10);
             } else if(range.getMax() < 990) {
-                setUpAxis(impedanceAxisY, min, 1000, 50);
+                setUpAxis(impedanceAxisY, min, 1000, 100);
+            } else if(range.getMax() < 1990) {
+                setUpAxis(impedanceAxisY, min, 2000, 200);
+            } else if(range.getMax() < 4990) {
+                setUpAxis(impedanceAxisY, min, 5000, 500);
             } else if(range.getMax() < 9900) {
-                setUpAxis(impedanceAxisY, min, 10000, 500);
+                setUpAxis(impedanceAxisY, min, 10000, 1000);
             } else {
                 impedanceAxisY.setAutoRanging(true);
             }

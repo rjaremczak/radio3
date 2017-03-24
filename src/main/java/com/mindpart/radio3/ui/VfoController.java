@@ -1,6 +1,5 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.types.Frequency;
 import javafx.event.ActionEvent;
 
@@ -9,10 +8,10 @@ import javafx.event.ActionEvent;
  * Date: 2016.03.24
  */
 public class VfoController extends ComponentController {
-    private DeviceService deviceService;
+    private Radio3 radio3;
 
-    public VfoController(DeviceService deviceService) {
-        this.deviceService = deviceService;
+    public VfoController(Radio3 radio3) {
+        this.radio3 = radio3;
     }
 
     @Override
@@ -24,7 +23,7 @@ public class VfoController extends ComponentController {
     @Override
     public void onMainButton(ActionEvent actionEvent) {
         Frequency frequency = Frequency.parse(valueField.getText());
-        deviceService.setVfoFrequency((int)frequency.toHz());
+        radio3.setVfoFrequency(frequency);
         setFrequency(frequency);
     }
 

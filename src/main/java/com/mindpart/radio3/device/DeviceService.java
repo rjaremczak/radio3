@@ -33,6 +33,8 @@ public class DeviceService {
     private long framesRecognized = 0;
     private BiConsumer<Frame, Boolean> incomingFrameListener;
 
+    private DeviceStateParser deviceStateParser = new DeviceStateParser();
+
     public <T extends FrameParser<U>, U> void registerBinding(T parser, BiConsumer<FrameParser, Frame> handler) {
         bindings.put(parser, handler);
     }
@@ -155,6 +157,11 @@ public class DeviceService {
         performRequest(new Frame(FrameCommand.DEVICE_GET_STATE));
     }
 
+    public DeviceState getDeviceState() {
+        Frame frame = dataLink.transaction(new Frame(FrameCommand.DEVICE_GET_STATE));
+        return frame!=null && deviceStateParser.recognizes(frame) ? deviceStateParser.parse(frame) : null;
+    }
+
     public void requestVfoFrequency() {
         performRequest(new Frame(VFO_GET_FREQ));
     }
@@ -183,8 +190,8 @@ public class DeviceService {
         performRequest(new Frame(PROBES_GET));
     }
 
-    public void requestDeviceReset() {
-        performRequest(new Frame(DEVICE_RESET));
+    public void sendPing() {
+        performRequest(new Frame(PING));
     }
 
     public String getDevicePortInfo() {

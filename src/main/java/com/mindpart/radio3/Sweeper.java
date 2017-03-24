@@ -26,6 +26,7 @@ public class Sweeper implements FrameParser<AnalyserData> {
     public AnalyserData parse(Frame frame) {
         BinaryIterator bi = frame.binaryIterator();
         AnalyserData ad = new AnalyserData(
+                AnalyserState.values()[bi.nextUInt8()],
                 bi.nextUInt32(),
                 bi.nextUInt32(),
                 bi.nextUInt16(),

@@ -5,7 +5,7 @@ package com.mindpart.radio3.device;
  * Date: 2016.03.23
  */
 public enum FrameCommand {
-    DEVICE_RESET(0x000),
+    PING(0x000),
     DEVICE_GET_INFO(0x001),
     DEVICE_GET_STATE(0x002),
     DEVICE_HARDWARE_REVISION(0x003),

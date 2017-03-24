@@ -6,7 +6,6 @@ package com.mindpart.radio3.device;
  */
 public class DeviceState {
     public long timeMs;
-    public AnalyserState analyserState;
     public VfoOut vfoOut;
     public VfoAmplifier vfoAmplifier;
     public VfoAttenuator vfoAttenuator;

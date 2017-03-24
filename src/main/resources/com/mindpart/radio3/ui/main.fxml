@@ -58,7 +58,7 @@
                                                          <children>
                                                                 <ChoiceBox fx:id="serialPorts" />
                                                                 <Button fx:id="serialPortsRefresh" focusTraversable="false" mnemonicParsing="false" text="Refresh" />
-                                                                <Button fx:id="deviceConnect" defaultButton="true" mnemonicParsing="false" text="Connect" />
+                                                                <Button fx:id="btnConnect" defaultButton="true" mnemonicParsing="false" text="Connect" />
                                                          </children>
                                                       </HBox>
                                                       <Label text="Serial Port" GridPane.rowIndex="2" />
