@@ -16,13 +16,13 @@ import java.util.List;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 public class Configuration {
+    public Integer portBaudRate = SerialPort.BAUDRATE_38400;
     public Level logLevel;
-    public Integer portBaudRate = SerialPort.BAUDRATE_115200;
+    public HardwareRevision hardwareRevision = HardwareRevision.AUTODETECT;
+    public VfoType vfoType = VfoType.NONE;
     public FMeterConfig fMeter;
     public LinearProbeConfig linearProbe;
     public LogarithmicProbeConfig logarithmicProbe;
     public VnaConfig vna;
     public List<SweepProfile> sweepProfiles;
-    public HardwareRevision hardwareRevision = HardwareRevision.AUTODETECT;
-    public VfoType vfoType = VfoType.NONE;
 }

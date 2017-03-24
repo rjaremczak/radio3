@@ -31,9 +31,14 @@ public class DeviceService {
     private Consumer<AnalyserData> analyserDataHandler;
     private long framesReceived = 0;
     private long framesRecognized = 0;
+    private BiConsumer<Frame, Boolean> incomingFrameListener;
 
     public <T extends FrameParser<U>, U> void registerBinding(T parser, BiConsumer<FrameParser, Frame> handler) {
         bindings.put(parser, handler);
+    }
+
+    public DeviceService(BiConsumer<Frame, Boolean> incomingFrameListener) {
+        this.incomingFrameListener = incomingFrameListener;
     }
 
     public void frameHandler(Frame frame) {
@@ -41,7 +46,9 @@ public class DeviceService {
 
         for(Map.Entry<FrameParser, BiConsumer<FrameParser, Frame>> binding : bindings.entrySet()) {
             FrameParser parser = binding.getKey();
-            if(parser.recognizes(frame)) {
+            boolean recognized = parser.recognizes(frame);
+            incomingFrameListener.accept(frame, recognized);
+            if(recognized) {
                 framesRecognized++;
                 binding.getValue().accept(parser, frame);
                 return;
@@ -64,7 +71,7 @@ public class DeviceService {
     }
 
     public void disconnect() {
-        if(dataLink.isOpened()) {
+        if(dataLink!=null && dataLink.isOpened()) {
             logger.debug("disconnect");
             dataLink.disconnect();
         }

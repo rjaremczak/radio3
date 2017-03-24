@@ -9,4 +9,5 @@ public class DeviceInfo {
     public String buildId;
     public HardwareRevision hardwareRevision;
     public VfoType vfoType;
+    public long baudRate;
 }

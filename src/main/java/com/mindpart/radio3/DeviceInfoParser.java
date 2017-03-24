@@ -25,6 +25,7 @@ public class DeviceInfoParser implements FrameParser<DeviceInfo> {
         di.buildId = bi.nextString(32);
         di.hardwareRevision = HardwareRevision.values()[bi.nextUInt8()];
         di.vfoType = VfoType.values()[bi.nextUInt8()];
+        di.baudRate = bi.nextUInt32();
         deviceInfo = di;
         return di;
     }

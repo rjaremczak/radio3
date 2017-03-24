@@ -225,9 +225,9 @@ public class MainController {
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue == componentsTab) {
                 radio3.requestVfoFrequency();
-                logger.info("enter components tab");
+                //logger.info("enter components tab");
             } else if(oldValue == componentsTab) {
-                logger.info("leave components tab");
+                //logger.info("leave components tab");
             }
         });
     }
@@ -265,7 +265,7 @@ public class MainController {
 
     private void initVnaMode() {
         vnaMode.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldValue, newValue) -> radio3.setVnaMode(newValue));
+                .addListener((observable, oldValue, newValue) -> radio3.requestVnaMode(newValue));
     }
 
     void updateVnaMode(HardwareRevision hardwareRevision) {
@@ -276,7 +276,7 @@ public class MainController {
 
     private void initVfoAmplifier() {
         vfoAmplifier.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldValue, newValue) -> radio3.setVfoAmplifier(newValue));
+                .addListener((observable, oldValue, newValue) -> radio3.requestVfoAmplifier(newValue));
     }
 
     void updateVfoAmplifier(HardwareRevision hardwareRevision) {
@@ -289,7 +289,7 @@ public class MainController {
         logLevel.getItems().addAll(LogLevel.values());
         logLevel.getSelectionModel().clearSelection();
         logLevel.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldValue, newValue) -> radio3.setLogLevel(newValue));
+                .addListener((observable, oldValue, newValue) -> radio3.requestLogLevel(newValue));
     }
 
     void shutdown() {
@@ -337,6 +337,7 @@ public class MainController {
         devicePropertiesMap.put("Build Id", di.buildId);
         devicePropertiesMap.put("Hardware Revision", di.hardwareRevision.toString());
         devicePropertiesMap.put("VFO", di.vfoType.toString());
+        devicePropertiesMap.put("Baud rate", Long.toString(di.baudRate));
         updateDeviceProperties();
         updateVfoAttenuator(di.hardwareRevision);
         updateVnaMode(di.hardwareRevision);
@@ -361,7 +362,7 @@ public class MainController {
         FxUtils.setDisabledOf(flag, nonModalNodes.stream().filter(e -> e!=element).toArray());
     }
 
-    void setDeviceStatus(Object o) {
+    void updateDeviceStatus(Object o) {
         deviceStatus.setText(o.toString());
     }
 }

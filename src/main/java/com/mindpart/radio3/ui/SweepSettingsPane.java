@@ -33,6 +33,8 @@ public class SweepSettingsPane extends GridPane {
     ChoiceBox<SweepProfile> presetsChoiceBox;
 
     private ObservableList<SweepProfile> presets = FXCollections.observableArrayList();
+    private Runnable rangeChangeListener = () -> {};
+    private Runnable qualityChangeListener = () -> {};
 
     public SweepSettingsPane(List<SweepProfile> presets) {
         this.presets.addAll(presets);
@@ -48,23 +50,27 @@ public class SweepSettingsPane extends GridPane {
         initSweepSteps();
 
         startFrequencyField.setMaxSupplier(() -> endFrequencyField.getFrequency());
+        startFrequencyField.setChangeListener(this::internalRangeChangeListener);
+
         endFrequencyField.setMinSupplier(() -> startFrequencyField.getFrequency());
-        endFrequencyField.setMaxSupplier(() -> Frequency.ofMHz(70));
+        endFrequencyField.setMaxSupplier(() -> Frequency.ofMHz(150));
+        endFrequencyField.setChangeListener(this::internalRangeChangeListener);
 
         presetsChoiceBox.setItems(presets);
         presetsChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newProfile) -> {
             if(newProfile!=null) {
-                startFrequencyField.clearOnChangeHandler();
-                endFrequencyField.clearOnChangeHandler();
-
                 startFrequencyField.setFrequency(Frequency.parse(newProfile.freqMin));
                 endFrequencyField.setFrequency(Frequency.parse(newProfile.freqMax));
-
-                startFrequencyField.setOnChangeHandler(() -> presetsChoiceBox.getSelectionModel().clearSelection());
-                endFrequencyField.setOnChangeHandler(() -> presetsChoiceBox.getSelectionModel().clearSelection());
+                rangeChangeListener.run();
             }
         });
         presetsChoiceBox.getSelectionModel().selectFirst();
+        sweepQuality.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> qualityChangeListener.run());
+    }
+
+    void internalRangeChangeListener() {
+        presetsChoiceBox.getSelectionModel().clearSelection();
+        rangeChangeListener.run();
     }
 
     public Frequency getStartFrequency() {
@@ -92,5 +98,13 @@ public class SweepSettingsPane extends GridPane {
         endFrequencyField.setDisable(disable);
         sweepQuality.setDisable(disable);
         presetsChoiceBox.setDisable(disable);
+    }
+
+    public void setRangeChangeListener(Runnable listener) {
+        this.rangeChangeListener = listener;
+    }
+
+    public void setQualityChangeListener(Runnable listener) {
+        this.qualityChangeListener = listener;
     }
 }

@@ -75,7 +75,7 @@ public class Radio3 extends Application {
             Logger.getRootLogger().setLevel(configuration.logLevel);
         }
 
-        deviceService = new DeviceService();
+        deviceService = new DeviceService((f,b) -> Platform.runLater(() -> mainController.updateDeviceStatus(b ? DeviceStatus.READY : DeviceStatus.ERROR )));
         vfoController = new VfoController(deviceService);
 
         fMeterParser = new FMeterParser(configuration.fMeter);
@@ -114,7 +114,7 @@ public class Radio3 extends Application {
         bind(deviceStateParser, deviceState -> {
             mainController.updateDeviceProperties(deviceState);
             vnaController.updateAnalyserState(deviceState.analyserState);
-            mainController.setDeviceStatus(deviceState.analyserState);
+            mainController.updateDeviceStatus(deviceState.analyserState);
         });
 
         logMessageParser = new LogMessageParser();
@@ -134,10 +134,6 @@ public class Radio3 extends Application {
         addFeatureBox(logarithmicProbeController);
         addFeatureBox(linearProbeController);
         addFeatureBox(vnaProbeController);
-    }
-
-    public void bindLogMessageHandler(Consumer<LogMessage> handler) {
-        bind(logMessageParser, handler);
     }
 
     public void saveConfiguration() throws IOException {
@@ -221,7 +217,7 @@ public class Radio3 extends Application {
         deviceInfoParser.resetDeviceInfo();
         sweepController.clear();
         vnaController.clear();
-        mainController.setDeviceStatus("");
+        mainController.updateDeviceStatus("");
     }
 
     public boolean isConnected() {
@@ -280,57 +276,67 @@ public class Radio3 extends Application {
         }
     }
 
-    public void setVnaMode(VnaMode vnaMode) {
+    public void requestVnaMode(VnaMode vnaMode) {
         if(vnaMode != null) {
+            mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
             deviceService.setVnaMode(vnaMode);
             deviceService.requestDeviceState();
         }
     }
 
-    public void setVfoAmplifier(VfoAmplifier vfoAmplifier) {
+    public void requestVfoAmplifier(VfoAmplifier vfoAmplifier) {
         if(vfoAmplifier != null) {
+            mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
             deviceService.setVfoAmplifier(vfoAmplifier);
             deviceService.requestDeviceState();
         }
     }
 
-    public void setLogLevel(LogLevel logLevel) {
+    public void requestLogLevel(LogLevel logLevel) {
         if(logLevel != null) {
+            mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
             deviceService.setLogLevel(logLevel);
             deviceService.requestDeviceState();
         }
     }
 
     public void requestDeviceState() {
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         deviceService.requestDeviceState();
     }
 
     public void requestVfoFrequency() {
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         deviceService.requestVfoFrequency();
     }
 
     public void requestDeviceInfo() {
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         deviceService.requestDeviceInfo();
     }
 
     public void requestFMeterSample() {
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         deviceService.requestFMeterSample();
     }
 
     public void requestLogarithmicProbeSample() {
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         deviceService.requestLogarithmicProbeSample();
     }
 
     public void requestLinearProbeSample() {
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         deviceService.requestLinearProbeSample();
     }
 
     public void requestVnaProbeSample() {
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         deviceService.requestVnaProbeSample();
     }
 
     public void startAnalyser(long fStart, int fStep, SweepQuality quality, AnalyserDataSource source, Consumer<AnalyserData> dataHandler) {
-        mainController.setDeviceStatus(DeviceStatus.PROCESSING);
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         deviceService.startAnalyser(fStart, fStep, quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(), source, dataHandler);
     }
 }

@@ -116,7 +116,6 @@ public class SweepController {
     }
 
     public void initialize() throws IOException {
-        initInputProbeList();
 
         chartMarker.initialize(anchorPane, signalChart, scenePos -> {
             Frequency freq = scenePosToFrequency(scenePos);
@@ -135,11 +134,22 @@ public class SweepController {
 
         hBox.getChildren().add(0, sweepSettingsPane);
 
-        btnNormalize.selectedProperty().addListener(this::onNormalizeChanged);
-        btnContinuous.selectedProperty().addListener(this::onContinuousChanged);
+        btnNormalize.selectedProperty().addListener(this::normalizeChangeListener);
+        btnContinuous.selectedProperty().addListener(this::continuousChangeListener);
+
+        sweepSettingsPane.setRangeChangeListener(this::sweepSettingsChangeListener);
+        sweepSettingsPane.setQualityChangeListener(this::sweepSettingsChangeListener);
+
+        initInputProbeList();
+        updateNormButton();
     }
 
-    private void onNormalizeChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean normalized) {
+    private void sweepSettingsChangeListener() {
+        clear();
+        updateNormButton();
+    }
+
+    private void normalizeChangeListener(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean normalized) {
         if(receivedData.isEmpty()) {
             btnNormalize.setSelected(false);
             return;
@@ -161,18 +171,42 @@ public class SweepController {
                 valueProcessor = this::fromLinearTo1mV;
             }
         } else {
-            referenceData.clear();
             updateInputSource(sourceProbe.getValue());
         }
 
         updateChart();
     }
 
+    private void inputSourceChangeListener(ObservableValue<? extends AnalyserDataSource> ob, AnalyserDataSource old, AnalyserDataSource source) {
+        clear();
+        updateInputSource(source);
+        updateNormButton();
+    }
+
+    private void continuousChangeListener(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {
+        if(continuous) {
+            FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
+            sweepSettingsPane.disableControls(true);
+            mainController.disableAllExcept(true, mainController.sweepTab);
+            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
+            btnContinuous.setText("Stop");
+        } else {
+            if(btnNormalize.isSelected()) {
+                FxUtils.enableItems(btnOnce, btnNormalize);
+            } else {
+                FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
+                sweepSettingsPane.disableControls(false);
+            }
+            mainController.disableAllExcept(false, mainController.sweepTab);
+            btnContinuous.setText("Continuous");
+        }
+    }
+
     private void initInputProbeList() {
         sourceProbe.getItems().add(AnalyserDataSource.LOG_PROBE);
         sourceProbe.getItems().add(AnalyserDataSource.LIN_PROBE);
         sourceProbe.getSelectionModel().selectFirst();
-        sourceProbe.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> updateInputSource(newValue)));
+        sourceProbe.getSelectionModel().selectedItemProperty().addListener(this::inputSourceChangeListener);
         updateInputSource(sourceProbe.getValue());
     }
 
@@ -211,26 +245,7 @@ public class SweepController {
             updateAnalyserData(analyserData);
             btnNormalize.setDisable(false);
         });
-        mainController.setDeviceStatus(AnalyserState.PROCESSING);
-    }
-
-    private void onContinuousChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {
-        if(continuous) {
-            FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
-            sweepSettingsPane.disableControls(true);
-            mainController.disableAllExcept(true, mainController.sweepTab);
-            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
-            btnContinuous.setText("Stop");
-        } else {
-            if(btnNormalize.isSelected()) {
-                FxUtils.enableItems(btnOnce, btnNormalize);
-            } else {
-                FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
-                sweepSettingsPane.disableControls(false);
-            }
-            mainController.disableAllExcept(false, mainController.sweepTab);
-            btnContinuous.setText("Continuous");
-        }
+        mainController.updateDeviceStatus(AnalyserState.PROCESSING);
     }
 
     private void displayDataAndSweepAgain(AnalyserData analyserData) {
@@ -250,6 +265,7 @@ public class SweepController {
     public void updateAnalyserData(AnalyserData ad) {
         receivedDataInfo = ad.toInfo();
         receivedData.clear();
+        updateNormButton();
 
         int samples[] = ad.getData()[0];
         long freq = ad.getFreqStart();
@@ -261,8 +277,13 @@ public class SweepController {
         updateChart();
     }
 
+    private void updateNormButton() {
+        btnNormalize.setDisable(receivedData.isEmpty());
+    }
+
     private void updateChart() {
-        clear();
+        chartMarker.clear();
+        signalDataSeries.clear();
 
         if(receivedDataInfo==null) { return; }
 
@@ -286,5 +307,7 @@ public class SweepController {
     void clear() {
         chartMarker.clear();
         signalDataSeries.clear();
+        receivedData.clear();
+        referenceData.clear();
     }
 }

@@ -2,6 +2,7 @@ package com.mindpart.ui;
 
 import com.mindpart.types.Frequency;
 import com.mindpart.utils.FxUtils;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,7 +19,7 @@ public class FrequencyField extends TextField {
     private static final NumberFormat IN_FORMAT = new DecimalFormat("0.###");
     private static final NumberFormat OUT_FORMAT = new DecimalFormat("0.000");
 
-    private Runnable onChangeHandler = null;
+    private Runnable changeListener = null;
     private Supplier<Frequency> minSupplier = () -> Frequency.ZERO;
     private Supplier<Frequency> maxSupplier = () -> Frequency.ofHz(Long.MAX_VALUE);
     private Frequency frequency;
@@ -38,7 +39,7 @@ public class FrequencyField extends TextField {
             try {
                 if(parse(getText())) {
                     format();
-                    callOnChangeHandler();
+                    runChangeListener();
                 } else {
                     event.consume();
                     requestFocus();
@@ -48,29 +49,28 @@ public class FrequencyField extends TextField {
             }
         });
 
-        focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!inActionEvent && !newValue.booleanValue()) {
-                if(parse(getText())) {
-                    format();
-                    callOnChangeHandler();
-                } else {
-                    requestFocus();
-                }
+        focusedProperty().addListener(this::internalChangeListener);
+    }
+
+    void internalChangeListener(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+        if (!inActionEvent && !newValue.booleanValue()) {
+            if(parse(getText())) {
+                format();
+                runChangeListener();
+            } else {
+                requestFocus();
             }
-        });
+        }
     }
 
-    public void setOnChangeHandler(Runnable onChangeHandler) {
-        this.onChangeHandler = onChangeHandler;
+    public void setChangeListener(Runnable changeListener) {
+        focusedProperty().addListener(this::internalChangeListener);
+        this.changeListener = changeListener;
     }
 
-    public void clearOnChangeHandler() {
-        this.onChangeHandler = null;
-    }
-
-    private void callOnChangeHandler() {
-        if(onChangeHandler!=null) {
-            onChangeHandler.run();
+    private void runChangeListener() {
+        if(changeListener !=null) {
+            changeListener.run();
         }
     }
 

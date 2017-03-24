@@ -20,7 +20,6 @@ import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
@@ -177,7 +176,7 @@ public class VnaController {
     }
 
     public void updateAnalyserState(AnalyserState analyserState) {
-        mainController.setDeviceStatus(analyserState);
+        mainController.updateDeviceStatus(analyserState);
     }
 
     public void updateAnalyserData(AnalyserData ad) {
