@@ -174,15 +174,18 @@ public class DataLink {
         return serialPort.isOpened();
     }
 
-    public synchronized Frame transaction(Frame request) {
+    public synchronized Frame request(Frame request) {
         try {
+            long t0 = System.currentTimeMillis();
             newHandling = true;
             receivedFrameLatch = new CountDownLatch(1);
             writeFrame(request);
             receivedFrameLatch.await(10, TimeUnit.SECONDS);
-            return receivedFrameRef.getAndSet(null);
+            Frame response = receivedFrameRef.getAndSet(null);
+            if(logger.isDebugEnabled()) { logger.debug("request:"+request.getCommand()+" -> "+response.getCommand()+" in "+(System.currentTimeMillis()-t0)+" ms"); }
+            return response;
         } catch (Exception e) {
-            logger.error("exception requesting "+request);
+            logger.error("request "+request+" exception",e);
             return null;
         } finally {
             newHandling = false;

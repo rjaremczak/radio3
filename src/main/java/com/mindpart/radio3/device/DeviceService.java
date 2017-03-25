@@ -158,7 +158,7 @@ public class DeviceService {
     }
 
     public DeviceState getDeviceState() {
-        Frame frame = dataLink.transaction(new Frame(FrameCommand.DEVICE_GET_STATE));
+        Frame frame = dataLink.request(new Frame(FrameCommand.DEVICE_GET_STATE));
         return frame!=null && deviceStateParser.recognizes(frame) ? deviceStateParser.parse(frame) : null;
     }
 
