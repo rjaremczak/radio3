@@ -4,11 +4,9 @@ import com.mindpart.radio3.*;
 import com.mindpart.utils.Binary;
 import com.mindpart.utils.BinaryBuilder;
 import jssc.SerialPortException;
-import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
 import org.apache.log4j.Logger;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +30,6 @@ public class DeviceService {
     private long framesReceived = 0;
     private long framesRecognized = 0;
     private BiConsumer<Frame, Boolean> incomingFrameListener;
-
     private DeviceStateParser deviceStateParser = new DeviceStateParser();
 
     public <T extends FrameParser<U>, U> void registerBinding(T parser, BiConsumer<FrameParser, Frame> handler) {
@@ -41,6 +38,9 @@ public class DeviceService {
 
     public DeviceService(BiConsumer<Frame, Boolean> incomingFrameListener) {
         this.incomingFrameListener = incomingFrameListener;
+        //dataLink = new DataLinkJSerialComm(this::frameHandler, this::exceptionHandler);
+        dataLink = new DataLinkJssc(this::frameHandler);
+        logger.info("dataLink: "+dataLink.getClass().getName());
     }
 
     public void frameHandler(Frame frame) {
@@ -59,15 +59,21 @@ public class DeviceService {
         logger.warn("no binding for frame "+frame);
     }
 
-    public Status connect(String portName, int portBaudRate) {
+    public void exceptionHandler(DataLinkException e) {
+        logger.fatal(e+" connected: "+e.isConnected(), e.getCause());
+        if(!e.isConnected()) {
+            disconnect();
+        }
+    }
+
+    public Status connect(String portName) {
         framesReceived = 0;
         framesRecognized = 0;
         logger.debug("connecting to "+portName);
-        dataLink = new DataLink(portName, portBaudRate, this::frameHandler);
         try {
-            dataLink.connect();
+            dataLink.connect(portName);
             return OK;
-        } catch (SerialPortException|SerialPortTimeoutException e) {
+        } catch (Exception e) {
             return error(e);
         }
     }
@@ -137,8 +143,8 @@ public class DeviceService {
         performRequest(new Frame(FrameCommand.LOG_LEVEL, Binary.fromUInt8(logLevel.getCode())));
     }
 
-    public List<String> availableSerialPorts() {
-        return Arrays.asList(SerialPortList.getPortNames());
+    public List<String> availablePorts() {
+        return dataLink.availablePorts();
     }
 
     public void handleAnalyserData(AnalyserData analyserData) {
@@ -195,6 +201,6 @@ public class DeviceService {
     }
 
     public String getDevicePortInfo() {
-        return dataLink.getPortName() + " @ " + dataLink.getSpeed();
+        return dataLink.getPortName();
     }
 }

@@ -11,7 +11,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import jssc.SerialPortException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -173,8 +172,8 @@ public class Radio3 extends Application {
         fMeterController.disableMainButton(disable);
     }
 
-    public List<String> availableSerialPorts() {
-        return deviceService.availableSerialPorts();
+    public List<String> availablePorts() {
+        return deviceService.availablePorts();
     }
 
     private void sleep(long ms) {
@@ -188,7 +187,7 @@ public class Radio3 extends Application {
     public void connect(String portName) {
         connectionStatus = CONNECTING;
         deviceInfoParser.resetDeviceInfo();
-        if(deviceService.connect(portName, configuration.portBaudRate).isOk()) {
+        if(deviceService.connect(portName).isOk()) {
             sleep(200);
             deviceService.setHardwareRevision(configuration.hardwareRevision);
             deviceService.setVfoType(configuration.vfoType);

@@ -5,6 +5,7 @@ import com.mindpart.utils.FxUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -128,10 +129,10 @@ public class MainController {
     }
 
     public void updateAvailablePorts() {
-        availablePortNames.setAll(radio3.availableSerialPorts());
+        availablePortNames.setAll(radio3.availablePorts());
         if (availablePortNames.isEmpty()) {
             FxUtils.disableItems(serialPorts, btnConnect);
-            connectionStatus.setText("");
+            connectionStatus.setText(ConnectionStatus.DISCONNECTED.getText());
         } else {
             FxUtils.enableItems(serialPorts, btnConnect);
             serialPorts.getSelectionModel().selectFirst();
@@ -149,18 +150,18 @@ public class MainController {
     }
 
     private void updateOnConnect() {
-        FxUtils.enableItems(componentsTab, sweepTab, vnaTab, btnConnect, deviceRuntimePane, deviceControlPane, configurationBox);
+        btnConnect.setText("Disconnect");
+        FxUtils.enableItems(btnConnect, componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         FxUtils.disableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         updateConnectionStatus();
-        btnConnect.setText("Disconnect");
         updateMainIndicator(MainIndicatorState.CONNECTED);
     }
 
     private void updateOnDisconnect() {
-        FxUtils.enableItems(serialPorts, serialPortsRefresh, btnConnect, hardwareRevisions, vfoType);
+        btnConnect.setText("Connect");
+        FxUtils.enableItems(btnConnect, serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         FxUtils.disableItems(componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         updateConnectionStatus();
-        btnConnect.setText("Connect");
         deviceProperties.clear();
         devicePropertiesMap.clear();
         updateMainIndicator(MainIndicatorState.DISCONNECTED);
@@ -169,8 +170,8 @@ public class MainController {
 
     private void doConnect() {
         connectionStatus.setText("connecting...");
+        FxUtils.disableItems(serialPortsRefresh, serialPorts);
         updateMainIndicator(MainIndicatorState.PROCESSING);
-        FxUtils.disableItems(btnConnect, serialPortsRefresh, serialPorts);
         Platform.runLater(() -> {
             radio3.connect(serialPorts.getValue());
             if (radio3.isConnected()) {
@@ -193,14 +194,14 @@ public class MainController {
         updateOnDisconnect();
     }
 
-    public void doConnectDisconnect() {
+    public void doConnectDisconnect(ActionEvent event) {
+        event.consume();
         btnConnect.setDisable(true);
         if (radio3.isConnected()) {
             doDisconnect();
         } else {
             doConnect();
         }
-        btnConnect.setDisable(false);
     }
 
     public void initialize() {
@@ -209,7 +210,7 @@ public class MainController {
         devicePropertiesTable.setItems(deviceProperties);
         devicePropertiesRefresh.setOnAction(event -> onDevicePropertiesRefresh());
         serialPortsRefresh.setOnAction(event -> updateAvailablePorts());
-        btnConnect.setOnAction(event -> doConnectDisconnect());
+        btnConnect.setOnAction(event -> doConnectDisconnect(event));
         serialPorts.setItems(availablePortNames);
 
         initVfoOutput();
