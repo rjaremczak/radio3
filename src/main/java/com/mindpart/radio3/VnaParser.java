@@ -3,7 +3,7 @@ package com.mindpart.radio3;
 import com.mindpart.radio3.device.*;
 import com.mindpart.utils.Binary;
 
-import static com.mindpart.radio3.device.FrameCommand.CMPPROBE_GET;
+import static com.mindpart.radio3.device.FrameCommand.CMPPROBE_DATA;
 
 /**
  * Created by Robert Jaremczak
@@ -14,7 +14,7 @@ public class VnaParser implements FrameParser<VnaResult> {
 
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getCommand() == CMPPROBE_GET;
+        return frame.getCommand() == CMPPROBE_DATA;
     }
 
     public double calculateReturnLoss(int adcValue) {

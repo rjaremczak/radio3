@@ -1,17 +1,13 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.LinearParser;
-import com.mindpart.radio3.LogarithmicParser;
 import com.mindpart.radio3.SweepProfile;
-import com.mindpart.radio3.device.AnalyserData;
-import com.mindpart.radio3.device.AnalyserDataInfo;
-import com.mindpart.radio3.device.AnalyserDataSource;
-import com.mindpart.radio3.device.AnalyserState;
+import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.Power;
 import com.mindpart.types.Voltage;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.utils.FxUtils;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -74,8 +70,6 @@ public class SweepController {
 
     private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
-    private LogarithmicParser logarithmicParser;
-    private LinearParser linearParser;
     private Function<Integer, Double> probeAdcConverter;
     private SweepSettingsPane sweepSettingsPane;
     private ChartMarker chartMarker = new ChartMarker();
@@ -86,11 +80,9 @@ public class SweepController {
     private AnalyserDataInfo receivedDataInfo;
     private MainController mainController;
 
-    public SweepController(Radio3 radio3, MainController mainController, LogarithmicParser logarithmicParser, LinearParser linearParser, List<SweepProfile> sweepProfiles) {
+    public SweepController(Radio3 radio3, MainController mainController, List<SweepProfile> sweepProfiles) {
         this.radio3 = radio3;
         this.mainController = mainController;
-        this.logarithmicParser = logarithmicParser;
-        this.linearParser = linearParser;
         this.sweepSettingsPane = new SweepSettingsPane(sweepProfiles);
     }
 
@@ -149,7 +141,7 @@ public class SweepController {
         updateNormButton();
     }
 
-    private void normalizeChangeListener(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean normalized) {
+    private void normalizeChangeListener(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean normalized) {
         if(receivedData.isEmpty()) {
             btnNormalize.setSelected(false);
             return;
@@ -161,12 +153,12 @@ public class SweepController {
             referenceData = receivedData.stream().map(XYChart.Data::getYValue).collect(Collectors.toList());
             if(sourceProbe.getValue() == AnalyserDataSource.LOG_PROBE) {
                 signalAxisY.setLabel("Normalized Power [dBm]");
-                probeAdcConverter = logarithmicParser::parse;
+                probeAdcConverter = radio3.getLogarithmicParser()::parse;
                 probeValueFormatter = this::powerValueFormatter;
                 valueProcessor = this::fromLogarithmicToRelativeGain;
             } else {
                 signalAxisY.setLabel("Normalized Voltage [mV]");
-                probeAdcConverter = linearParser::parse;
+                probeAdcConverter = radio3.getLinearParser()::parse;
                 probeValueFormatter = this::voltageValueFormatter;
                 valueProcessor = this::fromLinearTo1mV;
             }
@@ -183,12 +175,20 @@ public class SweepController {
         updateNormButton();
     }
 
-    private void continuousChangeListener(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {
+    private void initInputProbeList() {
+        sourceProbe.getItems().add(AnalyserDataSource.LOG_PROBE);
+        sourceProbe.getItems().add(AnalyserDataSource.LIN_PROBE);
+        sourceProbe.getSelectionModel().selectFirst();
+        sourceProbe.getSelectionModel().selectedItemProperty().addListener(this::inputSourceChangeListener);
+        updateInputSource(sourceProbe.getValue());
+    }
+
+    private void continuousChangeListener(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean continuous) {
         if(continuous) {
             FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
             sweepSettingsPane.disableControls(true);
             mainController.disableAllExcept(true, mainController.sweepTab);
-            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
+            runSweepOnce(this::displayDataAndSweepAgain);
             btnContinuous.setText("Stop");
         } else {
             if(btnNormalize.isSelected()) {
@@ -200,14 +200,6 @@ public class SweepController {
             mainController.disableAllExcept(false, mainController.sweepTab);
             btnContinuous.setText("Continuous");
         }
-    }
-
-    private void initInputProbeList() {
-        sourceProbe.getItems().add(AnalyserDataSource.LOG_PROBE);
-        sourceProbe.getItems().add(AnalyserDataSource.LIN_PROBE);
-        sourceProbe.getSelectionModel().selectFirst();
-        sourceProbe.getSelectionModel().selectedItemProperty().addListener(this::inputSourceChangeListener);
-        updateInputSource(sourceProbe.getValue());
     }
 
     private String powerValueFormatter(double dBm) {
@@ -222,14 +214,14 @@ public class SweepController {
         switch (source) {
             case LOG_PROBE: {
                 signalAxisY.setLabel("Power [dBm]");
-                probeAdcConverter = logarithmicParser::parse;
+                probeAdcConverter = radio3.getLogarithmicParser()::parse;
                 probeValueFormatter = this::powerValueFormatter;
                 valueProcessor = this::originalValue;
                 break;
             }
             case LIN_PROBE: {
                 signalAxisY.setLabel("Voltage [mV]");
-                probeAdcConverter = linearParser::parse;
+                probeAdcConverter = radio3.getLinearParser()::parse;
                 probeValueFormatter = this::voltageValueFormatter;
                 valueProcessor = this::originalValue;
                 break;
@@ -241,28 +233,18 @@ public class SweepController {
 
     public void onSweepOnce() {
         btnNormalize.setDisable(true);
-        sweepOnce(sweepSettingsPane.getQuality(), (analyserData) -> {
-            updateAnalyserData(analyserData);
-            btnNormalize.setDisable(false);
-        });
         mainController.updateDeviceStatus(AnalyserState.PROCESSING);
+        runSweepOnce(this::updateAnalyserData);
     }
 
-    private void displayDataAndSweepAgain(AnalyserData analyserData) {
+    private void displayDataAndSweepAgain(AnalyserResponse analyserResponse) {
         if(btnContinuous.isSelected()) {
-            updateAnalyserData(analyserData);
-            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
+            updateAnalyserData(analyserResponse);
+            runSweepOnce(this::displayDataAndSweepAgain);
         }
     }
 
-    private void sweepOnce(SweepQuality quality, Consumer<AnalyserData> dataHandler) {
-        long fStart = sweepSettingsPane.getStartFrequency().toHz();
-        long fEnd = sweepSettingsPane.getEndFrequency().toHz();
-        int fStep = (int) ((fEnd - fStart) / quality.getSteps());
-        radio3.startAnalyser(fStart, fStep, quality, sourceProbe.getValue(), dataHandler);
-    }
-
-    public void updateAnalyserData(AnalyserData ad) {
+    public void updateAnalyserData(AnalyserResponse ad) {
         receivedDataInfo = ad.toInfo();
         receivedData.clear();
         updateNormButton();
@@ -275,6 +257,23 @@ public class SweepController {
         }
 
         updateChart();
+    }
+    private void runSweepOnce(Consumer<AnalyserResponse> analyserDataConsumer) {
+        radio3.executeInBackground(() -> {
+            Response<AnalyserResponse> response = sweepOnce();
+            if(response.isOK()) {
+                Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
+            }
+        });
+    }
+
+    private Response<AnalyserResponse> sweepOnce() {
+        SweepQuality quality = sweepSettingsPane.getQuality();
+        long fStart = sweepSettingsPane.getStartFrequency().toHz();
+        long fEnd = sweepSettingsPane.getEndFrequency().toHz();
+        int fStep = (int) ((fEnd - fStart) / quality.getSteps());
+        return radio3.getDeviceService().startAnalyser(fStart, fStep,
+                quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(), sourceProbe.getValue());
     }
 
     private void updateNormButton() {

@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.device.Response;
 import javafx.event.ActionEvent;
 
 import java.text.DecimalFormat;
@@ -20,7 +21,8 @@ public class LogarithmicProbeController extends ComponentController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        radio3.requestLogarithmicProbeSample();
+        Response<Double> response = radio3.getDeviceService().readLogProbe();
+        if(response.isOK()) update(response.getData());
     }
 
     @Override

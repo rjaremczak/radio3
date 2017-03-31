@@ -7,6 +7,7 @@ package com.mindpart.utils;
 public interface DataDumper {
     static String byteArrayToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
+        sb.append("("+bytes.length+") ");
         for(int i=0; i<bytes.length; i++) {
             sb.append(String.format("%02X ", bytes[i]));
         }

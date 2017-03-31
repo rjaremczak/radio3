@@ -10,9 +10,8 @@ import java.util.List;
 public interface DataLink {
     void connect(String portName) throws Exception;
     void disconnect();
-    void writeFrame(Frame frame) throws Exception;
     String getPortName();
     boolean isOpened();
-    Frame request(Frame request);
+    Response request(Frame request);
     List<String> availablePorts();
 }

@@ -121,7 +121,6 @@
                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
                                                       <Label text="VFO output" GridPane.rowIndex="3" />
@@ -132,8 +131,6 @@
                                                       <Label text="VNA mode" />
                                                       <ChoiceBox fx:id="vfoAmplifier" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                       <ChoiceBox fx:id="vnaMode" GridPane.columnIndex="1" />
-                                                      <Label text="Log level" GridPane.rowIndex="4" />
-                                                      <ChoiceBox fx:id="logLevel" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                                    </children>
                                                    <padding>
                                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

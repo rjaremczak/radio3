@@ -12,7 +12,7 @@ import static com.mindpart.radio3.device.FrameCommand.PING;
 public class PingParser implements FrameParser<Class<Void>> {
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getCommand() == PING && frame.getPayloadSize() == 0;
+        return frame != null && frame.getCommand() == PING && frame.getPayloadSize() == 0;
     }
 
     @Override

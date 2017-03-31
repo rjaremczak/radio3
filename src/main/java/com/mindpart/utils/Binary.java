@@ -86,4 +86,8 @@ public class Binary {
     public static void storeUInt8(byte[] bytes, int offset, int val) {
         bytes[offset] = (byte) (val & 0xff);
     }
+
+    public static byte[] fromUInt16(int word) {
+        return new byte[] { (byte)Binary.toUInt8low(word),  (byte)Binary.toUInt8high(word) };
+    }
 }

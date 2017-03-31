@@ -3,13 +3,13 @@ package com.mindpart.radio3;
 import com.mindpart.radio3.device.*;
 import com.mindpart.utils.Binary;
 
-import static com.mindpart.radio3.device.FrameCommand.PROBES_GET;
+import static com.mindpart.radio3.device.FrameCommand.PROBES_DATA;
 
 /**
  * Created by Robert Jaremczak
  * Date: 2016.04.09
  */
-public class MultipleProbesParser implements FrameParser<ProbeValues> {
+public class MultipleProbesParser implements FrameParser<ProbesValues> {
     private LogarithmicParser logarithmicParser;
     private LinearParser linearParser;
     private VnaParser vnaParser;
@@ -24,11 +24,11 @@ public class MultipleProbesParser implements FrameParser<ProbeValues> {
 
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getCommand() == PROBES_GET;
+        return frame.getCommand() == PROBES_DATA;
     }
 
-    ProbeValues parse(int logarithmic, int linear, int complexGain, int complexPhase, long fMeter) {
-        return new ProbeValues(
+    ProbesValues parse(int logarithmic, int linear, int complexGain, int complexPhase, long fMeter) {
+        return new ProbesValues(
                 logarithmicParser.parse(logarithmic),
                 linearParser.parse(linear),
                 vnaParser.calculateVnaResult(complexGain, complexPhase),
@@ -37,7 +37,7 @@ public class MultipleProbesParser implements FrameParser<ProbeValues> {
     }
 
     @Override
-    public ProbeValues parse(Frame frame) {
+    public ProbesValues parse(Frame frame) {
         byte[] payload = frame.getPayload();
         return parse(Binary.toUInt16(payload, 0),
                 Binary.toUInt16(payload, 2),

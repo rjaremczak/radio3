@@ -5,7 +5,7 @@ package com.mindpart.radio3.ui;
  * Date: 2017.03.15
  */
 public enum SweepQuality {
-    BEST("best", 1000, 3, 3),
+    BEST("best", 1000, 2, 2),
     BALANCED("balanced", 500, 2, 2),
     FAST("fast", 100, 1, 1);
 

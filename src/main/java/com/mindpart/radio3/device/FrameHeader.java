@@ -52,6 +52,10 @@ class FrameHeader {
         return new FrameHeader(format, command);
     }
 
+    static FrameHeader fromBytes(byte[] bytes) {
+        return fromCode(Binary.toUInt16(bytes));
+    }
+
     FrameHeader(Frame frame) {
         this.command = frame.getCommand();
         int payloadSize = frame.getPayloadSize();
@@ -100,6 +104,16 @@ class FrameHeader {
             size = bytes[0] & 0xff;
         } else if(isFormatC()){
             size = Binary.toUInt16(bytes);
+        } else {
+            size = 0;
+        }
+    }
+
+    void setSizeBytes(byte[] bytes, int pos, int length) {
+        if(isFormatB()) {
+            size = bytes[pos] & 0xff;
+        } else if(isFormatC()){
+            size = Binary.toUInt16(bytes, pos);
         }
     }
 

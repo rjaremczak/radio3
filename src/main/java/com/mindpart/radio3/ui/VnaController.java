@@ -1,16 +1,16 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.SweepProfile;
-import com.mindpart.radio3.VnaParser;
 import com.mindpart.radio3.VnaResult;
-import com.mindpart.radio3.device.AnalyserData;
+import com.mindpart.radio3.device.AnalyserResponse;
 import com.mindpart.radio3.device.AnalyserDataSource;
-import com.mindpart.radio3.device.AnalyserState;
+import com.mindpart.radio3.device.Response;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.SWR;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.utils.FxUtils;
 import com.mindpart.utils.Range;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -76,15 +76,13 @@ public class VnaController {
     private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> swrDataSeries;
     private ObservableList<XYChart.Series<Number, Number>> impedanceDataSeries;
-    private VnaParser vnaParser;
     private SweepSettingsPane sweepSettingsPane;
     private ChartMarker chartMarker = new ChartMarker();
     private MainController mainController;
 
-    public VnaController(Radio3 radio3, MainController mainController, VnaParser vnaParser, List<SweepProfile> sweepProfiles) {
+    public VnaController(Radio3 radio3, MainController mainController, List<SweepProfile> sweepProfiles) {
         this.radio3 = radio3;
         this.mainController = mainController;
-        this.vnaParser = vnaParser;
         this.sweepSettingsPane = new SweepSettingsPane(sweepProfiles);
     }
 
@@ -138,7 +136,7 @@ public class VnaController {
             FxUtils.disableItems(btnStart);
             sweepSettingsPane.disableControls(true);
             mainController.disableAllExcept(true, mainController.vnaTab);
-            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
+            runSweepOnce(this::displayDataAndSweepAgain);
             btnContinuous.setText("Stop");
         } else {
             FxUtils.enableItems(btnStart);
@@ -148,10 +146,10 @@ public class VnaController {
         }
     }
 
-    private void displayDataAndSweepAgain(AnalyserData analyserData) {
+    private void displayDataAndSweepAgain(AnalyserResponse analyserResponse) {
         if(btnContinuous.isSelected()) {
-            updateAnalyserData(analyserData);
-            sweepOnce(sweepSettingsPane.getQuality(), this::displayDataAndSweepAgain);
+            updateAnalyserData(analyserResponse);
+            runSweepOnce(this::displayDataAndSweepAgain);
         }
     }
 
@@ -164,17 +162,29 @@ public class VnaController {
     }
 
     public void onSweepOnce() {
-        sweepOnce(sweepSettingsPane.getQuality(), this::updateAnalyserData);
+        runSweepOnce(this::updateAnalyserData);
     }
 
-    private void sweepOnce(SweepQuality quality, Consumer<AnalyserData> dataHandler) {
+    private void runSweepOnce(Consumer<AnalyserResponse> analyserDataConsumer) {
+        radio3.executeInBackground(() -> {
+            Response<AnalyserResponse> response = sweepOnce();
+            if(response.isOK()) {
+                Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
+            }
+        });
+    }
+
+    private Response<AnalyserResponse> sweepOnce() {
+        SweepQuality quality = sweepSettingsPane.getQuality();
         long fStart = sweepSettingsPane.getStartFrequency().toHz();
         long fEnd = sweepSettingsPane.getEndFrequency ().toHz();
         int fStep = (int) ((fEnd - fStart) / quality.getSteps());
-        radio3.startAnalyser(fStart, fStep, quality, AnalyserDataSource.VNA, dataHandler);
+        return radio3.getDeviceService().startAnalyser(fStart, fStep,
+                quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(),
+                AnalyserDataSource.VNA);
     }
 
-    public void updateAnalyserData(AnalyserData ad) {
+    public void updateAnalyserData(AnalyserResponse ad) {
         chartMarker.clear();
         long freqEnd = ad.getFreqStart() + (ad.getNumSteps() * ad.getFreqStep());
         int samples[][] = ad.getData();
@@ -206,7 +216,7 @@ public class VnaController {
         Range impedanceRange = new Range();
         long freq = freqStart;
         for (int num = 0; num <= numSteps; num++) {
-            VnaResult vnaResult = vnaParser.calculateVnaResult(samples[0][num], samples[1][num]);
+            VnaResult vnaResult = radio3.getVnaParser().calculateVnaResult(samples[0][num], samples[1][num]);
             double fMHz = Frequency.toMHz(freq);
             swrData.add(new XYChart.Data<>(fMHz, swrRange.update(vnaResult.getSwr())));
             rData.add(new XYChart.Data<>(fMHz, impedanceRange.update(vnaResult.getR())));

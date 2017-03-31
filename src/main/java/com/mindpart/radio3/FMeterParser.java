@@ -6,7 +6,7 @@ import com.mindpart.radio3.device.FrameParser;
 import com.mindpart.types.Frequency;
 import com.mindpart.utils.Binary;
 
-import static com.mindpart.radio3.device.FrameCommand.FMETER_GET;
+import static com.mindpart.radio3.device.FrameCommand.FMETER_DATA;
 
 /**
  * Created by Robert Jaremczak
@@ -21,7 +21,7 @@ public class FMeterParser implements FrameParser<Frequency> {
 
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getCommand() == FMETER_GET && frame.getPayloadSize() == 4;
+        return frame.getCommand() == FMETER_DATA && frame.getPayloadSize() == 4;
     }
 
     @Override

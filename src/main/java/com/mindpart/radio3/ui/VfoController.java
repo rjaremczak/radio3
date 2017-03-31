@@ -23,11 +23,13 @@ public class VfoController extends ComponentController {
     @Override
     public void onMainButton(ActionEvent actionEvent) {
         Frequency frequency = Frequency.parse(valueField.getText());
-        radio3.setVfoFrequency(frequency);
-        setFrequency(frequency);
+        if(frequency != null) {
+            radio3.getDeviceService().writeVfoFrequency((int) frequency.toHz());
+            update(frequency);
+        }
     }
 
-    public void setFrequency(Frequency frequency) {
+    public void update(Frequency frequency) {
         setValue(frequency.format());
     }
 }

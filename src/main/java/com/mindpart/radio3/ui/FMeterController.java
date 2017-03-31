@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.device.Response;
 import com.mindpart.types.Frequency;
 import javafx.event.ActionEvent;
 
@@ -21,10 +22,11 @@ public class FMeterController extends ComponentController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        radio3.requestFMeterSample();
+        Response<Frequency> response = radio3.getDeviceService().readFMeter();
+        if(response.isOK()) update(response.getData());
     }
 
-    public void setFrequency(Frequency frequency) {
+    public void update(Frequency frequency) {
         setValue(frequency.format());
     }
 }

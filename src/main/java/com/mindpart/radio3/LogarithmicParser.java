@@ -1,12 +1,11 @@
 package com.mindpart.radio3;
 
 import com.mindpart.radio3.device.Adc;
-import com.mindpart.radio3.device.DeviceService;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
 import com.mindpart.utils.Binary;
 
-import static com.mindpart.radio3.device.FrameCommand.LOGPROBE_GET;
+import static com.mindpart.radio3.device.FrameCommand.LOGPROBE_DATA;
 
 /**
  * Created by Robert Jaremczak
@@ -17,7 +16,7 @@ public class LogarithmicParser implements FrameParser<Double> {
 
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getCommand() == LOGPROBE_GET;
+        return frame.getCommand() == LOGPROBE_DATA;
     }
 
     public Double parse(int adc) {

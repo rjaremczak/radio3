@@ -11,16 +11,23 @@ public final class Crc8 {
         crc = 0;
     }
 
-    public void addBytes(byte[] buf) {
-        for(byte data : buf) { addByte(data); }
+    public void process(byte[] bytes, final int readPos, final int length) {
+        final int indexMax = readPos + length;
+        for(int i=readPos; i<indexMax; i++) {
+            process(bytes[i]);
+        }
     }
 
-    public void addWord(int word) {
-        addByte((byte) Binary.toUInt8low(word));
-        addByte((byte) Binary.toUInt8high(word));
+    public void process(byte[] buf) {
+        for(byte data : buf) { process(data); }
     }
 
-    public void addByte(byte data) {
+    public void process(int word) {
+        process((byte) Binary.toUInt8low(word));
+        process((byte) Binary.toUInt8high(word));
+    }
+
+    public void process(byte data) {
         for(int i=8; i>0; i--) {
             int sum = (crc ^ data) & 1;
             crc >>= 1;
@@ -36,8 +43,8 @@ public final class Crc8 {
     }
 
     public static class Error extends Exception {
-        public Error(int expected, int actual) {
-            super(String.format("CRC error: expected %02X received %02X",expected,actual));
+        public Error(int calculated, int received) {
+            super(String.format("CRC error: calculated %02X, received %02X", calculated, received));
         }
     }
 
