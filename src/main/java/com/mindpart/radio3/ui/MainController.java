@@ -251,7 +251,7 @@ public class MainController {
         updateConnectionStatus();
         updateAvailablePorts();
 
-        continuousSampling.scheduleWithFixedDelay(() -> { if(continuousSamplingEnabled) { radio3.getProbes(); } }, 200, 200, TimeUnit.MILLISECONDS);
+        continuousSampling.scheduleWithFixedDelay(() -> { if(continuousSamplingEnabled) { sampleAllProbes(); } }, 200, 200, TimeUnit.MILLISECONDS);
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue == componentsTab) {
@@ -357,8 +357,9 @@ public class MainController {
         devicePropertiesRefresh.setDisable(false);
     }
 
-    public void doSampleAllProbes() {
-        radio3.getProbes();
+    public void sampleAllProbes() {
+        Response<ProbesValues> response = radio3.getDeviceService().readAllProbes();
+        if(response.isOK()) updateAllProbes(response.getData());
     }
 
     private void updateAllProbes(ProbesValues probesValues) {
@@ -374,7 +375,6 @@ public class MainController {
         vnaProbeController.disableMainButton(disable);
         fMeterController.disableMainButton(disable);
     }
-
 
     public void doContinuousSamplingOfAllProbes() {
         if (continuousSamplingOfAllProbesBtn.isSelected()) {

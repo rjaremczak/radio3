@@ -8,6 +8,7 @@ import com.mindpart.utils.BinaryBuilder;
 import org.apache.log4j.Logger;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.mindpart.radio3.Status.OK;
 import static com.mindpart.radio3.Status.error;
@@ -35,9 +36,15 @@ public class DeviceService {
     private MultipleProbesParser multipleProbesParser;
     private AnalyserResponseParser analyserResponseParser;
 
-    public DeviceService(Configuration config) {
+    private Consumer<Frame> taskOnRequest;
+    private Consumer<Response> taskOnResponse;
+
+    public DeviceService(Configuration config, Consumer<Frame> taskOnRequest, Consumer<Response> taskOnResponse) {
         dataLink = new DataLinkJssc();
         logger.info("dataLink: "+dataLink);
+
+        this.taskOnRequest = taskOnRequest;
+        this.taskOnResponse = taskOnResponse;
 
         pingParser = new PingParser();
         deviceStateParser = new DeviceStateParser();
@@ -127,12 +134,17 @@ public class DeviceService {
     }
 
     private synchronized <T> Response<T> performRequest(Frame requestFrame, FrameParser<T> frameParser) {
+        taskOnRequest.accept(requestFrame);
         Response<Frame> response = dataLink.request(requestFrame);
         if(response.isOK() && frameParser.recognizes(response.getData())) {
-            return Response.success(frameParser.parse(response.getData()));
+            Response responseOk =  Response.success(frameParser.parse(response.getData()));
+            taskOnResponse.accept(responseOk);
+            return responseOk;
         }
 
-        return Response.error(response);
+        Response responseError = Response.error(response);
+        taskOnResponse.accept(responseError);
+        return responseError;
     }
 
     public Response<DeviceState> readDeviceState() {
@@ -189,5 +201,9 @@ public class DeviceService {
 
     public DeviceInfoParser getDeviceInfoParser() {
         return deviceInfoParser;
+    }
+
+    public boolean isConnected() {
+        return dataLink.isOpened();
     }
 }

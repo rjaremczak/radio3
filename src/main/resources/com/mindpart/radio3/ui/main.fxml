@@ -167,7 +167,7 @@
                                        </VBox.margin></Separator>
                                                 <HBox alignment="CENTER_LEFT" spacing="5.0">
                                                     <children>
-                                                        <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#doSampleAllProbes" text="Start" />
+                                                        <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#sampleAllProbes" text="Start" />
                                                         <ToggleButton fx:id="continuousSamplingOfAllProbesBtn" mnemonicParsing="false" onAction="#doContinuousSamplingOfAllProbes" text="Continuous">
                                                             <HBox.margin>
                                                                 <Insets />

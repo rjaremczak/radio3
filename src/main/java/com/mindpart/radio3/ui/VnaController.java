@@ -132,7 +132,6 @@ public class VnaController {
 
     private void onContinuousChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {
         if(continuous) {
-            clear();
             FxUtils.disableItems(btnStart);
             sweepSettingsPane.disableControls(true);
             mainController.disableAllExcept(true, mainController.vnaTab);

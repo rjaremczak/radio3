@@ -1,11 +1,16 @@
 package com.mindpart.radio3.ui;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2017.03.23
  */
 public enum DeviceStatus {
-    UNKNOWN(""), READY("ready"), ERROR("error"), PROCESSING("processing");
+    UNKNOWN("no device"), READY("ready"), ERROR("error"), PROCESSING("processing");
+
+    private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     private String name;
 
@@ -14,6 +19,6 @@ public enum DeviceStatus {
     }
 
     public String toString() {
-        return name;
+        return name + (this == UNKNOWN ? "" : " (last response: " + timeFormatter.format(LocalDateTime.now()) +")");
     }
 }

@@ -7,6 +7,7 @@ import com.mindpart.radio3.config.Configuration;
 import com.mindpart.radio3.config.ConfigurationService;
 import com.mindpart.radio3.device.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -48,10 +49,14 @@ public class Radio3 extends Application {
             Logger.getRootLogger().setLevel(configuration.logLevel);
         }
 
-        deviceService = new DeviceService(configuration);
         mainController = new MainController(this);
         vnaController = new VnaController(this, mainController, configuration.sweepProfiles);
         sweepController = new SweepController(this, mainController, configuration.sweepProfiles);
+        deviceService = new DeviceService(configuration, request -> {
+            Platform.runLater(() -> mainController.updateDeviceStatus(DeviceStatus.PROCESSING));
+        }, response -> {
+            Platform.runLater(() -> mainController.updateDeviceStatus(response.isOK() ? DeviceStatus.READY : DeviceStatus.ERROR));
+        });
 
         primaryStage.setTitle("radio3 by SQ6DGT ("+configurationService.getBuildId()+")");
         primaryStage.setScene(new Scene(loadPane(mainController, "main.fxml")));
@@ -116,24 +121,17 @@ public class Radio3 extends Application {
         }
     }
 
-
-
-
     public void disconnect() {
         connectionStatus = DISCONNECTED;
         deviceService.disconnect();
         deviceService.getDeviceInfoParser().resetDeviceInfo();
         sweepController.clear();
         vnaController.clear();
-        mainController.updateDeviceStatus("");
+        mainController.updateDeviceStatus(DeviceStatus.UNKNOWN);
     }
 
     public boolean isConnected() {
         return connectionStatus == CONNECTED;
-    }
-
-    public void getProbes() {
-        deviceService.readAllProbes();
     }
 
     public String getConnectionStatusStr() {
