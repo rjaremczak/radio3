@@ -1,8 +1,10 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.VnaResult;
+import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
 import javafx.event.ActionEvent;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -17,12 +19,12 @@ public class VnaProbeController extends ComponentController {
     private Radio3 radio3;
 
     public VnaProbeController(Radio3 radio3) {
-        this.radio3 = radio3;
+        this.radio3 = this.radio3;
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        Response<VnaResult> response = radio3.getDeviceService().readVnaProbe();
+        Response<VnaResult> response = radio3.readVnaProbe();
         if(response.isOK()) update(response.getData());
     }
 

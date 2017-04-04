@@ -10,8 +10,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -143,7 +141,7 @@ public class MainController {
         } else {
             FxUtils.enableItems(serialPorts, btnConnect);
             serialPorts.getSelectionModel().selectFirst();
-            updateDeviceStatus(radio3.getDeviceService().getDeviceStatus());
+            updateDeviceStatus(radio3.getDeviceStatus());
         }
     }
 
@@ -173,14 +171,14 @@ public class MainController {
         updateDeviceStatus(DeviceStatus.CONNECTING);
         FxUtils.disableItems(serialPortsRefresh, serialPorts);
         Platform.runLater(() -> {
-            Response<DeviceInfo> deviceInfoResponse = radio3.getDeviceService().connect(serialPorts.getValue(), hardwareRevisions.getValue(), vfoType.getValue());
+            Response<DeviceInfo> deviceInfoResponse = radio3.connect(serialPorts.getValue(), hardwareRevisions.getValue(), vfoType.getValue());
             if (deviceInfoResponse.isOK()) {
                 updateOnConnect();
                 updateDeviceInfo(deviceInfoResponse.getData());
                 requestDeviceState();
                 requestVfoFrequency();
             } else {
-                radio3.getDeviceService().disconnect();
+                radio3.disconnect();
                 updateOnDisconnect(DeviceStatus.ERROR);
             }
         });
@@ -188,14 +186,14 @@ public class MainController {
 
     private void doDisconnect() {
         updateDeviceStatus(DeviceStatus.DISCONNECTING);
-        radio3.getDeviceService().disconnect();
+        radio3.disconnect();
         updateOnDisconnect(DeviceStatus.DISCONNECTED);
     }
 
     public void doConnectDisconnect(ActionEvent event) {
         event.consume();
         btnConnect.setDisable(true);
-        if (radio3.getDeviceService().isConnected()) {
+        if (radio3.isConnected()) {
             doDisconnect();
         } else {
             doConnect();
@@ -206,9 +204,9 @@ public class MainController {
         nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, componentsTab);
 
         devicePropertiesTable.setItems(deviceProperties);
-        devicePropertiesRefresh.setOnAction(event -> onRefresh(event));
-        serialPortsRefresh.setOnAction(event -> updateAvailablePorts());
-        btnConnect.setOnAction(event -> doConnectDisconnect(event));
+        devicePropertiesRefresh.setOnAction(this::onRefresh);
+        serialPortsRefresh.setOnAction((event) -> updateAvailablePorts());
+        btnConnect.setOnAction(this::doConnectDisconnect);
         serialPorts.setItems(availablePortNames);
 
         vnaController = new VnaController(radio3, this);
@@ -238,13 +236,13 @@ public class MainController {
         updateOnDisconnect(DeviceStatus.DISCONNECTED);
         updateAvailablePorts();
 
-        continuousSampling.scheduleWithFixedDelay(() -> { if(continuousSamplingEnabled) { sampleAllProbes(); } }, 200, 200, TimeUnit.MILLISECONDS);
+        continuousSampling.scheduleWithFixedDelay(() -> {
+            if(continuousSamplingEnabled) { Platform.runLater(this::sampleAllProbes); }
+        }, 200, 200, TimeUnit.MILLISECONDS);
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue == componentsTab) {
                 requestVfoFrequency();
-            } else if(oldValue == componentsTab) {
-                //logger.info("leave components tab");
             }
         });
     }
@@ -254,14 +252,14 @@ public class MainController {
         vfoOutput.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
                     if(oldValue!=null && newValue!=null) {
-                        radio3.getDeviceService().writeVfoOutput(newValue);
+                        radio3.writeVfoOutput(newValue);
                     }
                 });
     }
 
     private void initVfoType() {
         vfoType.getItems().addAll(VfoType.DDS_AD9850, VfoType.DDS_AD9851);
-        vfoType.getSelectionModel().select(radio3.getVfoType());
+        vfoType.getSelectionModel().select(radio3.getConfiguration().getVfoType());
         vfoType.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> radio3.setVfoType(newValue));
     }
@@ -270,7 +268,7 @@ public class MainController {
         vfoAttenuator.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
                     if(oldValue!=null && newValue!=null) {
-                        radio3.getDeviceService().writeVfoAttenuator(newValue);
+                        radio3.writeVfoAttenuator(newValue);
                     }
                 });
     }
@@ -292,7 +290,7 @@ public class MainController {
         vnaMode.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
                     if(oldValue!=null && newValue != null) {
-                        radio3.getDeviceService().writeVnaMode(newValue);
+                        radio3.writeVnaMode(newValue);
                     }
                 });
     }
@@ -307,7 +305,7 @@ public class MainController {
         vfoAmplifier.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
                     if(oldValue!=null && newValue!=null) {
-                        radio3.getDeviceService().writeVfoAmpState(newValue);
+                        radio3.writeVfoAmpState(newValue);
                     }
                 });
     }
@@ -323,17 +321,17 @@ public class MainController {
     }
 
     private void requestDeviceState() {
-        Response<DeviceState> deviceStateResponse = radio3.getDeviceService().readDeviceState();
+        Response<DeviceState> deviceStateResponse = radio3.readDeviceState();
         if(deviceStateResponse.isOK()) updateDeviceState(deviceStateResponse.getData());
     }
 
     private void requestVfoFrequency() {
-        Response<Frequency> response = radio3.getDeviceService().readVfoFrequency();
+        Response<Frequency> response = radio3.readVfoFrequency();
         if(response.isOK()) vfoController.update(response.getData());
     }
 
     private void requestDeviceInfo() {
-        Response<DeviceInfo> deviceInfoResponse = radio3.getDeviceService().readDeviceInfo();
+        Response<DeviceInfo> deviceInfoResponse = radio3.readDeviceInfo();
         if(deviceInfoResponse.isOK()) updateDeviceInfo(deviceInfoResponse.getData());
     }
 
@@ -346,7 +344,7 @@ public class MainController {
 
     public void sampleAllProbes() {
         updateDeviceStatus(DeviceStatus.PROCESSING);
-        Response<ProbesValues> response = radio3.getDeviceService().readAllProbes();
+        Response<ProbesValues> response = radio3.readAllProbes();
         if(response.isOK()) updateAllProbes(response.getData());
         updateDeviceStatus(response.isOK() ? DeviceStatus.READY : DeviceStatus.ERROR);
     }
@@ -420,7 +418,7 @@ public class MainController {
 
     void updateDeviceStatus(DeviceStatus deviceStatus) {
         updateMainIndicator(deviceStatus.getMainIndicatorColor());
-        String portName = radio3.getDeviceService().isConnected() ? "("+radio3.getDeviceService().getPortName()+") " : "";
+        String portName = radio3.isConnected() ? "("+ radio3.getPortName()+") " : "";
         this.deviceStatus.setText(portName + deviceStatus.toString());
     }
 }

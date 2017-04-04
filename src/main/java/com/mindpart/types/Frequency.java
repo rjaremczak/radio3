@@ -45,19 +45,19 @@ public class Frequency implements Comparable<Frequency> {
         }
     }
 
-    public static final Frequency ofMHz(double mhz) {
+    public static Frequency ofMHz(double mhz) {
         return new Frequency(Math.round(mhz * VALUE_MHz));
     }
 
-    public static final Frequency ofKHz(double khz) {
+    public static Frequency ofKHz(double khz) {
         return new Frequency((long) (khz * VALUE_kHz));
     }
 
-    public static final Frequency ofHz(long hz) {
+    public static Frequency ofHz(long hz) {
         return new Frequency(hz);
     }
 
-    public static final Frequency parse(String str) {
+    public static Frequency parse(String str) {
         String norm = str.trim();
         ParsePosition pos = new ParsePosition(0);
 
@@ -71,7 +71,7 @@ public class Frequency implements Comparable<Frequency> {
         return ofHz(value!=null ? value.intValue() : Integer.parseInt(norm));
     }
 
-    public static final double toMHz(long hz) {
+    public static double toMHz(long hz) {
         return ((double) hz) / VALUE_MHz;
     }
 

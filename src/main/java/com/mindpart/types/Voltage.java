@@ -36,15 +36,15 @@ public class Voltage {
         }
     }
 
-    public static final Voltage ofVolt(double v) {
+    public static Voltage ofVolt(double v) {
         return new Voltage(v);
     }
 
-    public static final Voltage ofMilliVolt(double mV) {
+    public static Voltage ofMilliVolt(double mV) {
         return new Voltage(mV * VALUE_mV);
     }
 
-    public static final Voltage parse(String str) {
+    public static Voltage parse(String str) {
         String norm = str.trim();
         ParsePosition pos = new ParsePosition(0);
 

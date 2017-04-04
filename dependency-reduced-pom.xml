@@ -27,7 +27,7 @@
         <configuration>
           <transformers>
             <transformer>
-              <mainClass>com.mindpart.radio3.ui.Radio3</mainClass>
+              <mainClass>com.mindpart.radio3.ui.Radio3FxApp</mainClass>
             </transformer>
           </transformers>
         </configuration>

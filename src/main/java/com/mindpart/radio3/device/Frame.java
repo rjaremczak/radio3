@@ -3,7 +3,6 @@ package com.mindpart.radio3.device;
 import com.mindpart.utils.Binary;
 import com.mindpart.utils.BinaryIterator;
 import com.mindpart.utils.Crc8;
-import jssc.SerialPort;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -69,7 +68,7 @@ public class Frame {
         return os.toByteArray();
     }
 
-    public static final Frame fromBytes(byte[] bytes) throws Crc8.Error {
+    public static Frame fromBytes(byte[] bytes) throws Crc8.Error {
         int readPos = 0;
 
         Crc8 crc8 = new Crc8();

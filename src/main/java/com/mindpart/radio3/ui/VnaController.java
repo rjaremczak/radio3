@@ -3,6 +3,7 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.VnaResult;
 import com.mindpart.radio3.device.AnalyserDataSource;
 import com.mindpart.radio3.device.AnalyserResponse;
+import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.SWR;
@@ -132,9 +133,11 @@ public class VnaController {
         FxUtils.disableItems(btnStart);
         sweepSettingsPane.disableControls(true);
         mainController.disableAllExcept(true, mainController.vnaTab);
+        if(!btnContinuous.isSelected()) btnContinuous.setDisable(true);
     }
 
     private void enableUI() {
+        if(!btnContinuous.isSelected()) btnContinuous.setDisable(false);
         FxUtils.enableItems(btnStart);
         sweepSettingsPane.disableControls(false);
         mainController.disableAllExcept(false, mainController.vnaTab);
@@ -175,9 +178,9 @@ public class VnaController {
     }
 
     private void runSweepOnce(Consumer<AnalyserResponse> analyserDataConsumer) {
-        radio3.getDeviceService().executeInBackground(() -> {
+        radio3.executeInBackground(() -> {
             Response<AnalyserResponse> response = sweepOnce();
-            if(response.isOK() && radio3.getDeviceService().isConnected()) {
+            if(response.isOK() && radio3.isConnected()) {
                 Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
             }
         });
@@ -188,7 +191,7 @@ public class VnaController {
         long fStart = sweepSettingsPane.getStartFrequency().toHz();
         long fEnd = sweepSettingsPane.getEndFrequency ().toHz();
         int fStep = (int) ((fEnd - fStart) / quality.getSteps());
-        return radio3.getDeviceService().startAnalyser(fStart, fStep,
+        return radio3.startAnalyser(fStart, fStep,
                 quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(),
                 AnalyserDataSource.VNA);
     }

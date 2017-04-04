@@ -72,7 +72,7 @@
                               <NumberAxis fx:id="impedanceAxisX" autoRanging="false" forceZeroInRange="false" />
                            </xAxis>
                            <yAxis>
-                              <NumberAxis fx:id="impedanceAxisY" autoRanging="true" forceZeroInRange="false" label="Impedance [Ω]" prefWidth="60.0" />
+                              <NumberAxis fx:id="impedanceAxisY" forceZeroInRange="false" label="Impedance [Ω]" prefWidth="60.0" />
                            </yAxis>
                            <padding>
                               <Insets left="5.0" top="5.0" />

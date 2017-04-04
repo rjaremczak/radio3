@@ -1,6 +1,5 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.Power;
@@ -196,8 +195,8 @@ public class SweepController {
             FxUtils.enableItems(btnOnce, btnNormalize);
         } else {
             FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
-            sweepSettingsPane.disableControls(false);
         }
+        sweepSettingsPane.disableControls(false);
         mainController.disableAllExcept(false, mainController.sweepTab);
     }
 
@@ -272,9 +271,9 @@ public class SweepController {
         updateChart();
     }
     private void runSweepOnce(Consumer<AnalyserResponse> analyserDataConsumer) {
-        radio3.getDeviceService().executeInBackground(() -> {
+        radio3.executeInBackground(() -> {
             Response<AnalyserResponse> response = sweepOnce();
-            if(response.isOK() && radio3.getDeviceService().isConnected()) {
+            if(response.isOK() && radio3.isConnected()) {
                 Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
             }
         });
@@ -285,7 +284,7 @@ public class SweepController {
         long fStart = sweepSettingsPane.getStartFrequency().toHz();
         long fEnd = sweepSettingsPane.getEndFrequency().toHz();
         int fStep = (int) ((fEnd - fStart) / quality.getSteps());
-        return radio3.getDeviceService().startAnalyser(fStart, fStep,
+        return radio3.startAnalyser(fStart, fStep,
                 quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(), sourceProbe.getValue());
     }
 

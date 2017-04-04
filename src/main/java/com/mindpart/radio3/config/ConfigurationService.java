@@ -2,7 +2,6 @@ package com.mindpart.radio3.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

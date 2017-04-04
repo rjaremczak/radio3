@@ -1,10 +1,10 @@
 package com.mindpart.radio3.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.device.HardwareRevision;
 import com.mindpart.radio3.device.VfoType;
-import jssc.SerialPort;
 import org.apache.log4j.Level;
 
 import java.util.List;
@@ -15,8 +15,8 @@ import java.util.List;
  */
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Configuration {
-    private Integer portBaudRate = SerialPort.BAUDRATE_38400;
     private Level logLevel;
     private HardwareRevision hardwareRevision = HardwareRevision.AUTODETECT;
     private VfoType vfoType = VfoType.NONE;
@@ -25,10 +25,6 @@ public class Configuration {
     private LogarithmicProbeConfig logarithmicProbe;
     private VnaConfig vna;
     public List<SweepProfile> sweepProfiles;
-
-    public Integer getPortBaudRate() {
-        return portBaudRate;
-    }
 
     public Level getLogLevel() {
         return logLevel;

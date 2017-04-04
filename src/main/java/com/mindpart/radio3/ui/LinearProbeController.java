@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
 import javafx.event.ActionEvent;
 
@@ -21,7 +22,7 @@ public class LinearProbeController extends ComponentController {
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        Response<Double> response = radio3.getDeviceService().readLinProbe();
+        Response<Double> response = radio3.readLinProbe();
         if(response.isOK()) update(response.getData());
     }
 

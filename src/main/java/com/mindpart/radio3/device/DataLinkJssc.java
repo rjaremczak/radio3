@@ -1,11 +1,9 @@
 package com.mindpart.radio3.device;
 
-import com.mindpart.utils.Binary;
 import com.mindpart.utils.Crc8;
 import jssc.*;
 import org.apache.log4j.Logger;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -93,7 +91,7 @@ public class DataLinkJssc implements DataLink {
         return buf.array();
     }
 
-    private int flushReadBuffer() throws SerialPortException, SerialPortTimeoutException, IOException {
+    private int flushReadBuffer() throws SerialPortException, SerialPortTimeoutException {
         int count = 0;
         while(serialPort.isOpened() && serialPort.getInputBufferBytesCount() > 0) {
             count += serialPort.readBytes(serialPort.getInputBufferBytesCount(), TIMEOUT_MS).length;
@@ -142,10 +140,9 @@ public class DataLinkJssc implements DataLink {
             if(logger.isDebugEnabled()) {
                 logger.debug("request: "+request+" -> "+response+" in "+(System.currentTimeMillis()-t0)+" ms");
             }
-            return response!=null ? Response.success(response) : Response.error(Response.Status.ERROR, "no response");
+            return response!=null ? Response.success(response) : Response.error("no response");
         } catch (Exception e) {
             return Response.error(e);
-        } finally {
         }
     }
 

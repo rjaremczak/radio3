@@ -53,7 +53,7 @@ public class FrequencyField extends TextField {
     }
 
     void internalChangeListener(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-        if (!inActionEvent && !newValue.booleanValue()) {
+        if (!inActionEvent && !newValue) {
             if(parse(getText())) {
                 format();
                 runChangeListener();

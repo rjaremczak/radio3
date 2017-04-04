@@ -2,12 +2,14 @@ package com.mindpart.radio3.device;
 
 import com.mindpart.radio3.*;
 import com.mindpart.radio3.config.Configuration;
+import com.mindpart.radio3.config.ConfigurationService;
 import com.mindpart.radio3.ui.DeviceStatus;
 import com.mindpart.types.Frequency;
 import com.mindpart.utils.Binary;
 import com.mindpart.utils.BinaryBuilder;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,9 +21,11 @@ import static com.mindpart.radio3.device.FrameCommand.*;
  * Created by Robert Jaremczak
  * Date: 2016.02.07
  */
-public class DeviceService {
-    private static final Logger logger = Logger.getLogger(DeviceService.class);
+public class Radio3 {
+    private static final Logger logger = Logger.getLogger(Radio3.class);
 
+    private ConfigurationService configurationService;
+    private Configuration configuration;
     private DataLink dataLink;
     private PingParser pingParser;
     private DeviceStateParser deviceStateParser;
@@ -38,7 +42,9 @@ public class DeviceService {
     private Consumer<Response> taskOnResponse;
     private ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
 
-    public DeviceService(Configuration config, Consumer<Frame> taskOnRequest, Consumer<Response> taskOnResponse) {
+    public Radio3(Consumer<Frame> taskOnRequest, Consumer<Response> taskOnResponse) throws IOException {
+        initConfiguration();
+
         dataLink = new DataLinkJssc();
         logger.info("dataLink: "+dataLink);
 
@@ -52,9 +58,15 @@ public class DeviceService {
         logarithmicParser = new LogarithmicParser();
         linearParser = new LinearParser();
         vnaParser = new VnaParser();
-        fMeterParser = new FMeterParser(config.getfMeter());
+        fMeterParser = new FMeterParser(configuration.getfMeter());
         multipleProbesParser = new MultipleProbesParser(logarithmicParser, linearParser, vnaParser, fMeterParser);
         analyserResponseParser = new AnalyserResponseParser();
+    }
+
+    private void initConfiguration() throws IOException {
+        configurationService = new ConfigurationService();
+        configurationService.init();
+        configuration = configurationService.load();
     }
 
     public Response<DeviceInfo> connect(String portName, HardwareRevision hardwareRevision, VfoType vfoType) {
@@ -144,12 +156,12 @@ public class DeviceService {
         taskOnRequest.accept(requestFrame);
         Response<Frame> response = dataLink.request(requestFrame);
         if(response.isOK() && frameParser.recognizes(response.getData())) {
-            Response responseOk =  Response.success(frameParser.parse(response.getData()));
+            Response<T> responseOk =  Response.success(frameParser.parse(response.getData()));
             taskOnResponse.accept(responseOk);
             return responseOk;
         }
 
-        Response responseError = Response.error(response);
+        Response<T> responseError = Response.error(response);
         taskOnResponse.accept(responseError);
         return responseError;
     }
@@ -212,5 +224,35 @@ public class DeviceService {
 
     public DeviceStatus getDeviceStatus() {
         return isConnected() ? DeviceStatus.READY : DeviceStatus.DISCONNECTED;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public String buildId() {
+        return configurationService.getBuildId();
+    }
+
+    public VfoType getVfoType() {
+        return configuration.getVfoType();
+    }
+
+    public void setVfoType(VfoType vfoType) {
+        if(vfoType != null) {
+            configuration.setVfoType(vfoType);
+            configurationService.save(configuration);
+        }
+    }
+
+    public HardwareRevision getHardwareRevision() {
+        return configuration.getHardwareRevision();
+    }
+
+    public void setHardwareRevision(HardwareRevision hardwareRevision) {
+        if(hardwareRevision != null) {
+            configuration.setHardwareRevision(hardwareRevision);
+            configurationService.save(configuration);
+        }
     }
 }

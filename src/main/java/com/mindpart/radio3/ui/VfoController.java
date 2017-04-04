@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.device.Radio3;
 import com.mindpart.types.Frequency;
 import javafx.event.ActionEvent;
 
@@ -24,7 +25,7 @@ public class VfoController extends ComponentController {
     public void onMainButton(ActionEvent actionEvent) {
         Frequency frequency = Frequency.parse(valueField.getText());
         if(frequency != null) {
-            radio3.getDeviceService().writeVfoFrequency((int) frequency.toHz());
+            radio3.writeVfoFrequency((int) frequency.toHz());
             update(frequency);
         }
     }

@@ -45,19 +45,19 @@ public class Power {
         return FORMAT_dBm.format(toDBm());
     }
 
-    public static final Power ofWatt(double watt) {
+    public static Power ofWatt(double watt) {
         return new Power(watt);
     }
 
-    public static final Power ofMilliWatt(double mW) {
+    public static Power ofMilliWatt(double mW) {
         return new Power(mW * VALUE_mW);
     }
 
-    public static final Power ofDBm(double dBm) {
+    public static Power ofDBm(double dBm) {
         return new Power(Math.pow(10, (dBm - 30)/10 ));
     }
 
-    public static final Power parse(String str) {
+    public static Power parse(String str) {
         String norm = str.trim();
         ParsePosition pos = new ParsePosition(0);
 
