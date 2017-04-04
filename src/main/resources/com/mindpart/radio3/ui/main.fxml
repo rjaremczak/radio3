@@ -210,12 +210,7 @@
                   <Insets />
                </HBox.margin>
             </Circle>
-                <Label fx:id="connectionStatus" text="Label" HBox.hgrow="ALWAYS" />
-            <Separator orientation="VERTICAL">
-               <HBox.margin>
-                  <Insets left="2.0" />
-               </HBox.margin></Separator>
-            <Label fx:id="deviceStatus" text="Label" />
+                <Label fx:id="deviceStatus" text="Label" HBox.hgrow="ALWAYS" />
          </children>
          <VBox.margin>
             <Insets />

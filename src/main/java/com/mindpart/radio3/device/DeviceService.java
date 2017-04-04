@@ -2,16 +2,17 @@ package com.mindpart.radio3.device;
 
 import com.mindpart.radio3.*;
 import com.mindpart.radio3.config.Configuration;
+import com.mindpart.radio3.ui.DeviceStatus;
 import com.mindpart.types.Frequency;
 import com.mindpart.utils.Binary;
 import com.mindpart.utils.BinaryBuilder;
 import org.apache.log4j.Logger;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-import static com.mindpart.radio3.Status.OK;
-import static com.mindpart.radio3.Status.error;
 import static com.mindpart.radio3.device.FrameCommand.*;
 
 /**
@@ -22,9 +23,6 @@ public class DeviceService {
     private static final Logger logger = Logger.getLogger(DeviceService.class);
 
     private DataLink dataLink;
-    private long framesReceived = 0;
-    private long framesRecognized = 0;
-
     private PingParser pingParser;
     private DeviceStateParser deviceStateParser;
     private VfoParser vfoParser;
@@ -38,6 +36,7 @@ public class DeviceService {
 
     private Consumer<Frame> taskOnRequest;
     private Consumer<Response> taskOnResponse;
+    private ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
 
     public DeviceService(Configuration config, Consumer<Frame> taskOnRequest, Consumer<Response> taskOnResponse) {
         dataLink = new DataLinkJssc();
@@ -53,21 +52,23 @@ public class DeviceService {
         logarithmicParser = new LogarithmicParser();
         linearParser = new LinearParser();
         vnaParser = new VnaParser();
-        fMeterParser = new FMeterParser(config.fMeter);
+        fMeterParser = new FMeterParser(config.getfMeter());
         multipleProbesParser = new MultipleProbesParser(logarithmicParser, linearParser, vnaParser, fMeterParser);
         analyserResponseParser = new AnalyserResponseParser();
-
     }
 
-    public Status connect(String portName) {
-        framesReceived = 0;
-        framesRecognized = 0;
-        logger.debug("connecting to "+portName);
+    public Response<DeviceInfo> connect(String portName, HardwareRevision hardwareRevision, VfoType vfoType) {
+        getDeviceInfoParser().resetDeviceInfo();
         try {
+            logger.debug("connecting...");
             dataLink.connect(portName);
-            return OK;
+            writeHardwareRevision(hardwareRevision);
+            writeVfoType(vfoType);
+            return readDeviceInfo();
         } catch (Exception e) {
-            return error(e);
+            logger.error("connection error", e);
+            disconnect();
+            return Response.error(e);
         }
     }
 
@@ -76,6 +77,20 @@ public class DeviceService {
             logger.debug("disconnect");
             dataLink.disconnect();
         }
+        deviceInfoParser.resetDeviceInfo();
+    }
+
+    public boolean isConnected() {
+        return dataLink!=null && dataLink.isOpened();
+    }
+
+    public void executeInBackground(Runnable task) {
+        backgroundExecutor.submit(task);
+    }
+
+    public void shutdown() {
+        backgroundExecutor.shutdown();
+        disconnect();
     }
 
     static int buildAvgMode(int avgPasses, int avgSamples) {
@@ -123,14 +138,6 @@ public class DeviceService {
 
     public List<String> availablePorts() {
         return dataLink.availablePorts();
-    }
-
-    public long getFramesReceived() {
-        return framesReceived;
-    }
-
-    public long getFramesRecognized() {
-        return framesRecognized;
     }
 
     private synchronized <T> Response<T> performRequest(Frame requestFrame, FrameParser<T> frameParser) {
@@ -183,7 +190,7 @@ public class DeviceService {
         return performRequest(new Frame(PING), pingParser);
     }
 
-    public String getDevicePortInfo() {
+    public String getPortName() {
         return dataLink.getPortName();
     }
 
@@ -203,7 +210,7 @@ public class DeviceService {
         return deviceInfoParser;
     }
 
-    public boolean isConnected() {
-        return dataLink.isOpened();
+    public DeviceStatus getDeviceStatus() {
+        return isConnected() ? DeviceStatus.READY : DeviceStatus.DISCONNECTED;
     }
 }

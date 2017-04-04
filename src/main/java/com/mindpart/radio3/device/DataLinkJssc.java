@@ -154,6 +154,6 @@ public class DataLinkJssc implements DataLink {
     }
 
     public String toString() {
-        return SerialNativeInterface.getLibraryVersion()+" ("+SerialNativeInterface.getNativeLibraryVersion()+")";
+        return "jSSC " + SerialNativeInterface.getLibraryVersion()+" ("+SerialNativeInterface.getNativeLibraryVersion()+")";
     }
 }

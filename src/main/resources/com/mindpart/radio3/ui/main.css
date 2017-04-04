@@ -30,9 +30,3 @@
 .titled-pane .content AnchorPane {
     -fx-padding: 0;
 }
-
-.value-field {
-    -fx-font-family: monospace;
-    -fx-font-weight: bold;
-    -fx-font-size: 15;
-}

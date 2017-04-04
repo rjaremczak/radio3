@@ -14,7 +14,7 @@
             <children>
                 <Label fx:id="probeName" prefWidth="150.0" text="Label" />
             <Label fx:id="valueName" alignment="CENTER_RIGHT" prefWidth="150.0" text="Label" />
-                <TextField fx:id="valueField" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" prefWidth="200.0" styleClass="value-field">
+                <TextField fx:id="valueField" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" prefWidth="200.0">
                 </TextField>
                 <Button fx:id="mainButton" mnemonicParsing="false" onAction="#onMainButton" text="Main" textOverrun="CLIP" />
             </children>

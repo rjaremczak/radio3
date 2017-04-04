@@ -80,10 +80,10 @@ public class SweepController {
     private AnalyserDataInfo receivedDataInfo;
     private MainController mainController;
 
-    public SweepController(Radio3 radio3, MainController mainController, List<SweepProfile> sweepProfiles) {
+    public SweepController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
         this.mainController = mainController;
-        this.sweepSettingsPane = new SweepSettingsPane(sweepProfiles);
+        this.sweepSettingsPane = new SweepSettingsPane(radio3.getConfiguration().getSweepProfiles());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -183,21 +183,31 @@ public class SweepController {
         updateInputSource(sourceProbe.getValue());
     }
 
+    private void disableUI() {
+        FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
+        sweepSettingsPane.disableControls(true);
+        mainController.disableAllExcept(true, mainController.sweepTab);
+        if(!btnContinuous.isSelected()) btnContinuous.setDisable(true);
+    }
+
+    private void enableUI() {
+        if(!btnContinuous.isSelected()) btnContinuous.setDisable(false);
+        if(btnNormalize.isSelected()) {
+            FxUtils.enableItems(btnOnce, btnNormalize);
+        } else {
+            FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
+            sweepSettingsPane.disableControls(false);
+        }
+        mainController.disableAllExcept(false, mainController.sweepTab);
+    }
+
     private void continuousChangeListener(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean continuous) {
         if(continuous) {
-            FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
-            sweepSettingsPane.disableControls(true);
-            mainController.disableAllExcept(true, mainController.sweepTab);
+            disableUI();
             runSweepOnce(this::displayDataAndSweepAgain);
             btnContinuous.setText("Stop");
         } else {
-            if(btnNormalize.isSelected()) {
-                FxUtils.enableItems(btnOnce, btnNormalize);
-            } else {
-                FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
-                sweepSettingsPane.disableControls(false);
-            }
-            mainController.disableAllExcept(false, mainController.sweepTab);
+            enableUI();
             btnContinuous.setText("Continuous");
         }
     }
@@ -232,9 +242,12 @@ public class SweepController {
     }
 
     public void onSweepOnce() {
-        btnNormalize.setDisable(true);
-        mainController.updateDeviceStatus(AnalyserState.PROCESSING);
-        runSweepOnce(this::updateAnalyserData);
+        disableUI();
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
+        runSweepOnce(analyserResponse -> {
+            updateAnalyserData(analyserResponse);
+            enableUI();
+        });
     }
 
     private void displayDataAndSweepAgain(AnalyserResponse analyserResponse) {
@@ -259,9 +272,9 @@ public class SweepController {
         updateChart();
     }
     private void runSweepOnce(Consumer<AnalyserResponse> analyserDataConsumer) {
-        radio3.executeInBackground(() -> {
+        radio3.getDeviceService().executeInBackground(() -> {
             Response<AnalyserResponse> response = sweepOnce();
-            if(response.isOK()) {
+            if(response.isOK() && radio3.getDeviceService().isConnected()) {
                 Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
             }
         });

@@ -1,9 +1,8 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.VnaResult;
-import com.mindpart.radio3.device.AnalyserResponse;
 import com.mindpart.radio3.device.AnalyserDataSource;
+import com.mindpart.radio3.device.AnalyserResponse;
 import com.mindpart.radio3.device.Response;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.SWR;
@@ -28,7 +27,6 @@ import javafx.scene.layout.VBox;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static com.mindpart.utils.FxUtils.valueFromSeries;
@@ -80,10 +78,10 @@ public class VnaController {
     private ChartMarker chartMarker = new ChartMarker();
     private MainController mainController;
 
-    public VnaController(Radio3 radio3, MainController mainController, List<SweepProfile> sweepProfiles) {
+    public VnaController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
         this.mainController = mainController;
-        this.sweepSettingsPane = new SweepSettingsPane(sweepProfiles);
+        this.sweepSettingsPane = new SweepSettingsPane(radio3.getConfiguration().getSweepProfiles());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -130,17 +128,25 @@ public class VnaController {
         btnContinuous.selectedProperty().addListener(this::onContinuousChanged);
     }
 
+    private void disableUI() {
+        FxUtils.disableItems(btnStart);
+        sweepSettingsPane.disableControls(true);
+        mainController.disableAllExcept(true, mainController.vnaTab);
+    }
+
+    private void enableUI() {
+        FxUtils.enableItems(btnStart);
+        sweepSettingsPane.disableControls(false);
+        mainController.disableAllExcept(false, mainController.vnaTab);
+    }
+
     private void onContinuousChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {
         if(continuous) {
-            FxUtils.disableItems(btnStart);
-            sweepSettingsPane.disableControls(true);
-            mainController.disableAllExcept(true, mainController.vnaTab);
+            disableUI();
             runSweepOnce(this::displayDataAndSweepAgain);
             btnContinuous.setText("Stop");
         } else {
-            FxUtils.enableItems(btnStart);
-            sweepSettingsPane.disableControls(false);
-            mainController.disableAllExcept(false, mainController.vnaTab);
+            enableUI();
             btnContinuous.setText("Continuous");
         }
     }
@@ -161,13 +167,17 @@ public class VnaController {
     }
 
     public void onSweepOnce() {
-        runSweepOnce(this::updateAnalyserData);
+        disableUI();
+        runSweepOnce(analyserResponse -> {
+            updateAnalyserData(analyserResponse);
+            enableUI();
+        });
     }
 
     private void runSweepOnce(Consumer<AnalyserResponse> analyserDataConsumer) {
-        radio3.executeInBackground(() -> {
+        radio3.getDeviceService().executeInBackground(() -> {
             Response<AnalyserResponse> response = sweepOnce();
-            if(response.isOK()) {
+            if(response.isOK() && radio3.getDeviceService().isConnected()) {
                 Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
             }
         });

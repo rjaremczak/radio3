@@ -7,7 +7,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
@@ -23,7 +22,6 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import org.apache.log4j.Logger;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -114,9 +112,6 @@ public class MainController {
     VBox configurationBox;
 
     @FXML
-    Label connectionStatus;
-
-    @FXML
     Label deviceStatus;
 
     private Radio3 radio3;
@@ -126,6 +121,8 @@ public class MainController {
     private ScheduledExecutorService continuousSampling = Executors.newSingleThreadScheduledExecutor();
     private List<Object> nonModalNodes;
 
+    private VnaController vnaController;
+    private SweepController sweepController;
     private VfoController vfoController;
     private FMeterController fMeterController;
     private LogarithmicProbeController logarithmicProbeController;
@@ -142,11 +139,11 @@ public class MainController {
         availablePortNames.setAll(radio3.availablePorts());
         if (availablePortNames.isEmpty()) {
             FxUtils.disableItems(serialPorts, btnConnect);
-            connectionStatus.setText(ConnectionStatus.DISCONNECTED.getText());
+            updateDeviceStatus(DeviceStatus.DISCONNECTED);
         } else {
             FxUtils.enableItems(serialPorts, btnConnect);
             serialPorts.getSelectionModel().selectFirst();
-            updateConnectionStatus();
+            updateDeviceStatus(radio3.getDeviceService().getDeviceStatus());
         }
     }
 
@@ -156,63 +153,49 @@ public class MainController {
         componentsBox.getChildren().add(loader.load());
     }
 
-    private void updateMainIndicator(MainIndicatorState state) {
-        mainIndicator.setFill(new RadialGradient(-36.87, -0.19, 0.44, 0.41, 0.333, true, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.WHITE),
-                new Stop(0.175, Color.WHITE),
-                new Stop(0.65, state.getColor()),
-                new Stop(1.0, state.getColor())));
-
-    }
-
     private void updateOnConnect() {
         btnConnect.setText("Disconnect");
         FxUtils.enableItems(btnConnect, componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         FxUtils.disableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
-        updateConnectionStatus();
-        updateMainIndicator(MainIndicatorState.CONNECTED);
+        updateDeviceStatus(DeviceStatus.READY);
     }
 
-    private void updateOnDisconnect() {
+    private void updateOnDisconnect(DeviceStatus deviceStatus) {
         btnConnect.setText("Connect");
         FxUtils.enableItems(btnConnect, serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         FxUtils.disableItems(componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
-        updateConnectionStatus();
         deviceProperties.clear();
         devicePropertiesMap.clear();
-        updateMainIndicator(MainIndicatorState.DISCONNECTED);
-        updateDeviceStatus(DeviceStatus.UNKNOWN);
+        updateDeviceStatus(deviceStatus);
     }
 
     private void doConnect() {
-        connectionStatus.setText("connecting...");
+        updateDeviceStatus(DeviceStatus.CONNECTING);
         FxUtils.disableItems(serialPortsRefresh, serialPorts);
-        updateMainIndicator(MainIndicatorState.PROCESSING);
         Platform.runLater(() -> {
-            radio3.connect(serialPorts.getValue());
-            if (radio3.isConnected()) {
+            Response<DeviceInfo> deviceInfoResponse = radio3.getDeviceService().connect(serialPorts.getValue(), hardwareRevisions.getValue(), vfoType.getValue());
+            if (deviceInfoResponse.isOK()) {
                 updateOnConnect();
+                updateDeviceInfo(deviceInfoResponse.getData());
                 requestDeviceState();
                 requestVfoFrequency();
             } else {
-                updateOnDisconnect();
+                radio3.getDeviceService().disconnect();
+                updateOnDisconnect(DeviceStatus.ERROR);
             }
         });
     }
 
-    private void updateConnectionStatus() {
-        connectionStatus.setText(radio3.getConnectionStatusStr());
-    }
-
     private void doDisconnect() {
-        radio3.disconnect();
-        updateOnDisconnect();
+        updateDeviceStatus(DeviceStatus.DISCONNECTING);
+        radio3.getDeviceService().disconnect();
+        updateOnDisconnect(DeviceStatus.DISCONNECTED);
     }
 
     public void doConnectDisconnect(ActionEvent event) {
         event.consume();
         btnConnect.setDisable(true);
-        if (radio3.isConnected()) {
+        if (radio3.getDeviceService().isConnected()) {
             doDisconnect();
         } else {
             doConnect();
@@ -227,6 +210,11 @@ public class MainController {
         serialPortsRefresh.setOnAction(event -> updateAvailablePorts());
         btnConnect.setOnAction(event -> doConnectDisconnect(event));
         serialPorts.setItems(availablePortNames);
+
+        vnaController = new VnaController(radio3, this);
+        sweepController = new SweepController(radio3, this);
+        sweepTab.setContent(FxUtils.loadPane(sweepController, getClass().getResource("sweepPane.fxml")));
+        vnaTab.setContent(FxUtils.loadPane(vnaController, getClass().getResource("vnaPane.fxml")));
 
         vfoController = new VfoController(radio3);
         fMeterController = new FMeterController(radio3);
@@ -247,8 +235,7 @@ public class MainController {
         initVfoAmplifier();
         initVfoAttenuator();
 
-        updateOnDisconnect();
-        updateConnectionStatus();
+        updateOnDisconnect(DeviceStatus.DISCONNECTED);
         updateAvailablePorts();
 
         continuousSampling.scheduleWithFixedDelay(() -> { if(continuousSamplingEnabled) { sampleAllProbes(); } }, 200, 200, TimeUnit.MILLISECONDS);
@@ -345,21 +332,23 @@ public class MainController {
         if(response.isOK()) vfoController.update(response.getData());
     }
 
-    private void refreshDeviceInfo() {
+    private void requestDeviceInfo() {
         Response<DeviceInfo> deviceInfoResponse = radio3.getDeviceService().readDeviceInfo();
         if(deviceInfoResponse.isOK()) updateDeviceInfo(deviceInfoResponse.getData());
     }
 
     private void onRefresh(ActionEvent event) {
         devicePropertiesRefresh.setDisable(true);
-        refreshDeviceInfo();
+        requestDeviceInfo();
         requestDeviceState();
         devicePropertiesRefresh.setDisable(false);
     }
 
     public void sampleAllProbes() {
+        updateDeviceStatus(DeviceStatus.PROCESSING);
         Response<ProbesValues> response = radio3.getDeviceService().readAllProbes();
         if(response.isOK()) updateAllProbes(response.getData());
+        updateDeviceStatus(response.isOK() ? DeviceStatus.READY : DeviceStatus.ERROR);
     }
 
     private void updateAllProbes(ProbesValues probesValues) {
@@ -421,7 +410,17 @@ public class MainController {
         FxUtils.setDisabledOf(flag, nonModalNodes.stream().filter(e -> e!=element).toArray());
     }
 
-    void updateDeviceStatus(Object o) {
-        deviceStatus.setText(o.toString());
+    private void updateMainIndicator(Color color) {
+        mainIndicator.setFill(new RadialGradient(-36.87, -0.19, 0.44, 0.41, 0.333, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.WHITE),
+                new Stop(0.175, Color.WHITE),
+                new Stop(0.65, color),
+                new Stop(1.0, color)));
+    }
+
+    void updateDeviceStatus(DeviceStatus deviceStatus) {
+        updateMainIndicator(deviceStatus.getMainIndicatorColor());
+        String portName = radio3.getDeviceService().isConnected() ? "("+radio3.getDeviceService().getPortName()+") " : "";
+        this.deviceStatus.setText(portName + deviceStatus.toString());
     }
 }

@@ -7,8 +7,7 @@ package com.mindpart.radio3.ui;
 public enum ConnectionStatus {
     DISCONNECTED("disconnected"),
     CONNECTING("connecting..."),
-    DEVICE_ERROR("device error"),
-    CONNECTION_TIMEOUT("connection timeout"),
+    CONNECTION_ERROR("connection error"),
     CONNECTED("connected");
 
     private String text;

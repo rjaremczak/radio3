@@ -2,11 +2,13 @@ package com.mindpart.utils;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Created by Robert Jaremczak
@@ -25,6 +27,18 @@ public final class FxUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static Parent loadPane(Object controller, URL resourceLocation) {
+        FXMLLoader loader  = new FXMLLoader(resourceLocation);
+        loader.setControllerFactory(clazz -> controller);
+        try {
+            return loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
     public static void alert(Alert.AlertType alertType, String title, String header, String content) {
         Alert alert = new Alert(alertType);
