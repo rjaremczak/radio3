@@ -4,7 +4,7 @@ package com.mindpart.radio3.device;
  * Created by Robert Jaremczak
  * Date: 2016.11.18
  */
-public enum AnalyserDataSource {
+public enum SweepSignalSource {
     LOG_PROBE("Logarithmic",1, "Power [dBm]"),
     LIN_PROBE("Linear",1, "Power [mW]"),
     VNA("VNA", 2, "SWR", "Phase [°]");
@@ -13,7 +13,7 @@ public enum AnalyserDataSource {
     private String title;
     private String seriesTitle[];
 
-    AnalyserDataSource(String title, int numSeries, String... seriesTitles) {
+    SweepSignalSource(String title, int numSeries, String... seriesTitles) {
         this.title = title;
         this.numSeries = numSeries;
         this.seriesTitle = seriesTitles;

@@ -5,36 +5,6 @@
     "multiplier": 4,
     "base": 0
   },
-  "linearProbe": {
-    "adc": {
-      "adcMin": 0,
-      "adcMax": 4035,
-      "voltageMin": 0.0,
-      "voltageMax": 3.45
-    }
-  },
-  "logarithmicProbe": {
-    "adc": {
-      "adcMin": 0,
-      "adcMax": 4035,
-      "voltageMin": 0.0,
-      "voltageMax": 3.45
-    }
-  },
-  "vna": {
-    "gainAdc": {
-      "adcMin": 0,
-      "adcMax": 4035,
-      "voltageMin": 0.0,
-      "voltageMax": 3.45
-    },
-    "phaseAdc": {
-      "adcMin": 0,
-      "adcMax": 4035,
-      "voltageMin": 0.0,
-      "voltageMax": 3.45
-    }
-  },
   "sweepProfiles": [
     {
       "name": "KF + 50MHz",

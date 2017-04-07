@@ -17,7 +17,7 @@ public enum FrameCommand {
 
     LINPROBE_DATA(0x018),
 
-    CMPPROBE_DATA(0x020),
+    VNAPROBE_DATA(0x020),
 
     FMETER_DATA(0x028),
 
@@ -30,8 +30,8 @@ public enum FrameCommand {
     VFO_AMPLIFIER(0x037),
     VNA_MODE(0x038),
 
-    ANALYSER_REQUEST(0x040),
-    ANALYSER_RESPONSE(0x041);
+    SWEEP_REQUEST(0x040),
+    SWEEP_RESPONSE(0x041);
 
     private int code;
 

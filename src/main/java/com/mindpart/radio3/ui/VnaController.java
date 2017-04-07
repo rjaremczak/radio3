@@ -1,8 +1,8 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.VnaResult;
-import com.mindpart.radio3.device.AnalyserDataSource;
-import com.mindpart.radio3.device.AnalyserResponse;
+import com.mindpart.radio3.device.SweepSignalSource;
+import com.mindpart.radio3.device.SweepResponse;
 import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
 import com.mindpart.types.Frequency;
@@ -154,7 +154,7 @@ public class VnaController {
         }
     }
 
-    private void displayDataAndSweepAgain(AnalyserResponse analyserResponse) {
+    private void displayDataAndSweepAgain(SweepResponse analyserResponse) {
         if(btnContinuous.isSelected()) {
             updateAnalyserData(analyserResponse);
             runSweepOnce(this::displayDataAndSweepAgain);
@@ -177,26 +177,26 @@ public class VnaController {
         });
     }
 
-    private void runSweepOnce(Consumer<AnalyserResponse> analyserDataConsumer) {
+    private void runSweepOnce(Consumer<SweepResponse> analyserDataConsumer) {
         radio3.executeInBackground(() -> {
-            Response<AnalyserResponse> response = sweepOnce();
+            Response<SweepResponse> response = sweepOnce();
             if(response.isOK() && radio3.isConnected()) {
                 Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
             }
         });
     }
 
-    private Response<AnalyserResponse> sweepOnce() {
+    private Response<SweepResponse> sweepOnce() {
         SweepQuality quality = sweepSettingsPane.getQuality();
         long fStart = sweepSettingsPane.getStartFrequency().toHz();
         long fEnd = sweepSettingsPane.getEndFrequency ().toHz();
         int fStep = (int) ((fEnd - fStart) / quality.getSteps());
         return radio3.startAnalyser(fStart, fStep,
                 quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(),
-                AnalyserDataSource.VNA);
+                SweepSignalSource.VNA);
     }
 
-    public void updateAnalyserData(AnalyserResponse ad) {
+    public void updateAnalyserData(SweepResponse ad) {
         chartMarker.clear();
         long freqEnd = ad.getFreqStart() + (ad.getNumSteps() * ad.getFreqStep());
         int samples[][] = ad.getData();

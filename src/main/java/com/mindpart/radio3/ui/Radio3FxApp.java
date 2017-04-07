@@ -1,10 +1,7 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.LinearParser;
-import com.mindpart.radio3.LogarithmicParser;
-import com.mindpart.radio3.VnaParser;
-import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Frame;
+import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
 import com.mindpart.utils.FxUtils;
 import javafx.application.Application;
@@ -13,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
-import java.util.List;
 import java.util.Locale;
 
 public class Radio3FxApp extends Application {
@@ -52,22 +48,6 @@ public class Radio3FxApp extends Application {
         super.stop();
         mainController.shutdown();
         radio3.shutdown();
-    }
-
-    public List<String> availablePorts() {
-        return radio3.availablePorts();
-    }
-
-    public LogarithmicParser getLogarithmicParser() {
-        return radio3.getLogarithmicParser();
-    }
-
-    public LinearParser getLinearParser() {
-        return radio3.getLinearParser();
-    }
-
-    public VnaParser getVnaParser() {
-        return radio3.getVnaParser();
     }
 
     public static void main(String[] args) {

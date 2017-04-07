@@ -21,9 +21,6 @@ public class Configuration {
     private HardwareRevision hardwareRevision = HardwareRevision.AUTODETECT;
     private VfoType vfoType = VfoType.NONE;
     private FMeterConfig fMeter;
-    private LinearProbeConfig linearProbe;
-    private LogarithmicProbeConfig logarithmicProbe;
-    private VnaConfig vna;
     public List<SweepProfile> sweepProfiles;
 
     public Level getLogLevel() {
@@ -40,18 +37,6 @@ public class Configuration {
 
     public FMeterConfig getfMeter() {
         return fMeter;
-    }
-
-    public LinearProbeConfig getLinearProbe() {
-        return linearProbe;
-    }
-
-    public LogarithmicProbeConfig getLogarithmicProbe() {
-        return logarithmicProbe;
-    }
-
-    public VnaConfig getVna() {
-        return vna;
     }
 
     public List<SweepProfile> getSweepProfiles() {

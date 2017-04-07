@@ -343,10 +343,8 @@ public class MainController {
     }
 
     public void sampleAllProbes() {
-        updateDeviceStatus(DeviceStatus.PROCESSING);
         Response<ProbesValues> response = radio3.readAllProbes();
         if(response.isOK()) updateAllProbes(response.getData());
-        updateDeviceStatus(response.isOK() ? DeviceStatus.READY : DeviceStatus.ERROR);
     }
 
     private void updateAllProbes(ProbesValues probesValues) {

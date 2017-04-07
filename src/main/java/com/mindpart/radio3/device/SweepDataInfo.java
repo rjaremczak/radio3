@@ -4,14 +4,14 @@ package com.mindpart.radio3.device;
  * Created by Robert Jaremczak
  * Date: 2016.11.18
  */
-public class AnalyserDataInfo {
-    private AnalyserState state;
+public class SweepDataInfo {
+    private SweepState state;
     private long freqStart;
     private long freqStep;
     private int numSteps;
-    private AnalyserDataSource source;
+    private SweepSignalSource source;
 
-    public AnalyserDataInfo(AnalyserState state, long freqStart, long freqStep, int numSteps, AnalyserDataSource source) {
+    public SweepDataInfo(SweepState state, long freqStart, long freqStep, int numSteps, SweepSignalSource source) {
         this.state = state;
         this.freqStart = freqStart;
         this.freqStep = freqStep;
@@ -19,7 +19,7 @@ public class AnalyserDataInfo {
         this.source = source;
     }
 
-    public AnalyserState getState() {
+    public SweepState getState() {
         return state;
     }
 
@@ -43,7 +43,7 @@ public class AnalyserDataInfo {
         return source.getNumSeries();
     }
 
-    public AnalyserDataSource getSource() {
+    public SweepSignalSource getSource() {
         return source;
     }
 

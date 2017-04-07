@@ -33,7 +33,7 @@ public class FrameHeaderTest {
 
         header = FrameHeader.fromCode(0xE020);
         header.setSizeBytes(new byte[]{(byte)0});
-        assertEquals(FrameCommand.CMPPROBE_DATA, header.getCommand());
+        assertEquals(FrameCommand.VNAPROBE_DATA, header.getCommand());
         assertEquals(14, header.getPayloadSize());
     }
 
@@ -49,7 +49,7 @@ public class FrameHeaderTest {
 
         header = FrameHeader.fromCode(0xF020);
         header.setSizeBytes(new byte[]{(byte)0, (byte)0});
-        assertEquals(FrameCommand.CMPPROBE_DATA, header.getCommand());
+        assertEquals(FrameCommand.VNAPROBE_DATA, header.getCommand());
         assertEquals(270, header.getPayloadSize());
     }
 }

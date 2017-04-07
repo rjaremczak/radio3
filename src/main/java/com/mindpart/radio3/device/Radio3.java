@@ -36,20 +36,20 @@ public class Radio3 {
     private VnaParser vnaParser;
     private FMeterParser fMeterParser;
     private MultipleProbesParser multipleProbesParser;
-    private AnalyserResponseParser analyserResponseParser;
+    private SweepResponseParser sweepResponseParser;
 
-    private Consumer<Frame> taskOnRequest;
-    private Consumer<Response> taskOnResponse;
+    private Consumer<Frame> requestHandler;
+    private Consumer<Response> responseHandler;
     private ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
 
-    public Radio3(Consumer<Frame> taskOnRequest, Consumer<Response> taskOnResponse) throws IOException {
+    public Radio3(Consumer<Frame> requestHandler, Consumer<Response> responseHandler) throws IOException {
         initConfiguration();
 
         dataLink = new DataLinkJssc();
         logger.info("dataLink: "+dataLink);
 
-        this.taskOnRequest = taskOnRequest;
-        this.taskOnResponse = taskOnResponse;
+        this.requestHandler = requestHandler;
+        this.responseHandler = responseHandler;
 
         pingParser = new PingParser();
         deviceStateParser = new DeviceStateParser();
@@ -60,7 +60,7 @@ public class Radio3 {
         vnaParser = new VnaParser();
         fMeterParser = new FMeterParser(configuration.getfMeter());
         multipleProbesParser = new MultipleProbesParser(logarithmicParser, linearParser, vnaParser, fMeterParser);
-        analyserResponseParser = new AnalyserResponseParser();
+        sweepResponseParser = new SweepResponseParser();
     }
 
     private void initConfiguration() throws IOException {
@@ -109,7 +109,7 @@ public class Radio3 {
         return ((avgPasses - 1) & 0x0f) << 4 | ((avgSamples - 1) & 0x0f);
     }
 
-    public Response<AnalyserResponse> startAnalyser(long freqStart, long freqStep, int numSteps, int avgPasses, int avgSamples, AnalyserDataSource source) {
+    public Response<SweepResponse> startAnalyser(long freqStart, long freqStep, int numSteps, int avgPasses, int avgSamples, SweepSignalSource source) {
         BinaryBuilder builder = new BinaryBuilder(14);
         builder.addUInt32(freqStart);
         builder.addUInt32(freqStep);
@@ -117,7 +117,7 @@ public class Radio3 {
         builder.addUInt8(source.ordinal());
         builder.addUInt8(buildAvgMode(avgPasses, avgSamples));
 
-        return performRequest(new Frame(FrameCommand.ANALYSER_REQUEST, builder.getBytes()), analyserResponseParser);
+        return performRequest(new Frame(FrameCommand.SWEEP_REQUEST, builder.getBytes()), sweepResponseParser);
     }
 
     public Response<Class<Void>> writeVfoFrequency(int frequency) {
@@ -153,16 +153,16 @@ public class Radio3 {
     }
 
     private synchronized <T> Response<T> performRequest(Frame requestFrame, FrameParser<T> frameParser) {
-        taskOnRequest.accept(requestFrame);
+        requestHandler.accept(requestFrame);
         Response<Frame> response = dataLink.request(requestFrame);
         if(response.isOK() && frameParser.recognizes(response.getData())) {
             Response<T> responseOk =  Response.success(frameParser.parse(response.getData()));
-            taskOnResponse.accept(responseOk);
+            responseHandler.accept(responseOk);
             return responseOk;
         }
 
         Response<T> responseError = Response.error(response);
-        taskOnResponse.accept(responseError);
+        responseHandler.accept(responseError);
         return responseError;
     }
 
@@ -187,7 +187,7 @@ public class Radio3 {
     }
 
     public Response<VnaResult> readVnaProbe() {
-        return performRequest(new Frame(CMPPROBE_DATA), vnaParser);
+        return performRequest(new Frame(VNAPROBE_DATA), vnaParser);
     }
 
     public Response<Frequency> readFMeter() {

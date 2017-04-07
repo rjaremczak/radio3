@@ -47,7 +47,7 @@ public class SweepController {
     HBox hBox;
 
     @FXML
-    ChoiceBox<AnalyserDataSource> sourceProbe;
+    ChoiceBox<SweepSignalSource> sourceProbe;
 
     @FXML
     ToggleButton btnNormalize;
@@ -76,7 +76,7 @@ public class SweepController {
     private BiFunction<Integer, Double, Double> valueProcessor = this::originalValue;
     private List<XYChart.Data<Double, Double>> receivedData = new ArrayList<>();
     private List<Double> referenceData = new ArrayList<>();
-    private AnalyserDataInfo receivedDataInfo;
+    private SweepDataInfo receivedDataInfo;
     private MainController mainController;
 
     public SweepController(Radio3 radio3, MainController mainController) {
@@ -150,7 +150,7 @@ public class SweepController {
         sourceProbe.setDisable(normalized);
         if(normalized) {
             referenceData = receivedData.stream().map(XYChart.Data::getYValue).collect(Collectors.toList());
-            if(sourceProbe.getValue() == AnalyserDataSource.LOG_PROBE) {
+            if(sourceProbe.getValue() == SweepSignalSource.LOG_PROBE) {
                 signalAxisY.setLabel("Normalized Power [dBm]");
                 probeAdcConverter = radio3.getLogarithmicParser()::parse;
                 probeValueFormatter = this::powerValueFormatter;
@@ -168,15 +168,15 @@ public class SweepController {
         updateChart();
     }
 
-    private void inputSourceChangeListener(ObservableValue<? extends AnalyserDataSource> ob, AnalyserDataSource old, AnalyserDataSource source) {
+    private void inputSourceChangeListener(ObservableValue<? extends SweepSignalSource> ob, SweepSignalSource old, SweepSignalSource source) {
         clear();
         updateInputSource(source);
         updateNormButton();
     }
 
     private void initInputProbeList() {
-        sourceProbe.getItems().add(AnalyserDataSource.LOG_PROBE);
-        sourceProbe.getItems().add(AnalyserDataSource.LIN_PROBE);
+        sourceProbe.getItems().add(SweepSignalSource.LOG_PROBE);
+        sourceProbe.getItems().add(SweepSignalSource.LIN_PROBE);
         sourceProbe.getSelectionModel().selectFirst();
         sourceProbe.getSelectionModel().selectedItemProperty().addListener(this::inputSourceChangeListener);
         updateInputSource(sourceProbe.getValue());
@@ -219,7 +219,7 @@ public class SweepController {
         return "voltage: "+Voltage.ofMilliVolt(mV).format();
     }
 
-    private void updateInputSource(AnalyserDataSource source) {
+    private void updateInputSource(SweepSignalSource source) {
         switch (source) {
             case LOG_PROBE: {
                 signalAxisY.setLabel("Power [dBm]");
@@ -249,14 +249,14 @@ public class SweepController {
         });
     }
 
-    private void displayDataAndSweepAgain(AnalyserResponse analyserResponse) {
+    private void displayDataAndSweepAgain(SweepResponse analyserResponse) {
         if(btnContinuous.isSelected()) {
             updateAnalyserData(analyserResponse);
             runSweepOnce(this::displayDataAndSweepAgain);
         }
     }
 
-    public void updateAnalyserData(AnalyserResponse ad) {
+    public void updateAnalyserData(SweepResponse ad) {
         receivedDataInfo = ad.toInfo();
         receivedData.clear();
         updateNormButton();
@@ -270,16 +270,16 @@ public class SweepController {
 
         updateChart();
     }
-    private void runSweepOnce(Consumer<AnalyserResponse> analyserDataConsumer) {
+    private void runSweepOnce(Consumer<SweepResponse> analyserDataConsumer) {
         radio3.executeInBackground(() -> {
-            Response<AnalyserResponse> response = sweepOnce();
+            Response<SweepResponse> response = sweepOnce();
             if(response.isOK() && radio3.isConnected()) {
                 Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
             }
         });
     }
 
-    private Response<AnalyserResponse> sweepOnce() {
+    private Response<SweepResponse> sweepOnce() {
         SweepQuality quality = sweepSettingsPane.getQuality();
         long fStart = sweepSettingsPane.getStartFrequency().toHz();
         long fEnd = sweepSettingsPane.getEndFrequency().toHz();
