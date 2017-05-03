@@ -7,6 +7,8 @@ package com.mindpart.radio3.device;
 public class DeviceState {
     public long timeMs;
     public VfoOut vfoOut;
-    public VfoAmpState vfoAmpState;
-    public VfoAttenuator vfoAttenuator;
+    public VfoAmp vfoAmp;
+    public boolean vfoAtt0;
+    public boolean vfoAtt1;
+    public boolean vfoAtt2;
 }

@@ -6,7 +6,7 @@ package com.mindpart.utils;
  */
 public class Range {
     private double min = Double.MAX_VALUE;
-    private double max = Double.MIN_VALUE;
+    private double max = -Double.MAX_VALUE;
 
     public double update(double v) {
         min = Math.min(min, v);
@@ -14,11 +14,11 @@ public class Range {
         return v;
     }
 
-    public double getMin() {
+    public double min() {
         return min;
     }
 
-    public double getMax() {
+    public double max() {
         return max;
     }
 
@@ -26,6 +26,9 @@ public class Range {
         return Math.abs(max - min);
     }
 
+    public double mid() {
+        return min + span()/2;
+    }
     public boolean contains(double v) {
         return v >= min && v <= max;
     }
@@ -33,4 +36,9 @@ public class Range {
     public boolean isValid() {
         return span() < Double.MAX_VALUE;
     }
+
+    public String toString() {
+        return min+" - "+max;
+    }
+
 }

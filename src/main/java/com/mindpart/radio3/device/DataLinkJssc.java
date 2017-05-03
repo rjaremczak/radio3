@@ -2,15 +2,17 @@ package com.mindpart.radio3.device;
 
 import com.mindpart.utils.Crc8;
 import jssc.*;
+import jssc.SerialPort;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static jssc.SerialPort.*;
 
 /**
  * Created by Robert Jaremczak
@@ -21,10 +23,10 @@ public class DataLinkJssc implements DataLink {
     private static final Logger logger = Logger.getLogger(DataLinkJssc.class);
 
     private static final int TIMEOUT_MS = 2000;
-    private static final int DATA_BITS = SerialPort.DATABITS_8;
-    private static final int STOP_BITS = SerialPort.STOPBITS_1;
-    private static final int PARITY = SerialPort.PARITY_NONE;
-    private static final int BAUD_RATE = SerialPort.BAUDRATE_115200;
+    private static final int DATA_BITS = DATABITS_8;
+    private static final int STOP_BITS = STOPBITS_1;
+    private static final int PARITY = PARITY_NONE;
+    private static final int BAUD_RATE = BAUDRATE_115200;
 
     private SerialPort serialPort;
 
@@ -36,8 +38,9 @@ public class DataLinkJssc implements DataLink {
         this.serialPort = new SerialPort(portName);
         if(serialPort.openPort()) {
             logger.debug("port opened");
-            serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY, false, false);
-            serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
+            flushBuffers();
+            serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY);
+            serialPort.setFlowControlMode(FLOWCONTROL_NONE);
             attachEventListener();
         } else {
             logger.error("port not opened");
@@ -45,38 +48,50 @@ public class DataLinkJssc implements DataLink {
     }
 
     private void attachEventListener() throws SerialPortException {
-        serialPort.addEventListener(serialPortEvent -> {
+        serialPort.addEventListener(event -> {
             if(serialPort==null || !serialPort.isOpened()) return;
 
-            try {
-                Crc8 crc = new Crc8();
-                byte[] headerBytes = readBytes(2); //serialPort.readBytes(2, TIMEOUT_MS);
-                crc.process(headerBytes);
-
-                FrameHeader header = FrameHeader.fromBytes(headerBytes);
-                if(header.getSizeBytesCount() > 0) {
-                    byte[] sizeBytes = readBytes(header.getSizeBytesCount()); //serialPort.readBytes(header.getSizeBytesCount(), TIMEOUT_MS);
-                    header.setSizeBytes(sizeBytes);
-                    crc.process(sizeBytes);
-                }
-
-                byte[] payloadBytes = readBytes(header.getPayloadSize()); //serialPort.readBytes(header.getPayloadSize(), TIMEOUT_MS);
-                int receivedCrc = readBytes(1)[0] & 0xff; //serialPort.readBytes(1)[0] & 0xff;
-                crc.process(payloadBytes);
-
-                if(crc.getCrc() == receivedCrc) {
-                    final Frame frame = new Frame(header.getCommand(), payloadBytes);
-                    receivedFrameRef.set(frame);
-                } else {
-                    flushReadBuffer();
-                    receiveExceptionRef.set(new Crc8.Error(crc.getCrc(), receivedCrc));
-                }
-            } catch (Exception e) {
-                receiveExceptionRef.set(e);
-            } finally {
-                receivedFrameLatch.countDown();
+            if(event.isRXCHAR()) {
+                eventRxChar();
+            } else if(event.isTXEMPTY()) {
+                eventTxEmpty();
             }
-        }, SerialPort.MASK_RXCHAR);
+        });
+    }
+
+    private void eventRxChar() {
+        try {
+            Crc8 crc = new Crc8();
+            byte[] headerBytes = readBytes(2);
+            crc.process(headerBytes);
+
+            FrameHeader header = FrameHeader.fromBytes(headerBytes);
+            if(header.getSizeBytesCount() > 0) {
+                byte[] sizeBytes = readBytes(header.getSizeBytesCount());
+                header.setSizeBytes(sizeBytes);
+                crc.process(sizeBytes);
+            }
+
+            byte[] payloadBytes = readBytes(header.getPayloadSize());
+            int receivedCrc = readBytes(1)[0] & 0xff;
+            crc.process(payloadBytes);
+
+            if(crc.getCrc() == receivedCrc) {
+                final Frame frame = new Frame(header.getCommand(), payloadBytes);
+                receivedFrameRef.set(frame);
+            } else {
+                flushBuffers();
+                receiveExceptionRef.set(new Crc8.Error(crc.getCrc(), receivedCrc));
+            }
+        } catch (Exception e) {
+            receiveExceptionRef.set(e);
+        } finally {
+            receivedFrameLatch.countDown();
+        }
+    }
+
+    private void eventTxEmpty() {
+        logger.debug("txEmpty");
     }
 
     private byte[] readBytes(int num) throws SerialPortException, SerialPortTimeoutException {
@@ -91,17 +106,14 @@ public class DataLinkJssc implements DataLink {
         return buf.array();
     }
 
-    private int flushReadBuffer() throws SerialPortException, SerialPortTimeoutException {
-        int count = 0;
-        while(serialPort.isOpened() && serialPort.getInputBufferBytesCount() > 0) {
-            count += serialPort.readBytes(serialPort.getInputBufferBytesCount(), TIMEOUT_MS).length;
-        }
-        return count;
+    private void flushBuffers() throws SerialPortException {
+        serialPort.purgePort(PURGE_RXCLEAR|PURGE_TXCLEAR);
     }
 
     public synchronized void disconnect() {
         try {
             serialPort.removeEventListener();
+            flushBuffers();
             serialPort.closePort();
             serialPort = null;
             logger.debug("port closed");
@@ -120,14 +132,17 @@ public class DataLinkJssc implements DataLink {
 
     public synchronized Response request(Frame request) {
         try {
-            int garbageCount = flushReadBuffer();
-            if(garbageCount>0) {
-                logger.debug("garbage: "+garbageCount+" bytes flushed");
-            }
-
+            flushBuffers();
             long t0 = System.currentTimeMillis();
             receivedFrameLatch = new CountDownLatch(1);
             serialPort.writeBytes(request.toBytes());
+            /*
+            long tf0 = System.currentTimeMillis();
+            while(serialPort.getOutputBufferBytesCount()!=0) {
+                logger.debug("tx buffer count: "+serialPort.getOutputBufferBytesCount());
+            }
+            logger.debug("tx buffer emptied in "+(System.currentTimeMillis()-tf0)+" ms");
+            */
             receivedFrameLatch.await(TIMEOUT_MS, TimeUnit.MILLISECONDS);
             Exception exception = receiveExceptionRef.getAndSet(null);
             if(exception != null) {

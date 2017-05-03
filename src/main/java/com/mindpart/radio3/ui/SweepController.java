@@ -6,6 +6,7 @@ import com.mindpart.types.Power;
 import com.mindpart.types.Voltage;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.utils.FxUtils;
+import com.mindpart.utils.Range;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -195,8 +196,8 @@ public class SweepController {
             FxUtils.enableItems(btnOnce, btnNormalize);
         } else {
             FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
+            sweepSettingsPane.disableControls(false);
         }
-        sweepSettingsPane.disableControls(false);
         mainController.disableAllExcept(false, mainController.sweepTab);
     }
 
@@ -302,17 +303,41 @@ public class SweepController {
         chartSeries.setName(receivedDataInfo.getSource().getSeriesTitle(0));
         ObservableList<XYChart.Data<Number, Number>> data = chartSeries.getData();
 
+        Range range = new Range();
         for (int step = 0; step < receivedData.size(); step++) {
             XYChart.Data<Double, Double> received = receivedData.get(step);
-            data.add(new XYChart.Data<>(received.getXValue(), valueProcessor.apply(step, received.getYValue())));
+            double value = range.update(valueProcessor.apply(step, received.getYValue()));
+            data.add(new XYChart.Data<>(received.getXValue(), value));
         }
 
         signalDataSeries.add(chartSeries);
         signalAxisX.setForceZeroInRange(false);
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, receivedDataInfo.getFreqStart(), receivedDataInfo.getFreqEnd());
+        updateYAxis(range);
+    }
 
-        signalAxisY.setAutoRanging(true);
-        signalAxisY.setForceZeroInRange(false);
+    void setUpYAxis(double min, double max, double tickUnit) {
+        signalAxisY.setAutoRanging(false);
+        signalAxisY.setLowerBound(min);
+        signalAxisY.setUpperBound(max);
+        signalAxisY.setTickUnit(tickUnit);
+    }
+
+    double floor(double value, int grid) {
+        return Math.floor(value/grid) * grid;
+    }
+
+    double ceil(double value, int grid) {
+        return Math.ceil(value/grid) * grid;
+    }
+
+    void updateYAxis(Range range) {
+        if(range.isValid()) {
+            setUpYAxis(floor(range.min(), 3), ceil(range.max(), 3), range.span() <= 20 ? 1 : 5);
+        } else {
+            signalAxisY.setAutoRanging(true);
+            signalAxisY.setForceZeroInRange(false);
+        }
     }
 
     void clear() {

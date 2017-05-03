@@ -97,7 +97,7 @@ public class Radio3 {
     }
 
     public void executeInBackground(Runnable task) {
-        backgroundExecutor.submit(task);
+        if(!backgroundExecutor.isTerminated() && !backgroundExecutor.isShutdown()) { backgroundExecutor.submit(task); }
     }
 
     public void shutdown() {
@@ -132,8 +132,9 @@ public class Radio3 {
         return performRequest(new Frame(FrameCommand.VFO_TYPE, Binary.fromUInt8(vfoType.getCode())), pingParser);
     }
 
-    public Response<Class<Void>> writeVfoAttenuator(VfoAttenuator vfoAttenuator) {
-        return performRequest(new Frame(FrameCommand.VFO_ATTENUATOR, Binary.fromUInt8(vfoAttenuator.getCode())), pingParser);
+    public Response<Class<Void>> writeVfoAttenuator(boolean att0, boolean att1, boolean att2) {
+        int val = (att0 ? 1 : 0) + (att1 ? 2 : 0) + (att2 ? 4 : 0);
+        return performRequest(new Frame(FrameCommand.VFO_ATTENUATOR, Binary.fromUInt8(val)), pingParser);
     }
 
     public Response<Class<Void>> writeVfoOutput(VfoOut vfoOut) {
@@ -144,8 +145,8 @@ public class Radio3 {
         return performRequest(new Frame(FrameCommand.VNA_MODE, Binary.fromUInt8(vnaMode.getCode())), pingParser);
     }
 
-    public Response<Class<Void>> writeVfoAmpState(VfoAmpState vfoAmpState) {
-        return performRequest(new Frame(FrameCommand.VFO_AMPLIFIER, Binary.fromUInt8(vfoAmpState.getCode())), pingParser);
+    public Response<Class<Void>> writeVfoAmpState(VfoAmp vfoAmp) {
+        return performRequest(new Frame(FrameCommand.VFO_AMPLIFIER, Binary.fromUInt8(vfoAmp.getCode())), pingParser);
     }
 
     public List<String> availablePorts() {

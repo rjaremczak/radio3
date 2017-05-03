@@ -243,21 +243,21 @@ public class VnaController {
     }
 
     private void updateSwrAxis(Range range) {
-        double min = Math.min(0, range.getMin());
+        double min = Math.min(0, range.min());
         if(range.isValid()) {
-            if(range.getMax() < 1.95) {
+            if(range.max() < 1.95) {
                 setUpAxis(swrAxisY, min, 2, 0.1);
-            } else if(range.getMax() < 4.5) {
+            } else if(range.max() < 4.5) {
                 setUpAxis(swrAxisY, min, 5, 0.5);
-            } else if(range.getMax() < 19.5) {
+            } else if(range.max() < 19.5) {
                 setUpAxis(swrAxisY, min, 20, 2);
-            } else if(range.getMax() < 50) {
+            } else if(range.max() < 50) {
                 setUpAxis(swrAxisY, min, 50, 5);
-            } else if(range.getMax() < 90) {
+            } else if(range.max() < 90) {
                 setUpAxis(swrAxisY, min, 100, 20);
-            } else if(range.getMax() < 490) {
+            } else if(range.max() < 490) {
                 setUpAxis(swrAxisY, min, 500, 50);
-            } else if(range.getMax() < 1999) {
+            } else if(range.max() < 1999) {
                 setUpAxis(swrAxisY, min, 2000, 200);
             } else {
                 swrAxisY.setAutoRanging(true);
@@ -268,19 +268,19 @@ public class VnaController {
     }
 
     private void updateImpedanceAxis(Range range) {
-        double min = Math.min(0, range.getMin());
+        double min = Math.min(0, range.min());
         if(range.isValid()) {
-            if(range.getMax() < 24) {
+            if(range.max() < 24) {
                 setUpAxis(impedanceAxisY, min, 25, 5);
-            } else if(range.getMax() < 99) {
+            } else if(range.max() < 99) {
                 setUpAxis(impedanceAxisY, min, 100, 10);
-            } else if(range.getMax() < 990) {
+            } else if(range.max() < 990) {
                 setUpAxis(impedanceAxisY, min, 1000, 100);
-            } else if(range.getMax() < 1990) {
+            } else if(range.max() < 1990) {
                 setUpAxis(impedanceAxisY, min, 2000, 200);
-            } else if(range.getMax() < 4990) {
+            } else if(range.max() < 4990) {
                 setUpAxis(impedanceAxisY, min, 5000, 500);
-            } else if(range.getMax() < 9900) {
+            } else if(range.max() < 9900) {
                 setUpAxis(impedanceAxisY, min, 10000, 1000);
             } else {
                 impedanceAxisY.setAutoRanging(true);

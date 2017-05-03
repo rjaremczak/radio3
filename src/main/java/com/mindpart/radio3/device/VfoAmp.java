@@ -4,13 +4,13 @@ package com.mindpart.radio3.device;
  * Created by Robert Jaremczak
  * Date: 2017.02.21
  */
-public enum VfoAmpState {
+public enum VfoAmp {
     OFF(0, "Off"), ON(1, "On");
 
     private int code;
     private String name;
 
-    VfoAmpState(int code, String name) {
+    VfoAmp(int code, String name) {
         this.code = code;
         this.name = name;
     }

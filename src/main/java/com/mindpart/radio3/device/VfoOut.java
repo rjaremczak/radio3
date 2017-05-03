@@ -5,7 +5,7 @@ package com.mindpart.radio3.device;
  * Date: 2016.12.03
  */
 public enum VfoOut {
-    DIRECT(FrameCommand.VFO_OUT_DIRECT),
+    VFO(FrameCommand.VFO_OUT_DIRECT),
     VNA(FrameCommand.VFO_OUT_VNA);
 
     private FrameCommand frameCommand;
