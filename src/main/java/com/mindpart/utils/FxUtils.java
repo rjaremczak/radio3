@@ -61,7 +61,7 @@ public final class FxUtils {
         return number!=null ? number.doubleValue() : 0;
     }
 
-    public static void setDisabledOf(boolean flag, Object... items) {
+    public static void setDisabled(boolean flag, Object... items) {
         for (Object item : items) {
             if (item instanceof Node) {
                 ((Node) item).setDisable(flag);
@@ -72,10 +72,10 @@ public final class FxUtils {
     }
 
     public static void disableItems(Object... items) {
-        setDisabledOf(true, items);
+        setDisabled(true, items);
     }
 
     public static void enableItems(Object... items) {
-        FxUtils.setDisabledOf(false, items);
+        FxUtils.setDisabled(false, items);
     }
 }

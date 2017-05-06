@@ -187,6 +187,7 @@ public class SweepController {
         FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
         sweepSettingsPane.disableControls(true);
         mainController.disableAllExcept(true, mainController.sweepTab);
+        mainController.disableVfoOut(true);
         if(!btnContinuous.isSelected()) btnContinuous.setDisable(true);
     }
 
@@ -199,6 +200,7 @@ public class SweepController {
             sweepSettingsPane.disableControls(false);
         }
         mainController.disableAllExcept(false, mainController.sweepTab);
+        mainController.disableVfoOut(false);
     }
 
     private void continuousChangeListener(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean continuous) {
@@ -276,6 +278,8 @@ public class SweepController {
             Response<SweepResponse> response = sweepOnce();
             if(response.isOK() && radio3.isConnected()) {
                 Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
+            } else {
+                enableUI();
             }
         });
     }

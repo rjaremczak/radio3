@@ -186,9 +186,11 @@ public class MainController {
             Response<DeviceInfo> deviceInfoResponse = radio3.connect(serialPorts.getValue(), hardwareRevisions.getValue(), vfoType.getValue());
             if (deviceInfoResponse.isOK()) {
                 updateOnConnect();
-                updateDeviceInfo(deviceInfoResponse.getData());
+                DeviceInfo deviceInfo = deviceInfoResponse.getData();
+                updateDeviceProperties(deviceInfo);
+                setUpVfoAtt(deviceInfo.hardwareRevision);
+                setUpVfoAmp(deviceInfo.hardwareRevision);
                 requestDeviceState();
-                requestVfoFrequency();
             } else {
                 radio3.disconnect();
                 updateOnDisconnect(DeviceStatus.ERROR);
@@ -196,7 +198,7 @@ public class MainController {
         });
     }
 
-    private void doDisconnect() {
+    void doDisconnect() {
         updateDeviceStatus(DeviceStatus.DISCONNECTING);
         radio3.disconnect();
         updateOnDisconnect(DeviceStatus.DISCONNECTED);
@@ -241,8 +243,8 @@ public class MainController {
         initVfoOut();
         initHardwareRevision();
         initVfoType();
-        initVfoAmplifier();
-        initVfoAttenuator();
+        initVfoAmp();
+        initVfoAtt();
 
         updateOnDisconnect(DeviceStatus.DISCONNECTED);
         updateAvailablePorts();
@@ -251,11 +253,27 @@ public class MainController {
             if(continuousSamplingEnabled) { Platform.runLater(this::sampleAllProbes); }
         }, 200, 200, TimeUnit.MILLISECONDS);
 
-        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue == componentsTab) {
-                requestVfoFrequency();
-            }
-        });
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> tabPaneListener(newValue));
+    }
+
+    private void tabPaneListener(Tab selectedPane) {
+        if(selectedPane == componentsTab) {
+            disableVfoOut(false);
+            requestVfoFrequency();
+        } else if(selectedPane == sweepTab) {
+            updateVfoOut(VfoOut.VFO);
+            disableVfoOut(true);
+        } else if(selectedPane == vnaTab) {
+            updateVfoOut(VfoOut.VNA);
+            disableVfoOut(true);
+        } else if(selectedPane == deviceTab) {
+            disableVfoOut(false);
+            requestDeviceState();
+        }
+    }
+
+    private boolean isDeviceTabSelected() {
+        return tabPane.getSelectionModel().getSelectedItem() == deviceTab;
     }
 
     private void initVfoOut() {
@@ -264,6 +282,7 @@ public class MainController {
             if(newValue!=null) {
                 VfoOut vfoOut = VfoOut.valueOf(((ToggleButton) newValue).getText());
                 radio3.writeVfoOutput(vfoOut);
+                if(isDeviceTabSelected()) requestDeviceState();
             }
         });
     }
@@ -271,27 +290,25 @@ public class MainController {
     private void initVfoType() {
         vfoType.getItems().addAll(VfoType.DDS_AD9850, VfoType.DDS_AD9851);
         vfoType.getSelectionModel().select(radio3.getConfiguration().getVfoType());
-        vfoType.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldValue, newValue) -> radio3.setVfoType(newValue));
+        vfoType.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> radio3.setVfoType(newValue));
     }
 
-    private void initVfoAttenuator() {
-        vfoAtt0.selectedProperty().addListener((observable, oldValue, newValue) -> vfoAttListener());
-        vfoAtt1.selectedProperty().addListener((observable, oldValue, newValue) -> vfoAttListener());
-        vfoAtt2.selectedProperty().addListener((observable, oldValue, newValue) -> vfoAttListener());
+    private void initVfoAtt() {
+        vfoAtt0.setOnAction(e -> vfoAttListener());
+        vfoAtt1.setOnAction(e -> vfoAttListener());
+        vfoAtt2.setOnAction(e -> vfoAttListener());
     }
 
     private void vfoAttListener() {
         radio3.writeVfoAttenuator(vfoAtt0.isSelected(), vfoAtt1.isSelected(), vfoAtt2.isSelected());
+        if(isDeviceTabSelected()) requestDeviceState();
     }
 
-    void updateVfoAtt(HardwareRevision hardwareRevision) {
-        if(hardwareRevision != HardwareRevision.VERSION_2) {
-            vfoAtt0.setSelected(false);
-            vfoAtt1.setSelected(false);
-            vfoAtt2.setSelected(false);
-            FxUtils.disableItems(vfoAtt0, vfoAtt1, vfoAtt1);
-        }
+    void setUpVfoAtt(HardwareRevision hardwareRevision) {
+        vfoAtt0.setSelected(false);
+        vfoAtt1.setSelected(false);
+        vfoAtt2.setSelected(false);
+        FxUtils.setDisabled(hardwareRevision != HardwareRevision.VERSION_2, vfoAtt0, vfoAtt1, vfoAtt2);
     }
 
     private void initHardwareRevision() {
@@ -333,15 +350,14 @@ public class MainController {
         }
     }
 
-    private void initVfoAmplifier() {
-        vfoAmp.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if(oldValue!=null && newValue!=null) {
-                radio3.writeVfoAmpState(newValue ? VfoAmp.ON : VfoAmp.OFF);
-            }
+    private void initVfoAmp() {
+        vfoAmp.setOnAction(e -> {
+            radio3.writeVfoAmp(vfoAmp.isSelected() ? VfoAmp.ON : VfoAmp.OFF);
+            if(isDeviceTabSelected()) requestDeviceState();
         });
     }
 
-    void updateVfoAmp(HardwareRevision hardwareRevision) {
+    void setUpVfoAmp(HardwareRevision hardwareRevision) {
         vfoAmp.setSelected(false);
         vfoAmp.setDisable(hardwareRevision != HardwareRevision.VERSION_2);
     }
@@ -352,7 +368,13 @@ public class MainController {
 
     private void requestDeviceState() {
         Response<DeviceState> deviceStateResponse = radio3.readDeviceState();
-        if(deviceStateResponse.isOK()) updateDeviceState(deviceStateResponse.getData());
+        if(deviceStateResponse.isOK()) {
+            DeviceState ds = deviceStateResponse.getData();
+            updateDeviceProperties(ds);
+            updateVfoOut(ds.vfoOut);
+            updateVfoAmp(ds.vfoAmp);
+            updateVfoAtt(ds.vfoAtt0, ds.vfoAtt1, ds.vfoAtt2);
+        }
     }
 
     private void requestVfoFrequency() {
@@ -362,7 +384,9 @@ public class MainController {
 
     private void requestDeviceInfo() {
         Response<DeviceInfo> deviceInfoResponse = radio3.readDeviceInfo();
-        if(deviceInfoResponse.isOK()) updateDeviceInfo(deviceInfoResponse.getData());
+        if(deviceInfoResponse.isOK()) {
+            updateDeviceProperties(deviceInfoResponse.getData());
+        }
     }
 
     private void onRefresh(ActionEvent event) {
@@ -409,29 +433,23 @@ public class MainController {
         deviceProperties.setAll(devicePropertiesMap.entrySet().stream().map(e -> new Property(e.getKey(), e.getValue())).collect(Collectors.toList()));
     }
 
-    void updateDeviceInfo(DeviceInfo di) {
+    private void updateDeviceProperties(DeviceInfo di) {
         devicePropertiesMap.put("Device", di.name);
         devicePropertiesMap.put("Build Id", di.buildId);
         devicePropertiesMap.put("Hardware Revision", di.hardwareRevision.toString());
         devicePropertiesMap.put("VFO", di.vfoType.toString());
         devicePropertiesMap.put("Baud rate", Long.toString(di.baudRate));
         updateDeviceProperties();
-        updateVfoAtt(di.hardwareRevision);
-        updateVfoAmp(di.hardwareRevision);
     }
 
-    void updateDeviceState(DeviceState ds) {
+    private void updateDeviceProperties(DeviceState ds) {
         devicePropertiesMap.put("Time since reset", ds.timeMs + " ms");
         devicePropertiesMap.put("VFO output", ds.vfoOut.toString());
         devicePropertiesMap.put("VFO amplifier", ds.vfoAmp.toString());
         devicePropertiesMap.put("VFO attenuator stage 0", Boolean.toString(ds.vfoAtt0));
         devicePropertiesMap.put("VFO attenuator stage 1", Boolean.toString(ds.vfoAtt1));
         devicePropertiesMap.put("VFO attenuator stage 2", Boolean.toString(ds.vfoAtt2));
-
         updateDeviceProperties();
-        updateVfoOut(ds.vfoOut);
-        updateVfoAmp(ds.vfoAmp);
-        updateVfoAtt(ds.vfoAtt0, ds.vfoAtt1, ds.vfoAtt2);
     }
 
     private void updateVfoAtt(boolean att0, boolean att1, boolean att2) {
@@ -441,7 +459,11 @@ public class MainController {
     }
 
     void disableAllExcept(boolean flag, Object element) {
-        FxUtils.setDisabledOf(flag, nonModalNodes.stream().filter(e -> e!=element).toArray());
+        FxUtils.setDisabled(flag, nonModalNodes.stream().filter(e -> e!=element).toArray());
+    }
+
+    void disableVfoOut(boolean flag) {
+        FxUtils.setDisabled(flag, outVfo, outVna);
     }
 
     private void updateMainIndicator(Color color) {

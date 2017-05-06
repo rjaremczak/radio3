@@ -43,7 +43,7 @@ public class SweepSettingsPane extends GridPane {
 
     private void initSweepSteps() {
         sweepQuality.getItems().addAll(SweepQuality.values());
-        sweepQuality.getSelectionModel().select(SweepQuality.FINE);
+        sweepQuality.getSelectionModel().select(SweepQuality.BEST);
     }
 
     public void initialize() {

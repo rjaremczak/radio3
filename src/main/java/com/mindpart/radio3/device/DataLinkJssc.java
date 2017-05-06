@@ -22,7 +22,7 @@ import static jssc.SerialPort.*;
 public class DataLinkJssc implements DataLink {
     private static final Logger logger = Logger.getLogger(DataLinkJssc.class);
 
-    private static final int TIMEOUT_MS = 2000;
+    private static final int TIMEOUT_MS = 1000;
     private static final int DATA_BITS = DATABITS_8;
     private static final int STOP_BITS = STOPBITS_1;
     private static final int PARITY = PARITY_NONE;
@@ -36,14 +36,14 @@ public class DataLinkJssc implements DataLink {
 
     public synchronized void connect(String portName) throws SerialPortException, SerialPortTimeoutException {
         this.serialPort = new SerialPort(portName);
-        if(serialPort.openPort()) {
+        if(serialPort!=null && serialPort.openPort()) {
             logger.debug("port opened");
             flushBuffers();
             serialPort.setParams(BAUD_RATE, DATA_BITS, STOP_BITS, PARITY);
             serialPort.setFlowControlMode(FLOWCONTROL_NONE);
             attachEventListener();
         } else {
-            logger.error("port not opened");
+            logger.error("error opening port");
         }
     }
 
@@ -136,13 +136,6 @@ public class DataLinkJssc implements DataLink {
             long t0 = System.currentTimeMillis();
             receivedFrameLatch = new CountDownLatch(1);
             serialPort.writeBytes(request.toBytes());
-            /*
-            long tf0 = System.currentTimeMillis();
-            while(serialPort.getOutputBufferBytesCount()!=0) {
-                logger.debug("tx buffer count: "+serialPort.getOutputBufferBytesCount());
-            }
-            logger.debug("tx buffer emptied in "+(System.currentTimeMillis()-tf0)+" ms");
-            */
             receivedFrameLatch.await(TIMEOUT_MS, TimeUnit.MILLISECONDS);
             Exception exception = receiveExceptionRef.getAndSet(null);
             if(exception != null) {
@@ -153,7 +146,7 @@ public class DataLinkJssc implements DataLink {
             }
             Frame response = receivedFrameRef.getAndSet(null);
             if(logger.isDebugEnabled()) {
-                logger.debug("request: "+request+" -> "+response+" in "+(System.currentTimeMillis()-t0)+" ms");
+                logger.debug("request: "+request+" -> "+(response!=null ? response : "no response")+" in "+(System.currentTimeMillis()-t0)+" ms");
             }
             return response!=null ? Response.success(response) : Response.error("no response");
         } catch (Exception e) {

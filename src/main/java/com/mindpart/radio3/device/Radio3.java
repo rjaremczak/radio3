@@ -145,7 +145,7 @@ public class Radio3 {
         return performRequest(new Frame(FrameCommand.VNA_MODE, Binary.fromUInt8(vnaMode.getCode())), pingParser);
     }
 
-    public Response<Class<Void>> writeVfoAmpState(VfoAmp vfoAmp) {
+    public Response<Class<Void>> writeVfoAmp(VfoAmp vfoAmp) {
         return performRequest(new Frame(FrameCommand.VFO_AMPLIFIER, Binary.fromUInt8(vfoAmp.getCode())), pingParser);
     }
 
