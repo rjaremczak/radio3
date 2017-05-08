@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepController">
+<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepController">
    <children>
       <VBox fx:id="vBox" layoutX="211.0" layoutY="50.0" prefHeight="200.0" prefWidth="738.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -39,7 +39,7 @@
                     </rowConstraints>
                      <children>
                         <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <Label text="input probe" />
+                        <Label text="Input" />
                         <ChoiceBox fx:id="sourceProbe" focusTraversable="false" GridPane.rowIndex="1" />
                         <ToggleButton fx:id="btnNormalize" mnemonicParsing="false" text="Norm" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="Continuous" GridPane.columnIndex="3" GridPane.rowIndex="1" />

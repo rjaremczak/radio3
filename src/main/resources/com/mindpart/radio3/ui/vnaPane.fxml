@@ -34,13 +34,14 @@
                     </columnConstraints>
                     <rowConstraints>
                         <RowConstraints vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints vgrow="SOMETIMES" />
                       <RowConstraints vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
                         <Button fx:id="btnStart" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="Start" GridPane.rowIndex="2" />
                         <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="Continuous" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text=" " GridPane.rowIndex="1" />
+                        <Label GridPane.rowIndex="1" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -57,7 +58,7 @@
                               <NumberAxis fx:id="swrAxisX" autoRanging="false" label="Frequency [MHz]" />
                            </xAxis>
                            <yAxis>
-                              <NumberAxis fx:id="swrAxisY" autoRanging="false" label="SWR" minWidth="-Infinity" prefWidth="60.0" tickUnit="0.5" upperBound="10.0" />
+                              <NumberAxis fx:id="swrAxisY" autoRanging="false" label="SWR" minWidth="-Infinity" prefWidth="70.0" tickUnit="0.5" upperBound="10.0" />
                            </yAxis>
                            <padding>
                               <Insets left="5.0" top="5.0" />
@@ -72,7 +73,7 @@
                               <NumberAxis fx:id="impedanceAxisX" autoRanging="false" forceZeroInRange="false" />
                            </xAxis>
                            <yAxis>
-                              <NumberAxis fx:id="impedanceAxisY" forceZeroInRange="false" label="Impedance [Ω]" prefWidth="60.0" />
+                              <NumberAxis fx:id="impedanceAxisY" forceZeroInRange="false" label="Impedance [Ω]" minWidth="-Infinity" prefWidth="70.0" />
                            </yAxis>
                            <padding>
                               <Insets left="5.0" top="5.0" />

@@ -167,6 +167,7 @@ public class VnaController {
         numberAxis.setLowerBound(min);
         numberAxis.setUpperBound(max);
         numberAxis.setTickUnit(tickUnit);
+        numberAxis.setMinorTickVisible(false);
     }
 
     public void onSweepOnce() {
@@ -182,6 +183,8 @@ public class VnaController {
             Response<SweepResponse> response = sweepOnce();
             if(response.isOK() && radio3.isConnected()) {
                 Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
+            } else {
+                enableUI();
             }
         });
     }

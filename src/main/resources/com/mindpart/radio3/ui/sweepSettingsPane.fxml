@@ -21,11 +21,11 @@
       <RowConstraints vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
-      <FrequencyField fx:id="startFrequencyField" alignment="CENTER_RIGHT" label="start frequency" promptText="from" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <FrequencyField fx:id="endFrequencyField" alignment="CENTER_RIGHT" label="end frequency" promptText="to" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <Label text="frequency range [MHz]" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-      <Label text="quality" GridPane.columnIndex="3" />
-      <Label text="presets" />
+      <FrequencyField fx:id="startFrequencyField" alignment="CENTER_RIGHT" label="start frequency" prefColumnCount="8" promptText="from" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <FrequencyField fx:id="endFrequencyField" alignment="CENTER_RIGHT" label="end frequency" prefColumnCount="8" promptText="to" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+      <Label text="Frequency range [MHz]" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+      <Label text="Quality" GridPane.columnIndex="3" />
+      <Label text="Presets" />
       <ChoiceBox fx:id="presetsChoiceBox" GridPane.rowIndex="1" />
       <ChoiceBox fx:id="sweepQuality" GridPane.columnIndex="3" GridPane.rowIndex="1" />
    </children>
