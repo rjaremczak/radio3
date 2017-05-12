@@ -10,9 +10,14 @@ import com.mindpart.utils.BinaryBuilder;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static com.mindpart.radio3.device.FrameCommand.*;
@@ -41,6 +46,9 @@ public class Radio3 {
     private Consumer<Frame> requestHandler;
     private Consumer<Response> responseHandler;
     private ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
+    private ScheduledExecutorService keepAliveExecutor = Executors.newSingleThreadScheduledExecutor();
+    private AtomicReference<Instant> lastResponseTime = new AtomicReference<>(Instant.MIN);
+    private Duration keepAlivePeriod = Duration.ofSeconds(10);
 
     public Radio3(Consumer<Frame> requestHandler, Consumer<Response> responseHandler) throws IOException {
         initConfiguration();
@@ -61,6 +69,16 @@ public class Radio3 {
         fMeterParser = new FMeterParser(configuration.getfMeter());
         multipleProbesParser = new MultipleProbesParser(logarithmicParser, linearParser, vnaParser, fMeterParser);
         sweepResponseParser = new SweepResponseParser();
+
+        initKeepAlive();
+    }
+
+    private void initKeepAlive() {
+        keepAliveExecutor.scheduleWithFixedDelay(() -> {
+            if(isConnected() && Duration.between(lastResponseTime.get(), Instant.now()).compareTo(keepAlivePeriod) > 0) {
+                sendPing();
+            }
+        }, keepAlivePeriod.toMillis(), keepAlivePeriod.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     private void initConfiguration() throws IOException {
@@ -102,6 +120,7 @@ public class Radio3 {
 
     public void shutdown() {
         backgroundExecutor.shutdown();
+        keepAliveExecutor.shutdown();
         disconnect();
     }
 
@@ -159,6 +178,7 @@ public class Radio3 {
         if(response.isOK() && frameParser.recognizes(response.getData())) {
             Response<T> responseOk =  Response.success(frameParser.parse(response.getData()));
             responseHandler.accept(responseOk);
+            lastResponseTime.set(Instant.now());
             return responseOk;
         }
 

@@ -22,7 +22,7 @@ import static jssc.SerialPort.*;
 public class DataLinkJssc implements DataLink {
     private static final Logger logger = Logger.getLogger(DataLinkJssc.class);
 
-    private static final int TIMEOUT_MS = 1000;
+    private static final int TIMEOUT_MS = 2000;
     private static final int DATA_BITS = DATABITS_8;
     private static final int STOP_BITS = STOPBITS_1;
     private static final int PARITY = PARITY_NONE;

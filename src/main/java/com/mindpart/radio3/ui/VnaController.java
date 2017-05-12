@@ -141,6 +141,7 @@ public class VnaController {
         FxUtils.enableItems(btnStart);
         sweepSettingsPane.disableControls(false);
         mainController.disableAllExcept(false, mainController.vnaTab);
+        mainController.requestDeviceState();
     }
 
     private void onContinuousChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {

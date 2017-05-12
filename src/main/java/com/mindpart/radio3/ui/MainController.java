@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -262,10 +261,8 @@ public class MainController {
             disableVfoOut(false);
             requestVfoFrequency();
         } else if(selectedPane == sweepTab) {
-            updateVfoOut(VfoOut.VFO);
             disableVfoOut(true);
         } else if(selectedPane == vnaTab) {
-            updateVfoOut(VfoOut.VNA);
             disableVfoOut(true);
         } else if(selectedPane == deviceTab) {
             disableVfoOut(false);
@@ -367,7 +364,7 @@ public class MainController {
         continuousSampling.shutdown();
     }
 
-    private void requestDeviceState() {
+    void requestDeviceState() {
         Response<DeviceState> deviceStateResponse = radio3.readDeviceState();
         if(deviceStateResponse.isOK()) {
             DeviceState ds = deviceStateResponse.getData();
