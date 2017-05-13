@@ -432,9 +432,8 @@ public class MainController {
     }
 
     private void updateDeviceProperties(DeviceInfo di) {
-        devicePropertiesMap.put("Device", di.name);
-        devicePropertiesMap.put("Build Id", di.buildId);
-        devicePropertiesMap.put("Hardware Revision", di.hardwareRevision.toString());
+        devicePropertiesMap.put("Hardware", di.name+" ("+di.hardwareRevision+")");
+        devicePropertiesMap.put("Firmware", di.buildId);
         devicePropertiesMap.put("VFO", di.vfoType.toString());
         devicePropertiesMap.put("Baud rate", Long.toString(di.baudRate));
         updateDeviceProperties();

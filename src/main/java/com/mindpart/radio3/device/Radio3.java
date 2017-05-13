@@ -76,7 +76,7 @@ public class Radio3 {
     private void initKeepAlive() {
         keepAliveExecutor.scheduleWithFixedDelay(() -> {
             if(isConnected() && Duration.between(lastResponseTime.get(), Instant.now()).compareTo(keepAlivePeriod) > 0) {
-                sendPing();
+                if(isConnected()) sendPing();
             }
         }, keepAlivePeriod.toMillis(), keepAlivePeriod.toMillis(), TimeUnit.MILLISECONDS);
     }
