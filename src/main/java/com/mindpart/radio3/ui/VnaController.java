@@ -1,10 +1,10 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.VnaResult;
-import com.mindpart.radio3.device.SweepSignalSource;
-import com.mindpart.radio3.device.SweepResponse;
 import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
+import com.mindpart.radio3.device.SweepResponse;
+import com.mindpart.radio3.device.SweepSignalSource;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.SWR;
 import com.mindpart.ui.ChartMarker;
@@ -16,7 +16,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
-import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -30,6 +29,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.function.Consumer;
 
+import static com.mindpart.utils.FxChartUtils.rangeAxis;
 import static com.mindpart.utils.FxUtils.valueFromSeries;
 
 /**
@@ -116,13 +116,11 @@ public class VnaController {
         impedanceChart.setData(impedanceDataSeries);
         impedanceChart.setCreateSymbols(false);
 
-        setUpAxis(swrAxisX, 1, 55, 2.5);
-        setUpAxis(swrAxisY, 0, 200, 10);
-        //swrAxisY.setAutoRanging(true);
+        rangeAxis(swrAxisX, 1, 55, 2.5);
+        rangeAxis(swrAxisY, 0, 200, 10);
 
-        setUpAxis(impedanceAxisX, 1, 55, 2.5);
-        setUpAxis(impedanceAxisY, 0, 1000, 50);
-        //impedanceAxisY.setAutoRanging(true);
+        rangeAxis(impedanceAxisX, 1, 55, 2.5);
+        rangeAxis(impedanceAxisY, 0, 1000, 50);
 
         hBox.getChildren().add(0, sweepSettingsPane);
 
@@ -144,7 +142,18 @@ public class VnaController {
         mainController.requestDeviceState();
     }
 
-    private void onContinuousChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean continuous) {
+    private void runSweepOnce(Consumer<SweepResponse> analyserDataConsumer) {
+        radio3.executeInBackground(() -> {
+            Response<SweepResponse> response = sweepOnce();
+            if(response.isOK() && radio3.isConnected()) {
+                Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
+            } else {
+                enableUI();
+            }
+        });
+    }
+
+    private void onContinuousChanged(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean continuous) {
         if(continuous) {
             disableUI();
             runSweepOnce(this::displayDataAndSweepAgain);
@@ -162,31 +171,11 @@ public class VnaController {
         }
     }
 
-    private void setUpAxis(Axis<Number> axis, double min, double max, double tickUnit) {
-        NumberAxis numberAxis = (NumberAxis) axis;
-        numberAxis.setAutoRanging(false);
-        numberAxis.setLowerBound(min);
-        numberAxis.setUpperBound(max);
-        numberAxis.setTickUnit(tickUnit);
-        numberAxis.setMinorTickVisible(false);
-    }
-
     public void onSweepOnce() {
         disableUI();
         runSweepOnce(analyserResponse -> {
             updateAnalyserData(analyserResponse);
             enableUI();
-        });
-    }
-
-    private void runSweepOnce(Consumer<SweepResponse> analyserDataConsumer) {
-        radio3.executeInBackground(() -> {
-            Response<SweepResponse> response = sweepOnce();
-            if(response.isOK() && radio3.isConnected()) {
-                Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
-            } else {
-                enableUI();
-            }
         });
     }
 
@@ -242,56 +231,8 @@ public class VnaController {
 
         swrChart.getData().add(swrSeries);
         impedanceChart.getData().addAll(rSeries, xSeries);
-        updateSwrAxis(swrRange);
-        updateImpedanceAxis(impedanceRange);
-    }
-
-    private void updateSwrAxis(Range range) {
-        double min = Math.min(0, range.min());
-        if(range.isValid()) {
-            if(range.max() < 1.95) {
-                setUpAxis(swrAxisY, min, 2, 0.1);
-            } else if(range.max() < 4.5) {
-                setUpAxis(swrAxisY, min, 5, 0.5);
-            } else if(range.max() < 19.5) {
-                setUpAxis(swrAxisY, min, 20, 2);
-            } else if(range.max() < 50) {
-                setUpAxis(swrAxisY, min, 50, 5);
-            } else if(range.max() < 90) {
-                setUpAxis(swrAxisY, min, 100, 20);
-            } else if(range.max() < 490) {
-                setUpAxis(swrAxisY, min, 500, 50);
-            } else if(range.max() < 1999) {
-                setUpAxis(swrAxisY, min, 2000, 200);
-            } else {
-                swrAxisY.setAutoRanging(true);
-            }
-        } else {
-            swrAxisY.setAutoRanging(true);
-        }
-    }
-
-    private void updateImpedanceAxis(Range range) {
-        double min = Math.min(0, range.min());
-        if(range.isValid()) {
-            if(range.max() < 24) {
-                setUpAxis(impedanceAxisY, min, 25, 5);
-            } else if(range.max() < 99) {
-                setUpAxis(impedanceAxisY, min, 100, 10);
-            } else if(range.max() < 990) {
-                setUpAxis(impedanceAxisY, min, 1000, 100);
-            } else if(range.max() < 1990) {
-                setUpAxis(impedanceAxisY, min, 2000, 200);
-            } else if(range.max() < 4990) {
-                setUpAxis(impedanceAxisY, min, 5000, 500);
-            } else if(range.max() < 9900) {
-                setUpAxis(impedanceAxisY, min, 10000, 1000);
-            } else {
-                impedanceAxisY.setAutoRanging(true);
-            }
-        } else {
-            impedanceAxisY.setAutoRanging(true);
-        }
+        rangeAxis(swrAxisY, swrRange, 2, 0, Double.MAX_VALUE, 1);
+        rangeAxis(impedanceAxisY, impedanceRange, 10, 0, Double.MAX_VALUE, 1);
     }
 
     void clear() {

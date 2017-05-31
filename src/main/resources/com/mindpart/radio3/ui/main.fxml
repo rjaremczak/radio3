@@ -95,7 +95,7 @@
                            </children>
                         </AnchorPane>
                      </content></Tab>
-                        <Tab fx:id="sweepTab" text="Sweep Generator" />
+                        <Tab fx:id="sweepTab" text="Sweep" />
                         <Tab fx:id="vnaTab" text="VNA" />
                         <Tab fx:id="componentsTab" text="Components">
                             <content>

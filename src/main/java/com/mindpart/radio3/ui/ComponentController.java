@@ -35,11 +35,11 @@ public abstract class ComponentController {
     @FXML
     abstract protected void initialize();
 
-    protected void setUpAsProbe(String title, String name) {
+    void setUpAsProbe(String title, String name) {
         setUp(title, name, false, "Get");
     }
 
-    protected void setUp(String title, String name, boolean editable, String mainButtonText) {
+    void setUp(String title, String name, boolean editable, String mainButtonText) {
         probeName.setText(title);
         valueName.setText(name);
         valueField.setText("");

@@ -7,12 +7,12 @@
   },
   "sweepProfiles": [
     {
-      "name": "KF + 50MHz",
+      "name": "HF + 50MHz",
       "freqMin": "1.8 MHz",
       "freqMax": "52.0 MHz"
     },
     {
-      "name": "KF",
+      "name": "HF",
       "freqMin": "1.8 MHz",
       "freqMax": "30.0 MHz"
     },

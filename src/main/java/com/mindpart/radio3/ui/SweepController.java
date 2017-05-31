@@ -31,6 +31,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.mindpart.utils.FxChartUtils.rangeAxis;
 import static com.mindpart.utils.FxUtils.valueFromSeries;
 
 /**
@@ -103,8 +104,8 @@ public class SweepController {
         return value - referenceData.get(index);
     }
 
-    private Double fromLinearTo1mV(int index, Double value) {
-        return 1.0 + (value - referenceData.get(index));
+    private Double fromLinearToNorm(int index, Double value) {
+        return value - referenceData.get(index);
     }
 
     public void initialize() throws IOException {
@@ -152,15 +153,15 @@ public class SweepController {
         if(normalized) {
             referenceData = receivedData.stream().map(XYChart.Data::getYValue).collect(Collectors.toList());
             if(sourceProbe.getValue() == SweepSignalSource.LOG_PROBE) {
-                signalAxisY.setLabel("Normalized Power [dBm]");
+                signalAxisY.setLabel("Relative Power [dB]");
                 probeAdcConverter = radio3.getLogarithmicParser()::parse;
                 probeValueFormatter = this::powerValueFormatter;
                 valueProcessor = this::fromLogarithmicToRelativeGain;
             } else {
-                signalAxisY.setLabel("Normalized Voltage [mV]");
+                signalAxisY.setLabel("Normalized Voltage [V]");
                 probeAdcConverter = radio3.getLinearParser()::parse;
                 probeValueFormatter = this::voltageValueFormatter;
-                valueProcessor = this::fromLinearTo1mV;
+                valueProcessor = this::fromLinearToNorm;
             }
         } else {
             updateInputSource(sourceProbe.getValue());
@@ -202,23 +203,12 @@ public class SweepController {
         mainController.requestDeviceState();
     }
 
-    private void continuousChangeListener(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean continuous) {
-        if(continuous) {
-            disableUI();
-            runSweepOnce(this::displayDataAndSweepAgain);
-            btnContinuous.setText("Stop");
-        } else {
-            enableUI();
-            btnContinuous.setText("Continuous");
-        }
-    }
-
     private String powerValueFormatter(double dBm) {
         return "power: "+Power.ofDBm(dBm).formatDBm();
     }
 
-    private String voltageValueFormatter(double mV) {
-        return "voltage: "+Voltage.ofMilliVolt(mV).format();
+    private String voltageValueFormatter(double v) {
+        return "voltage: "+Voltage.ofVolt(v).format();
     }
 
     private void updateInputSource(SweepSignalSource source) {
@@ -231,7 +221,7 @@ public class SweepController {
                 break;
             }
             case LIN_PROBE: {
-                signalAxisY.setLabel("Voltage [mV]");
+                signalAxisY.setLabel("Voltage [V]");
                 probeAdcConverter = radio3.getLinearParser()::parse;
                 probeValueFormatter = this::voltageValueFormatter;
                 valueProcessor = this::originalValue;
@@ -283,6 +273,17 @@ public class SweepController {
         });
     }
 
+    private void continuousChangeListener(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean continuous) {
+        if(continuous) {
+            disableUI();
+            runSweepOnce(this::displayDataAndSweepAgain);
+            btnContinuous.setText("Stop");
+        } else {
+            enableUI();
+            btnContinuous.setText("Continuous");
+        }
+    }
+
     private Response<SweepResponse> sweepOnce() {
         SweepQuality quality = sweepSettingsPane.getQuality();
         long fStart = sweepSettingsPane.getStartFrequency().toHz();
@@ -316,30 +317,12 @@ public class SweepController {
         signalDataSeries.add(chartSeries);
         signalAxisX.setForceZeroInRange(false);
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, receivedDataInfo.getFreqStart(), receivedDataInfo.getFreqEnd());
-        updateYAxis(range);
-    }
-
-    void setUpYAxis(double min, double max, double tickUnit) {
-        signalAxisY.setAutoRanging(false);
-        signalAxisY.setLowerBound(min);
-        signalAxisY.setUpperBound(max);
-        signalAxisY.setTickUnit(tickUnit);
-    }
-
-    double floor(double value, int grid) {
-        return Math.floor(value/grid) * grid;
-    }
-
-    double ceil(double value, int grid) {
-        return Math.ceil(value/grid) * grid;
-    }
-
-    void updateYAxis(Range range) {
-        if(range.isValid()) {
-            setUpYAxis(floor(range.min(), 3), ceil(range.max(), 3), range.span() <= 20 ? 1 : 5);
-        } else {
-            signalAxisY.setAutoRanging(true);
-            signalAxisY.setForceZeroInRange(false);
+        switch (sourceProbe.getValue()) {
+            case LIN_PROBE:
+                rangeAxis(signalAxisY, range, 0.01, 0.001);
+                break;
+            default:
+                rangeAxis(signalAxisY, range, 6, 1);
         }
     }
 

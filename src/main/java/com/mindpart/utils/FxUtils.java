@@ -38,8 +38,6 @@ public final class FxUtils {
         }
     }
 
-
-
     public static void alert(Alert.AlertType alertType, String title, String header, String content) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);

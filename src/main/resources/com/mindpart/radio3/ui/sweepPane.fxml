@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepController">
+<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepController">
    <children>
       <VBox fx:id="vBox" layoutX="211.0" layoutY="50.0" prefHeight="200.0" prefWidth="738.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -52,7 +52,7 @@
             </HBox>
             <LineChart fx:id="signalChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
                <xAxis><NumberAxis fx:id="signalAxisX" label="Frequency [MHz]" /></xAxis>
-               <yAxis><NumberAxis fx:id="signalAxisY" label="Power [dBm]" /></yAxis>
+               <yAxis><NumberAxis fx:id="signalAxisY" label="Power [dBm]" prefWidth="70.0" /></yAxis>
             </LineChart>
          </children>
          <padding>
