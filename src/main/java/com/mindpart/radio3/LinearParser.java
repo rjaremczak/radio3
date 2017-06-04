@@ -22,13 +22,12 @@ public class LinearParser implements FrameParser<Double> {
         return frame.getCommand() == LINPROBE_DATA;
     }
 
-    public Double parse(int adc) {
-        return Math.max(0, (REF_VRMS + this.adc.convert(adc)) / V_TO_VRMS_RATIO);
-    }
-
     @Override
     public Double parse(Frame frame) {
         return parse(Binary.toUInt16(frame.getPayload()));
     }
 
+    public Double parse(int adc) {
+        return Math.max(0, (REF_VRMS + this.adc.convert(adc)) / V_TO_VRMS_RATIO);
+    }
 }
