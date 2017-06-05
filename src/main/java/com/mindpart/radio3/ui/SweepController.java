@@ -14,9 +14,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -64,15 +62,19 @@ public class SweepController {
     @FXML
     NumberAxis signalAxisY;
 
+    @FXML   
+    VBox infoBox;
+
     private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
     private SweepSettingsPane sweepSettingsPane;
     private ChartMarker chartMarker = new ChartMarker();
-    private List<XYChart.Data<Double, Double>> receivedData = new ArrayList<>();
     private SweepDataInfo receivedDataInfo;
     private MainController mainController;
-
     private ChartContext<Integer,Double> chartContext;
+    private SweepInfoController sweepInfoController;
+
+    private final List<XYChart.Data<Double, Double>> receivedData = new ArrayList<>();
 
     public SweepController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
@@ -81,7 +83,7 @@ public class SweepController {
     }
 
     private double[] receivedDataArray() {
-        return receivedData.stream().mapToDouble(d -> d.getXValue().doubleValue()).toArray();
+        return receivedData.stream().mapToDouble(d -> d.getYValue().doubleValue()).toArray();
     }
 
     private void initChartContext() {
@@ -103,6 +105,8 @@ public class SweepController {
         } else {
             throw new IllegalStateException("source probe: "+sourceProbe.getValue());
         }
+        
+        signalAxisY.setLabel(chartContext.label());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -141,6 +145,10 @@ public class SweepController {
 
         initInputProbeList();
         initChartContext();
+
+        sweepInfoController = new SweepInfoController(infoBox);
+        sweepInfoController.initialize();
+
         updateNormButton();
     }
 
@@ -165,6 +173,7 @@ public class SweepController {
         clear();
         initChartContext();
         updateNormButton();
+        sweepInfoController.update(chartContext, null);
     }
 
     private void initInputProbeList() {
@@ -223,6 +232,7 @@ public class SweepController {
 
         updateChart();
     }
+    
     private void runSweepOnce(Consumer<SweepResponse> analyserDataConsumer) {
         radio3.executeInBackground(() -> {
             Response<SweepResponse> response = sweepOnce();
@@ -275,6 +285,7 @@ public class SweepController {
             data.add(new XYChart.Data<>(received.getXValue(), value));
         }
 
+        sweepInfoController.update(chartContext, data);
         signalDataSeries.add(chartSeries);
         signalAxisX.setForceZeroInRange(false);
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, receivedDataInfo.getFreqStart(), receivedDataInfo.getFreqEnd());
@@ -285,6 +296,7 @@ public class SweepController {
             default:
                 rangeAxis(signalAxisY, range, 6, 1);
         }
+
     }
 
     void clear() {

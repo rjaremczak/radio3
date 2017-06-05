@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -38,11 +39,11 @@
                       <RowConstraints vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="Start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="Start" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                         <Label text="Input" />
                         <ChoiceBox fx:id="sourceProbe" focusTraversable="false" GridPane.rowIndex="1" />
-                        <ToggleButton fx:id="btnNormalize" mnemonicParsing="false" text="Norm" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="Continuous" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <ToggleButton fx:id="btnNormalize" mnemonicParsing="false" text="Norm" textOverrun="CLIP" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="Continuous" textOverrun="CLIP" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -50,10 +51,27 @@
                   </GridPane>
                </children>
             </HBox>
-            <LineChart fx:id="signalChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" VBox.vgrow="ALWAYS">
-               <xAxis><NumberAxis fx:id="signalAxisX" label="Frequency [MHz]" /></xAxis>
-               <yAxis><NumberAxis fx:id="signalAxisY" label="Power [dBm]" prefWidth="70.0" /></yAxis>
-            </LineChart>
+            <SplitPane dividerPositions="0.8" VBox.vgrow="SOMETIMES">
+              <items>
+                <AnchorPane>
+                     <children>
+                        <LineChart fx:id="signalChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <xAxis>
+                              <NumberAxis fx:id="signalAxisX" label="Frequency [MHz]" />
+                           </xAxis>
+                           <yAxis>
+                              <NumberAxis fx:id="signalAxisY" label="Power [dBm]" prefWidth="70.0" />
+                           </yAxis>
+                        </LineChart>
+                     </children>
+                  </AnchorPane>
+                <AnchorPane>
+                     <children>
+                        <VBox fx:id="infoBox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                </AnchorPane>
+              </items>
+            </SplitPane>
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
