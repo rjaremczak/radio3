@@ -16,8 +16,13 @@ public class LinearProbeContext implements ChartContext<Integer, Double> {
     }
 
     @Override
-    public String label() {
+    public String axisLabel() {
         return "Voltage [V]";
+    }
+
+    @Override
+    public String valueLabel() {
+        return "voltage";
     }
 
     @Override
@@ -27,7 +32,7 @@ public class LinearProbeContext implements ChartContext<Integer, Double> {
 
     @Override
     public String format(Double value) {
-        return "voltage: "+ Voltage.ofVolt(value).format();
+        return Voltage.ofVolt(value).format();
     }
 
     @Override

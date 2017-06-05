@@ -15,7 +15,7 @@ public class LogarithmicProbeNormContext extends LogarithmicProbeContext {
     }
 
     @Override
-    public String label() {
+    public String axisLabel() {
         return "Relative Power [dB]";
     }
 

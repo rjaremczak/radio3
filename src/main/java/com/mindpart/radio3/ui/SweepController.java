@@ -106,7 +106,7 @@ public class SweepController {
             throw new IllegalStateException("source probe: "+sourceProbe.getValue());
         }
         
-        signalAxisY.setLabel(chartContext.label());
+        signalAxisY.setLabel(chartContext.axisLabel());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -124,7 +124,7 @@ public class SweepController {
             Frequency freq = scenePosToFrequency(scenePos);
             double value = valueFromSeries(signalDataSeries.get(0), freq.toMHz());
             Point2D selectionPos = new Point2D(scenePos.getX(), valueToRefPos(value).getY());
-            return new ChartMarker.SelectionData(selectionPos, "freq: "+freq+"\n" + chartContext.format(value));
+            return new ChartMarker.SelectionData(selectionPos, "freq: "+freq+"\n" + chartContext.valueLabel()+": "+chartContext.format(value));
         }, () -> !btnContinuous.isSelected());
 
         chartMarker.setupRangeSelection(

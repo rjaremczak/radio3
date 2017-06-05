@@ -15,7 +15,7 @@ public class LinearProbeNormContext extends LinearProbeContext {
     }
 
     @Override
-    public String label() {
+    public String axisLabel() {
         return "Normalized Voltage [V]";
     }
 

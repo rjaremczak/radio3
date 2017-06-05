@@ -5,7 +5,8 @@ package com.mindpart.radio3.ui;
  * Date: 2017.06.02
  */
 public interface ChartContext<R,T> {
-    String label();
+    String axisLabel();
+    String valueLabel();
     T parse(R rawData);
     String format(T value);
     T process(int arg, T value);

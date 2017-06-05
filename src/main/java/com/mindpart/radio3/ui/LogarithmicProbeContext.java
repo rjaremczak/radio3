@@ -16,8 +16,13 @@ public class LogarithmicProbeContext implements ChartContext<Integer, Double> {
     }
 
     @Override
-    public String label() {
+    public String axisLabel() {
         return "Power [dBm]";
+    }
+
+    @Override
+    public String valueLabel() {
+        return "power";
     }
 
     @Override
@@ -27,7 +32,7 @@ public class LogarithmicProbeContext implements ChartContext<Integer, Double> {
 
     @Override
     public String format(Double value) {
-        return "power: "+ Power.ofDBm(value).formatDBm();
+        return Power.ofDBm(value).formatDBm();
     }
 
     @Override
