@@ -103,8 +103,10 @@ public class ChartMarker {
         initRangeRulers();
 
         chart.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> updateChartBounds());
+        chart.setOnMousePressed(this::onMousePressedOrDragged);
+        chart.setOnMouseDragged(this::onMousePressedOrDragged);
+        chart.setOnMouseReleased(this::onMouseReleased);
         chart.setOnMouseClicked(this::onMouseClicked);
-        chart.setOnMouseExited(this::onMouseExited);
 
         clear();
     }
@@ -187,7 +189,40 @@ public class ChartMarker {
         }
     }
 
-    public void onMouseClicked(MouseEvent event) {
+    private void onMouseReleased(MouseEvent mouseEvent) {
+        hideChartMarker();
+    }
+
+    private void onMousePressedOrDragged(MouseEvent mouseEvent) {
+        if(isMouseOverChartArea(mouseEvent)) {
+            showChartMarker(eventToRefPos(mouseEvent));
+        } else {
+            hideChartMarker();
+        }
+    }
+
+    private void showChartMarker(Point2D refPos) {
+        SelectionData selectionData = selectionHandler.apply(refPos);
+        if(selectionData==null) return;
+
+        selectionLabel.setText(selectionData.text);
+        Point2D selPopupScreenPos = referencePane.localToScreen(selectionData.pos);
+        selectionPopup.show(referencePane, selPopupScreenPos.getX()+10, selPopupScreenPos.getY()+20);
+
+        selectionPoint.setCenterX(selectionData.pos.getX());
+        selectionPoint.setCenterY(selectionData.pos.getY());
+        selectionPoint.setVisible(true);
+
+        updateRuler(selectionRuler, selectionData.pos.getX(), true);
+    }
+
+    private void hideChartMarker() {
+        selectionPopup.hide();
+        selectionPoint.setVisible(false);
+        selectionRuler.setVisible(false);
+    }
+
+    private void onMouseClicked(MouseEvent event) {
         if(!clickActive.get()) { return; }
         if(chart.getData().isEmpty()) { return; }
 
@@ -196,26 +231,10 @@ public class ChartMarker {
 
         if(event.getButton() == MouseButton.SECONDARY) {
             if(isRangeSelection()) { handleRangeSelection(refPos, event); }
-        } else {
-            SelectionData selectionData = selectionHandler.apply(refPos);
-
-            selectionLabel.setText(selectionData.text);
-            Point2D selPopupScreenPos = referencePane.localToScreen(selectionData.pos);
-            selectionPopup.show(referencePane, selPopupScreenPos.getX()+10, selPopupScreenPos.getY()+20);
-
-            selectionPoint.setCenterX(selectionData.pos.getX());
-            selectionPoint.setCenterY(selectionData.pos.getY());
-            selectionPoint.setVisible(true);
-
-            updateRuler(selectionRuler, selectionData.pos.getX(), true);
         }
     }
 
-    public void onMouseExited(MouseEvent event) {
-        if(!chartBounds.contains(referencePane.sceneToLocal(event.getSceneX(),event.getSceneY()))) {
-            selectionPopup.hide();
-            selectionPoint.setVisible(false);
-            selectionRuler.setVisible(false);
-        }
+    private boolean isMouseOverChartArea(MouseEvent mouseEvent) {
+        return chartBounds.contains(referencePane.sceneToLocal(mouseEvent.getSceneX(),mouseEvent.getSceneY()));
     }
 }

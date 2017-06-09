@@ -121,6 +121,8 @@ public class SweepController {
     public void initialize() throws IOException {
 
         chartMarker.initialize(anchorPane, signalChart, scenePos -> {
+            if(signalDataSeries.isEmpty()) return null;
+            
             Frequency freq = scenePosToFrequency(scenePos);
             double value = valueFromSeries(signalDataSeries.get(0), freq.toMHz());
             Point2D selectionPos = new Point2D(scenePos.getX(), valueToRefPos(value).getY());

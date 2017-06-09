@@ -101,6 +101,8 @@ public class VnaController {
         swrChart.setCreateSymbols(false);
 
         chartMarker.initialize(anchorPane, swrChart, scenePos -> {
+            if(swrDataSeries.isEmpty()) return null;
+            
             Frequency freq = scenePosToFrequency(scenePos);
             SWR swr = new SWR(valueFromSeries(swrDataSeries.get(0), freq.toMHz()));
             double r = valueFromSeries(impedanceDataSeries.get(0), freq.toMHz());
