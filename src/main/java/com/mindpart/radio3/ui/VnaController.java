@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.Parent;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -75,14 +76,14 @@ public class VnaController {
     private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> swrDataSeries;
     private ObservableList<XYChart.Series<Number, Number>> impedanceDataSeries;
-    private SweepSettingsPane sweepSettingsPane;
+    private SweepSettingsController sweepSettingsController;
     private ChartMarker chartMarker = new ChartMarker();
     private MainController mainController;
 
     public VnaController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
         this.mainController = mainController;
-        this.sweepSettingsPane = new SweepSettingsPane(radio3.getConfiguration().getSweepProfiles());
+        this.sweepSettingsController = new SweepSettingsController(radio3.getConfiguration().getSweepProfiles());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -109,8 +110,8 @@ public class VnaController {
         }, () -> !btnContinuous.isSelected());
 
         chartMarker.setupRangeSelection(
-                data -> sweepSettingsPane.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
-                data -> sweepSettingsPane.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
+                data -> sweepSettingsController.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
+                data -> sweepSettingsController.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
 
         impedanceDataSeries = FXCollections.observableArrayList();
         impedanceChart.setData(impedanceDataSeries);
@@ -122,6 +123,7 @@ public class VnaController {
         rangeAxis(impedanceAxisX, 1, 55, 2.5);
         rangeAxis(impedanceAxisY, 0, 1000, 50);
 
+        Parent sweepSettingsPane = FxUtils.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml");
         hBox.getChildren().add(0, sweepSettingsPane);
 
         btnContinuous.selectedProperty().addListener(this::onContinuousChanged);
@@ -129,7 +131,7 @@ public class VnaController {
 
     private void disableUI() {
         FxUtils.disableItems(btnStart);
-        sweepSettingsPane.disableControls(true);
+        sweepSettingsController.disableControls(true);
         mainController.disableAllExcept(true, mainController.vnaTab);
         if(!btnContinuous.isSelected()) btnContinuous.setDisable(true);
     }
@@ -137,7 +139,7 @@ public class VnaController {
     private void enableUI() {
         if(!btnContinuous.isSelected()) btnContinuous.setDisable(false);
         FxUtils.enableItems(btnStart);
-        sweepSettingsPane.disableControls(false);
+        sweepSettingsController.disableControls(false);
         mainController.disableAllExcept(false, mainController.vnaTab);
         mainController.requestDeviceState();
     }
@@ -180,9 +182,9 @@ public class VnaController {
     }
 
     private Response<SweepResponse> sweepOnce() {
-        SweepQuality quality = sweepSettingsPane.getQuality();
-        long fStart = sweepSettingsPane.getStartFrequency().toHz();
-        long fEnd = sweepSettingsPane.getEndFrequency ().toHz();
+        SweepQuality quality = sweepSettingsController.getQuality();
+        long fStart = sweepSettingsController.getStartFrequency().toHz();
+        long fEnd = sweepSettingsController.getEndFrequency ().toHz();
         int fStep = (int) ((fEnd - fStart) / quality.getSteps());
         return radio3.startAnalyser(fStart, fStep,
                 quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(),

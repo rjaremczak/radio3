@@ -17,19 +17,8 @@ import java.net.URL;
 public final class FxUtils {
     private FxUtils() {}
 
-    public static void loadFxml(Object root, String resourceName) {
-        FXMLLoader loader = new FXMLLoader(root.getClass().getResource(resourceName));
-        loader.setRoot(root);
-        loader.setControllerFactory(clazz -> root);
-        try {
-            loader.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Parent loadPane(Object controller, URL resourceLocation) {
-        FXMLLoader loader  = new FXMLLoader(resourceLocation);
+    public static Parent loadFXml(Object controller, String resource) {
+        FXMLLoader loader = new FXMLLoader(controller.getClass().getResource(resource));
         loader.setControllerFactory(clazz -> controller);
         try {
             return loader.load();

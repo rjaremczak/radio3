@@ -12,7 +12,7 @@ import static com.mindpart.radio3.device.FrameCommand.LINPROBE_DATA;
  * Date: 2016.03.13
  */
 public class LinearParser implements FrameParser<Double> {
-    private static double REF_VRMS = -0.01;
+    private static double REF_VRMS = -0.03;
     private static double V_TO_VRMS_RATIO = 7.5 / 1.80;
 
     private Adc adc = Adc.getDefault();

@@ -225,8 +225,8 @@ public class MainController {
 
         vnaController = new VnaController(radio3, this);
         sweepController = new SweepController(radio3, this);
-        sweepTab.setContent(FxUtils.loadPane(sweepController, getClass().getResource("sweepPane.fxml")));
-        vnaTab.setContent(FxUtils.loadPane(vnaController, getClass().getResource("vnaPane.fxml")));
+        sweepTab.setContent(FxUtils.loadFXml(sweepController, "sweepPane.fxml"));
+        vnaTab.setContent(FxUtils.loadFXml(vnaController, "vnaPane.fxml"));
 
         vfoController = new VfoController(radio3);
         fMeterController = new FMeterController(radio3);

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepInfoController">
+   <children>
+      <Accordion nodeOrientation="LEFT_TO_RIGHT" VBox.vgrow="NEVER">
+        <panes>
+          <TitledPane alignment="TOP_LEFT" animated="false" contentDisplay="TOP" text="General" textOverrun="CLIP">
+               <content>
+                  <GridPane>
+                     <columnConstraints>
+                        <ColumnConstraints fillWidth="false" />
+                        <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints fillHeight="false" />
+                        <RowConstraints fillHeight="false" />
+                        <RowConstraints fillHeight="false" />
+                     </rowConstraints>
+                     <children>
+                        <Label text="min" textFill="GREY">
+                           <font>
+                              <Font name="Courier" size="13.0" />
+                           </font>
+                        </Label>
+                        <Label text="max" textFill="GREY" GridPane.rowIndex="1" />
+                        <Label text="span" textFill="GREY" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Courier" size="13.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="minValue" text="0.000" textAlignment="RIGHT" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                           <font>
+                              <Font name="Courier Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="maxValue" text="0.000" textAlignment="RIGHT" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Courier Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="spanValue" text="0.000" textAlignment="RIGHT" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Courier Bold" size="13.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </GridPane>
+               </content>
+            </TitledPane>
+          <TitledPane alignment="TOP_LEFT" animated="false" contentDisplay="TOP" expanded="false" text="Filter's Q" textOverrun="CLIP">
+               <content>
+                  <GridPane>
+                     <columnConstraints>
+                        <ColumnConstraints fillWidth="false" />
+                        <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints fillHeight="false" />
+                        <RowConstraints fillHeight="false" />
+                        <RowConstraints fillHeight="false" />
+                     </rowConstraints>
+                     <children>
+                        <Label text="freq" textFill="GREY">
+                           <font>
+                              <Font name="Courier" size="13.0" />
+                           </font>
+                        </Label>
+                        <Label text="width" textFill="GREY" GridPane.rowIndex="1" />
+                        <Label text="Q" textFill="GREY" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Courier" size="13.0" />
+                           </font>
+                        </Label>
+                        <Label text="0.000" textAlignment="RIGHT" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                           <font>
+                              <Font name="Courier Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <Label text="0.000" textAlignment="RIGHT" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Courier Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <Label text="0.000" textAlignment="RIGHT" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="Courier Bold" size="13.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </GridPane>
+               </content>
+            </TitledPane>
+        </panes>
+      </Accordion>
+   </children>
+</VBox>

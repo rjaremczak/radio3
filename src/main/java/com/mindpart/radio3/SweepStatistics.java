@@ -50,4 +50,8 @@ public class SweepStatistics {
     public double getMaxValue() {
         return maxValue;
     }
+
+    public double getSpanValue() {
+        return Math.abs(maxValue - minValue);
+    }
 }

@@ -11,9 +11,9 @@ import java.text.ParsePosition;
 public class Power {
     private static final double VALUE_W = 1;
     private static final double VALUE_mW = 0.001;
-    private static final NumberFormat FORMAT_W = new DecimalFormat("0.### W");
-    private static final NumberFormat FORMAT_mW = new DecimalFormat("0.# mW");
-    private static final NumberFormat FORMAT_dBm = new DecimalFormat("0.## dBm");
+    private static final NumberFormat FORMAT_W = new DecimalFormat("0.000 W");
+    private static final NumberFormat FORMAT_mW = new DecimalFormat("0.0 mW");
+    private static final NumberFormat FORMAT_dBm = new DecimalFormat("0.00 dBm");
 
     private double watt;
 

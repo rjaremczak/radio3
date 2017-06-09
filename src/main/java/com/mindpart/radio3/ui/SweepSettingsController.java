@@ -8,7 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.layout.GridPane;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -17,8 +16,8 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2016.10.31
  */
-public class SweepSettingsPane extends GridPane {
-    private static Logger logger = Logger.getLogger(SweepSettingsPane.class);
+public class SweepSettingsController {
+    private static Logger logger = Logger.getLogger(SweepSettingsController.class);
 
     @FXML
     FrequencyField startFrequencyField;
@@ -36,9 +35,8 @@ public class SweepSettingsPane extends GridPane {
     private Runnable rangeChangeListener = () -> {};
     private Runnable qualityChangeListener = () -> {};
 
-    public SweepSettingsPane(List<SweepProfile> presets) {
+    public SweepSettingsController(List<SweepProfile> presets) {
         this.presets.addAll(presets);
-        FxUtils.loadFxml(this, "sweepSettingsPane.fxml");
     }
 
     private void initSweepSteps() {

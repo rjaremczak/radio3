@@ -39,7 +39,10 @@ public class SweepController {
     VBox vBox;
 
     @FXML
-    HBox hBox;
+    HBox controlBox;
+
+    @FXML
+    HBox chartBox;
 
     @FXML
     ChoiceBox<SweepSignalSource> sourceProbe;
@@ -62,12 +65,9 @@ public class SweepController {
     @FXML
     NumberAxis signalAxisY;
 
-    @FXML   
-    VBox infoBox;
-
     private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
-    private SweepSettingsPane sweepSettingsPane;
+    private SweepSettingsController sweepSettingsController;
     private ChartMarker chartMarker = new ChartMarker();
     private SweepDataInfo receivedDataInfo;
     private MainController mainController;
@@ -79,7 +79,7 @@ public class SweepController {
     public SweepController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
         this.mainController = mainController;
-        this.sweepSettingsPane = new SweepSettingsPane(radio3.getConfiguration().getSweepProfiles());
+        this.sweepSettingsController = new SweepSettingsController(radio3.getConfiguration().getSweepProfiles());
     }
 
     private double[] receivedDataArray() {
@@ -128,26 +128,26 @@ public class SweepController {
         }, () -> !btnContinuous.isSelected());
 
         chartMarker.setupRangeSelection(
-                data -> sweepSettingsPane.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
-                data -> sweepSettingsPane.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
+                data -> sweepSettingsController.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
+                data -> sweepSettingsController.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
 
         signalDataSeries = FXCollections.observableArrayList();
         signalChart.setData(signalDataSeries);
         signalChart.setCreateSymbols(false);
 
-        hBox.getChildren().add(0, sweepSettingsPane);
+        controlBox.getChildren().add(0, FxUtils.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml"));
 
         btnNormalize.selectedProperty().addListener(this::normalizeChangeListener);
         btnContinuous.selectedProperty().addListener(this::continuousChangeListener);
 
-        sweepSettingsPane.setRangeChangeListener(this::sweepSettingsChangeListener);
-        sweepSettingsPane.setQualityChangeListener(this::sweepSettingsChangeListener);
+        sweepSettingsController.setRangeChangeListener(this::sweepSettingsChangeListener);
+        sweepSettingsController.setQualityChangeListener(this::sweepSettingsChangeListener);
 
         initInputProbeList();
         initChartContext();
 
-        sweepInfoController = new SweepInfoController(infoBox);
-        sweepInfoController.initialize();
+        sweepInfoController = new SweepInfoController();
+        chartBox.getChildren().add(sweepInfoController.getContainer());
 
         updateNormButton();
     }
@@ -163,7 +163,7 @@ public class SweepController {
             return;
         }
 
-        sweepSettingsPane.disableControls(normalized);
+        sweepSettingsController.disableControls(normalized);
         sourceProbe.setDisable(normalized);
         initChartContext();
         updateChart();
@@ -185,7 +185,7 @@ public class SweepController {
 
     private void disableUI() {
         FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
-        sweepSettingsPane.disableControls(true);
+        sweepSettingsController.disableControls(true);
         mainController.disableAllExcept(true, mainController.sweepTab);
         if(!btnContinuous.isSelected()) btnContinuous.setDisable(true);
     }
@@ -196,7 +196,7 @@ public class SweepController {
             FxUtils.enableItems(btnOnce, btnNormalize);
         } else {
             FxUtils.enableItems(btnOnce, btnNormalize, sourceProbe);
-            sweepSettingsPane.disableControls(false);
+            sweepSettingsController.disableControls(false);
         }
         mainController.disableAllExcept(false, mainController.sweepTab);
         mainController.requestDeviceState();
@@ -256,9 +256,9 @@ public class SweepController {
     }
 
     private Response<SweepResponse> sweepOnce() {
-        SweepQuality quality = sweepSettingsPane.getQuality();
-        long fStart = sweepSettingsPane.getStartFrequency().toHz();
-        long fEnd = sweepSettingsPane.getEndFrequency().toHz();
+        SweepQuality quality = sweepSettingsController.getQuality();
+        long fStart = sweepSettingsController.getStartFrequency().toHz();
+        long fEnd = sweepSettingsController.getEndFrequency().toHz();
         int fStep = (int) ((fEnd - fStart) / quality.getSteps());
         return radio3.startAnalyser(fStart, fStep,
                 quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(), sourceProbe.getValue());
@@ -291,7 +291,7 @@ public class SweepController {
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, receivedDataInfo.getFreqStart(), receivedDataInfo.getFreqEnd());
         switch (sourceProbe.getValue()) {
             case LIN_PROBE:
-                rangeAxis(signalAxisY, range, 0.01, 0.001);
+                rangeAxis(signalAxisY, range, 0.02, 0.01);
                 break;
             default:
                 rangeAxis(signalAxisY, range, 6, 1);
