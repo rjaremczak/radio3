@@ -1,6 +1,6 @@
 package com.mindpart.radio3.device;
 
-import com.mindpart.utils.Binary;
+import com.mindpart.bin.Binary;
 
 /**
  * Created by Robert Jaremczak

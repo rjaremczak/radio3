@@ -3,7 +3,7 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
-import com.mindpart.utils.FxUtils;
+import com.mindpart.ui.FxUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;

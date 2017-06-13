@@ -20,7 +20,7 @@
    <children>
       <VBox fx:id="vBox" layoutX="211.0" layoutY="50.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox fx:id="hBox" spacing="5.0">
+            <HBox fx:id="controlBox" spacing="5.0">
                <children>
                   <Separator orientation="VERTICAL">
                      <HBox.margin>
@@ -49,43 +49,44 @@
                   </GridPane>
                </children>
             </HBox>
-            <SplitPane dividerPositions="0.5" orientation="VERTICAL" VBox.vgrow="SOMETIMES">
-              <items>
-                <AnchorPane>
-                     <children>
-                        <LineChart fx:id="swrChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <xAxis>
-                              <NumberAxis fx:id="swrAxisX" autoRanging="false" label="Frequency [MHz]" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis fx:id="swrAxisY" autoRanging="false" label="SWR" minWidth="-Infinity" prefWidth="70.0" tickUnit="0.5" upperBound="10.0" />
-                           </yAxis>
-                           <padding>
-                              <Insets left="5.0" top="5.0" />
-                           </padding>
-                        </LineChart>
-                     </children>
-                  </AnchorPane>
-                <AnchorPane>
-                     <children>
-                        <LineChart fx:id="impedanceChart" animated="false" horizontalZeroLineVisible="false" verticalZeroLineVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <xAxis>
-                              <NumberAxis fx:id="impedanceAxisX" autoRanging="false" forceZeroInRange="false" />
-                           </xAxis>
-                           <yAxis>
-                              <NumberAxis fx:id="impedanceAxisY" forceZeroInRange="false" label="Impedance [Ω]" minWidth="-Infinity" prefWidth="70.0" />
-                           </yAxis>
-                           <padding>
-                              <Insets left="5.0" top="5.0" />
-                           </padding>
-                        </LineChart>
-                     </children>
-                  </AnchorPane>
-              </items>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </SplitPane>
+            <HBox fx:id="chartBox">
+               <children>
+                  <SplitPane dividerPositions="0.65" orientation="VERTICAL">
+                    <items>
+                      <AnchorPane>
+                           <children>
+                              <LineChart fx:id="swrChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <xAxis>
+                                    <NumberAxis fx:id="swrAxisX" autoRanging="false" label="Frequency [MHz]" />
+                                 </xAxis>
+                                 <yAxis>
+                                    <NumberAxis fx:id="swrAxisY" autoRanging="false" label="SWR" minWidth="-Infinity" prefWidth="70.0" tickUnit="0.5" upperBound="10.0" />
+                                 </yAxis>
+                                 <padding>
+                                    <Insets left="5.0" top="5.0" />
+                                 </padding>
+                              </LineChart>
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane>
+                           <children>
+                              <LineChart fx:id="impedanceChart" animated="false" horizontalZeroLineVisible="false" verticalZeroLineVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <xAxis>
+                                    <NumberAxis fx:id="impedanceAxisX" autoRanging="false" forceZeroInRange="false" />
+                                 </xAxis>
+                                 <yAxis>
+                                    <NumberAxis fx:id="impedanceAxisY" forceZeroInRange="false" label="Impedance [Ω]" minWidth="-Infinity" prefWidth="70.0" />
+                                 </yAxis>
+                                 <padding>
+                                    <Insets left="5.0" top="5.0" />
+                                 </padding>
+                              </LineChart>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </HBox>
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

@@ -1,6 +1,6 @@
 package com.mindpart.radio3.device;
 
-import com.mindpart.utils.Crc8;
+import com.mindpart.bin.Crc8;
 import jssc.*;
 import jssc.SerialPort;
 import org.apache.log4j.Logger;

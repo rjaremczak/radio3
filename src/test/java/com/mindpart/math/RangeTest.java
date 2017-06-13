@@ -1,5 +1,6 @@
-package com.mindpart.utils;
+package com.mindpart.math;
 
+import com.mindpart.math.Range;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

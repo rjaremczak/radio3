@@ -1,4 +1,4 @@
-package com.mindpart.utils;
+package com.mindpart.bin;
 
 /**
  * Created by Robert Jaremczak

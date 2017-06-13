@@ -5,8 +5,8 @@ import com.mindpart.radio3.config.Configuration;
 import com.mindpart.radio3.config.ConfigurationService;
 import com.mindpart.radio3.ui.DeviceStatus;
 import com.mindpart.types.Frequency;
-import com.mindpart.utils.Binary;
-import com.mindpart.utils.BinaryBuilder;
+import com.mindpart.bin.Binary;
+import com.mindpart.bin.BinaryBuilder;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

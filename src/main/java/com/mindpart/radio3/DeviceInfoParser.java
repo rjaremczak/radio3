@@ -1,7 +1,7 @@
 package com.mindpart.radio3;
 
 import com.mindpart.radio3.device.*;
-import com.mindpart.utils.BinaryIterator;
+import com.mindpart.bin.BinaryIterator;
 
 import static com.mindpart.radio3.device.FrameCommand.DEVICE_GET_INFO;
 

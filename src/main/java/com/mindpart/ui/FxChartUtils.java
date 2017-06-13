@@ -1,10 +1,11 @@
-package com.mindpart.utils;
+package com.mindpart.ui;
 
+import com.mindpart.math.Range;
 import javafx.scene.chart.NumberAxis;
 
-import static com.mindpart.utils.MathUtils.ceil;
-import static com.mindpart.utils.MathUtils.tickUnit;
-import static com.mindpart.utils.MathUtils.floor;
+import static com.mindpart.math.MathUtils.ceil;
+import static com.mindpart.math.MathUtils.tickUnit;
+import static com.mindpart.math.MathUtils.floor;
 import static java.lang.Math.*;
 
 /**

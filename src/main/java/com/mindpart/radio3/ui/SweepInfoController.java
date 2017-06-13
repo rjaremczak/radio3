@@ -1,16 +1,11 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.SweepStatistics;
-import com.mindpart.utils.FxUtils;
+import com.mindpart.ui.FxUtils;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Accordion;
 import javafx.scene.control.Label;
-import javafx.scene.control.TitledPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 
 import java.util.List;
 

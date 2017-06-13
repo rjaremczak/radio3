@@ -3,8 +3,8 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.ChartMarker;
-import com.mindpart.utils.FxUtils;
-import com.mindpart.utils.Range;
+import com.mindpart.ui.FxUtils;
+import com.mindpart.math.Range;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.mindpart.utils.FxChartUtils.rangeAxis;
-import static com.mindpart.utils.FxUtils.valueFromSeries;
+import static com.mindpart.ui.FxChartUtils.rangeAxis;
+import static com.mindpart.ui.FxUtils.valueFromSeries;
 
 /**
  * Created by Robert Jaremczak

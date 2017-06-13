@@ -1,8 +1,8 @@
 package com.mindpart.radio3.device;
 
-import com.mindpart.utils.Binary;
-import com.mindpart.utils.BinaryIterator;
-import com.mindpart.utils.Crc8;
+import com.mindpart.bin.Binary;
+import com.mindpart.bin.BinaryIterator;
+import com.mindpart.bin.Crc8;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

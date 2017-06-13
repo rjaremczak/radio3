@@ -1,4 +1,4 @@
-package com.mindpart.utils;
+package com.mindpart.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -8,7 +8,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
 
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * Created by Robert Jaremczak

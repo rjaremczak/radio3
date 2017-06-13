@@ -1,5 +1,6 @@
-package com.mindpart.utils;
+package com.mindpart.bin;
 
+import com.mindpart.bin.Crc8;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

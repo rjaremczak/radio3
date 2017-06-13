@@ -3,7 +3,7 @@ package com.mindpart.radio3;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
 import com.mindpart.types.Frequency;
-import com.mindpart.utils.Binary;
+import com.mindpart.bin.Binary;
 
 import static com.mindpart.radio3.device.FrameCommand.VFO_GET_FREQ;
 

@@ -3,7 +3,7 @@ package com.mindpart.radio3;
 import com.mindpart.radio3.device.Adc;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
-import com.mindpart.utils.Binary;
+import com.mindpart.bin.Binary;
 
 import static com.mindpart.radio3.device.FrameCommand.LOGPROBE_DATA;
 

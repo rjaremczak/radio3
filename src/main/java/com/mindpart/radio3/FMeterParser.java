@@ -4,7 +4,7 @@ import com.mindpart.radio3.config.FMeterConfig;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
 import com.mindpart.types.Frequency;
-import com.mindpart.utils.Binary;
+import com.mindpart.bin.Binary;
 
 import static com.mindpart.radio3.device.FrameCommand.FMETER_DATA;
 

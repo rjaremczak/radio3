@@ -8,8 +8,8 @@ import com.mindpart.radio3.device.SweepSignalSource;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.SWR;
 import com.mindpart.ui.ChartMarker;
-import com.mindpart.utils.FxUtils;
-import com.mindpart.utils.Range;
+import com.mindpart.ui.FxUtils;
+import com.mindpart.math.Range;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -30,8 +30,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.function.Consumer;
 
-import static com.mindpart.utils.FxChartUtils.rangeAxis;
-import static com.mindpart.utils.FxUtils.valueFromSeries;
+import static com.mindpart.ui.FxChartUtils.rangeAxis;
+import static com.mindpart.ui.FxUtils.valueFromSeries;
 
 /**
  * Created by Robert Jaremczak
@@ -47,7 +47,10 @@ public class VnaController {
     VBox vBox;
 
     @FXML
-    HBox hBox;
+    HBox controlBox;
+
+    @FXML
+    HBox chartBox;
 
     @FXML
     Button btnStart;
@@ -126,7 +129,7 @@ public class VnaController {
         rangeAxis(impedanceAxisY, 0, 1000, 50);
 
         Parent sweepSettingsPane = FxUtils.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml");
-        hBox.getChildren().add(0, sweepSettingsPane);
+        controlBox.getChildren().add(0, sweepSettingsPane);
 
         btnContinuous.selectedProperty().addListener(this::onContinuousChanged);
     }

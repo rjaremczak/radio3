@@ -1,7 +1,6 @@
 package com.mindpart.ui;
 
 import com.mindpart.types.Frequency;
-import com.mindpart.utils.FxUtils;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
@@ -80,7 +79,7 @@ public class FrequencyField extends TextField {
         try {
             parsed = Frequency.ofMHz(IN_FORMAT.parse(str).doubleValue());
         } catch (NumberFormatException|ParseException e) {
-            FxUtils.alertInputError(getLabel(), "malformed value", "must be a valid frequency");
+            FxUtils.alertInputError(getLabel(), "malformed y", "must be a valid frequency");
             setText(lastValue);
             return false;
         }
@@ -96,7 +95,7 @@ public class FrequencyField extends TextField {
             return true;
         } else {
             try {
-                FxUtils.alertInputError(getLabel(), "value out of range", "must be between "+min+" and "+max);
+                FxUtils.alertInputError(getLabel(), "y value of range", "must be between "+min+" and "+max);
                 setText(lastValue);
             } catch (Exception e) {
                 e.printStackTrace();

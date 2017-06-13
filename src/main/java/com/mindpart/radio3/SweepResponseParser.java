@@ -1,7 +1,7 @@
 package com.mindpart.radio3;
 
 import com.mindpart.radio3.device.*;
-import com.mindpart.utils.BinaryIterator;
+import com.mindpart.bin.BinaryIterator;
 
 /**
  * Created by Robert Jaremczak

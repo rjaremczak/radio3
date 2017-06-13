@@ -3,7 +3,6 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.FrequencyField;
-import com.mindpart.utils.FxUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

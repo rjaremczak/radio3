@@ -1,5 +1,6 @@
-package com.mindpart.utils;
+package com.mindpart.bin;
 
+import com.mindpart.bin.Binary;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

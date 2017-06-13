@@ -1,7 +1,7 @@
 package com.mindpart.radio3;
 
 import com.mindpart.radio3.device.*;
-import com.mindpart.utils.Binary;
+import com.mindpart.bin.Binary;
 
 import static com.mindpart.radio3.device.FrameCommand.VNAPROBE_DATA;
 

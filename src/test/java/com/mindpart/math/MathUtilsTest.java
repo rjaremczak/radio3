@@ -1,8 +1,8 @@
-package com.mindpart.utils;
+package com.mindpart.math;
 
 import org.junit.Test;
 
-import static com.mindpart.utils.MathUtils.tickUnit;
+import static com.mindpart.math.MathUtils.tickUnit;
 import static org.junit.Assert.*;
 
 /**
