@@ -39,7 +39,7 @@ public class Radio3FxApp extends Application {
         }
 
         primaryStage.setTitle("radio3 by SQ6DGT ("+ radio3.buildId()+")");
-        primaryStage.setScene(new Scene(FxUtils.loadFXml(mainController, "main.fxml")));
+        primaryStage.setScene(new Scene(mainController.loadFXml("main.fxml")));
         primaryStage.show();
     }
 

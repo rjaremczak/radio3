@@ -12,6 +12,9 @@ import java.io.IOException;
 public class ConfigurationServiceTest {
     ConfigurationService configurationService = new ConfigurationService();
 
+    public ConfigurationServiceTest() throws IOException {
+    }
+
     @Test
     public void testLoadDefaults() throws IOException {
         configurationService.loadDefaults();

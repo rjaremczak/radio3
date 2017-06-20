@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  * Created by Robert Jaremczak
  * Date: 2016.02.04
  */
-public class MainController {
+public class MainController extends BaseController {
     private static final Logger logger = Logger.getLogger(MainController.class);
 
     @FXML
@@ -225,8 +226,8 @@ public class MainController {
 
         vnaController = new VnaController(radio3, this);
         sweepController = new SweepController(radio3, this);
-        sweepTab.setContent(FxUtils.loadFXml(sweepController, "sweepPane.fxml"));
-        vnaTab.setContent(FxUtils.loadFXml(vnaController, "vnaPane.fxml"));
+        sweepTab.setContent(sweepController.loadFXml("sweepPane.fxml"));
+        vnaTab.setContent(vnaController.loadFXml("vnaPane.fxml"));
 
         vfoController = new VfoController(radio3);
         fMeterController = new FMeterController(radio3);

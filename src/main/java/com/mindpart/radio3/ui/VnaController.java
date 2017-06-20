@@ -37,7 +37,7 @@ import static com.mindpart.ui.FxUtils.valueFromSeries;
  * Created by Robert Jaremczak
  * Date: 2016.04.15
  */
-public class VnaController {
+public class VnaController extends BaseController {
     private static final NumberFormat RX_FORMAT = new DecimalFormat("0.0");
 
     @FXML
@@ -128,7 +128,7 @@ public class VnaController {
         rangeAxis(impedanceAxisX, 1, 55, 2.5);
         rangeAxis(impedanceAxisY, 0, 1000, 50);
 
-        Parent sweepSettingsPane = FxUtils.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml");
+        Parent sweepSettingsPane = sweepSettingsController.loadFXml("sweepSettingsPane.fxml");
         controlBox.getChildren().add(0, sweepSettingsPane);
 
         btnContinuous.selectedProperty().addListener(this::onContinuousChanged);

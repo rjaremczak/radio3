@@ -31,7 +31,7 @@ import static com.mindpart.ui.FxUtils.valueFromSeries;
  * Created by Robert Jaremczak
  * Date: 2016.04.15
  */
-public class SweepController {
+public class SweepController extends BaseController {
     @FXML
     AnchorPane anchorPane;
 
@@ -137,7 +137,7 @@ public class SweepController {
         signalChart.setData(signalDataSeries);
         signalChart.setCreateSymbols(false);
 
-        controlBox.getChildren().add(0, FxUtils.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml"));
+        controlBox.getChildren().add(0, sweepSettingsController.loadFXml("sweepSettingsPane.fxml"));
 
         btnNormalize.selectedProperty().addListener(this::normalizeChangeListener);
         btnContinuous.selectedProperty().addListener(this::continuousChangeListener);

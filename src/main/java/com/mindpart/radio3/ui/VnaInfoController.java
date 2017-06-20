@@ -13,7 +13,7 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2017.06.05
  */
-public class VnaInfoController {
+public class VnaInfoController extends BaseController {
 
     private Parent container;
 
@@ -29,7 +29,7 @@ public class VnaInfoController {
     private final VnaStatistics vnaStatistics = new VnaStatistics();
 
     public VnaInfoController() {
-        this.container = FxUtils.loadFXml(this, "vnaInfoPane.fxml");
+        this.container = loadFXml("vnaInfoPane.fxml");
     }
 
     public void initialize() {

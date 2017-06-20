@@ -15,7 +15,7 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2016.10.31
  */
-public class SweepSettingsController {
+public class SweepSettingsController extends BaseController {
     private static Logger logger = Logger.getLogger(SweepSettingsController.class);
 
     @FXML

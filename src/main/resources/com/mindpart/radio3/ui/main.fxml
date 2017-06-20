@@ -62,7 +62,7 @@
                                           <Label text="Port:" />
                                               <ChoiceBox fx:id="serialPorts" />
                                               <Button fx:id="serialPortsRefresh" focusTraversable="false" mnemonicParsing="false" text="Refresh" />
-                                              <Button fx:id="btnConnect" defaultButton="true" mnemonicParsing="false" text="Connect" />
+                                              <Button fx:id="btnConnect" defaultButton="true" mnemonicParsing="false" text="%button.connect" />
                                        </items>
                                     </ToolBar>
                                     <TableView fx:id="devicePropertiesTable">

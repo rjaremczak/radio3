@@ -83,7 +83,6 @@ public class Radio3 {
 
     private void initConfiguration() throws IOException {
         configurationService = new ConfigurationService();
-        configurationService.init();
         configuration = configurationService.load();
     }
 

@@ -8,6 +8,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
 
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Created by Robert Jaremczak
@@ -16,8 +18,8 @@ import java.io.IOException;
 public final class FxUtils {
     private FxUtils() {}
 
-    public static Parent loadFXml(Object controller, String resource) {
-        FXMLLoader loader = new FXMLLoader(controller.getClass().getResource(resource));
+    public static Parent loadFXml(Object controller, String fxml, ResourceBundle resources) {
+        FXMLLoader loader = new FXMLLoader(controller.getClass().getResource(fxml), resources);
         loader.setControllerFactory(clazz -> controller);
         try {
             return loader.load();

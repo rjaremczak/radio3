@@ -13,7 +13,7 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2017.06.05
  */
-public class SweepInfoController {
+public class SweepInfoController extends BaseController {
 
     private Parent container;
 
@@ -29,7 +29,7 @@ public class SweepInfoController {
     private final SweepStatistics sweepStatistics = new SweepStatistics();
 
     public SweepInfoController() {
-        this.container = FxUtils.loadFXml(this, "sweepInfoPane.fxml");
+        this.container = loadFXml("sweepInfoPane.fxml");
     }
 
     public void initialize() {
