@@ -33,11 +33,6 @@ public class Radio3FxApp extends Application {
         radio3 = new Radio3(".radio3", this::requestHandler, this::responseHandler);
         mainController = new MainController(radio3);
 
-        if(radio3.getConfiguration().getLogLevel() != null) {
-            logger.info("root log level: "+ radio3.getConfiguration().getLogLevel());
-            Logger.getRootLogger().setLevel(radio3.getConfiguration().getLogLevel());
-        }
-
         primaryStage.setTitle("radio3 by SQ6DGT ("+ radio3.buildId()+")");
         primaryStage.setScene(new Scene(mainController.loadFXml(mainController, "main.fxml")));
         primaryStage.show();

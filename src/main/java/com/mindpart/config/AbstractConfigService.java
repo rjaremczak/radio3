@@ -23,19 +23,21 @@ public abstract class AbstractConfigService<T> {
     private final String defaultsFileName;
     private final Class<T> theClass;
 
-    protected AbstractConfigService(Class<T> theClass, String appDirectory, String configFileName, String defaultsFileName) throws IOException {
+    protected AbstractConfigService(Class<T> theClass, String appDirectory, String configFileName, String defaultsFileName) {
         this.theClass = theClass;
         this.defaultsFileName = defaultsFileName;
         this.ownDirectory = Paths.get(System.getProperty("user.home"), appDirectory);
-        initDirectory(ownDirectory);
         this.configurationFile = Paths.get(ownDirectory.toString(),configFileName);
-        if(!Files.exists(configurationFile, LinkOption.NOFOLLOW_LINKS)) save(loadDefaults());
     }
 
-    private void initDirectory(Path directory) throws IOException {
-        if(!Files.exists(directory, LinkOption.NOFOLLOW_LINKS)) {
-            logger.info("create directory " + directory);
-            Files.createDirectory(directory);
+    protected void init() throws IOException {
+        if(!Files.exists(ownDirectory, LinkOption.NOFOLLOW_LINKS)) {
+            logger.info("create directory " + ownDirectory);
+            Files.createDirectory(ownDirectory);
+        }
+        
+        if(!Files.exists(configurationFile, LinkOption.NOFOLLOW_LINKS)) {
+            save(loadDefaults());
         }
     }
 

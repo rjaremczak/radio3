@@ -3,6 +3,7 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.FxUtils;
+import com.mindpart.utils.ResourceBundleUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -138,6 +139,9 @@ public class MainController {
     private LinearProbeController linearProbeController;
     private VnaProbeController vnaProbeController;
 
+    private String txtButtonConnect;
+    private String txtButtonDisconnect;
+
     private volatile boolean continuousSamplingEnabled = false;
 
     public MainController(Radio3 radio3) {
@@ -163,14 +167,14 @@ public class MainController {
     }
 
     private void updateOnConnect() {
-        btnConnect.setText("Disconnect");
+        btnConnect.setText(txtButtonDisconnect);
         FxUtils.enableItems(toolBar, btnConnect, componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         FxUtils.disableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         updateDeviceStatus(DeviceStatus.READY);
     }
 
     private void updateOnDisconnect(DeviceStatus deviceStatus) {
-        btnConnect.setText("Connect");
+        btnConnect.setText(txtButtonConnect);
         FxUtils.enableItems(btnConnect, serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         FxUtils.disableItems(toolBar, componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         deviceProperties.clear();
@@ -215,7 +219,11 @@ public class MainController {
 
 
     public Parent loadFXml(Object controller, String fxml) {
-        return FxUtils.loadFXml(controller, fxml, ResourceBundle.getBundle("bundle"));
+        //ResourceBundle bundle = ResourceBundle.getBundle("bundle", radio3.getConfiguration().getLocale());
+        ResourceBundle bundle = ResourceBundleUtils.getBundle("bundle", radio3.getConfiguration().getLocale(), "UTF-8");
+        txtButtonConnect = bundle.getString("button.connect");
+        txtButtonDisconnect = bundle.getString("button.disconnect");
+        return FxUtils.loadFXml(controller, fxml, bundle);
     }
 
     public void initialize() throws IOException {

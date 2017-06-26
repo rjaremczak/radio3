@@ -71,7 +71,7 @@ public class Radio3 {
         logarithmicParser = new LogarithmicParser();
         linearParser = new LinearParser();
         vnaParser = new VnaParser();
-        fMeterParser = new FMeterParser(configuration.getfMeter());
+        fMeterParser = new FMeterParser(configuration.getFMeter());
         multipleProbesParser = new MultipleProbesParser(logarithmicParser, linearParser, vnaParser, fMeterParser);
         sweepResponseParser = new SweepResponseParser();
 
@@ -89,6 +89,7 @@ public class Radio3 {
     private void initConfiguration(String appDirectory) throws IOException {
         configurationService = new ConfigurationService(appDirectory);
         configuration = configurationService.load();
+        logger.info("UI locale: "+configuration.getLocale());
 
         sweepProfilesService = new SweepProfilesService(appDirectory);
         sweepProfiles = sweepProfilesService.load();
