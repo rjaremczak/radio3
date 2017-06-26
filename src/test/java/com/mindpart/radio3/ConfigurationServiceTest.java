@@ -10,7 +10,7 @@ import java.io.IOException;
  * Date: 2016.10.11
  */
 public class ConfigurationServiceTest {
-    ConfigurationService configurationService = new ConfigurationService();
+    ConfigurationService configurationService = new ConfigurationService(".radio3");
 
     public ConfigurationServiceTest() throws IOException {
     }

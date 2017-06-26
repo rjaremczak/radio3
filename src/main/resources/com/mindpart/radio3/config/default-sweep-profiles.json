@@ -1,0 +1,64 @@
+{
+  "profiles": [
+    {
+      "name": "KF + 50MHz",
+      "freqMin": "1.8 MHz",
+      "freqMax": "52.0 MHz"
+    },
+    {
+      "name": "KF",
+      "freqMin": "1.8 MHz",
+      "freqMax": "30.0 MHz"
+    },
+    {
+      "name": "160m (1.8 MHz)",
+      "freqMin": "1.8 MHz",
+      "freqMax": "2.0 MHz"
+    },
+    {
+      "name": "80m (3.5 MHz)",
+      "freqMin": "3.5 MHz",
+      "freqMax": "3.8 MHz"
+    },
+    {
+      "name": "40m (7 MHz)",
+      "freqMin": "7.0 MHz",
+      "freqMax": "7.2 MHz"
+    },
+    {
+      "name": "30m (10 MHz) WARC",
+      "freqMin": "10.100 MHz",
+      "freqMax": "10.150 MHz"
+    },
+    {
+      "name": "20m (14 MHz)",
+      "freqMin": "14.000 MHz",
+      "freqMax": "14.350 MHz"
+    },
+    {
+      "name": "17m (18 MHz) WARC",
+      "freqMin": "18.068 MHz",
+      "freqMax": "18.168 MHz"
+    },
+    {
+      "name": "15m (21 MHz)",
+      "freqMin": "21.000 MHz",
+      "freqMax": "21.450 MHz"
+    },
+    {
+      "name": "12m (24 MHz) WARC",
+      "freqMin": "24.000 MHz",
+      "freqMax": "24.990 MHz"
+    },
+    {
+      "name": "10m (28 MHz)",
+      "freqMin": "28.000 MHz",
+      "freqMax": "29.700 MHz"
+    },
+    {
+      "name": "6m (50 MHz)",
+      "freqMin": "50.0 MHz",
+      "freqMax": "52.0 MHz"
+    }
+  ]
+}

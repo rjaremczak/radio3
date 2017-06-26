@@ -37,7 +37,7 @@ import static com.mindpart.ui.FxUtils.valueFromSeries;
  * Created by Robert Jaremczak
  * Date: 2016.04.15
  */
-public class VnaController extends BaseController {
+public class VnaController {
     private static final NumberFormat RX_FORMAT = new DecimalFormat("0.0");
 
     @FXML
@@ -86,7 +86,7 @@ public class VnaController extends BaseController {
     public VnaController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
         this.mainController = mainController;
-        this.sweepSettingsController = new SweepSettingsController(radio3.getConfiguration().getSweepProfiles());
+        this.sweepSettingsController = new SweepSettingsController(radio3.getSweepProfiles());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -128,7 +128,7 @@ public class VnaController extends BaseController {
         rangeAxis(impedanceAxisX, 1, 55, 2.5);
         rangeAxis(impedanceAxisY, 0, 1000, 50);
 
-        Parent sweepSettingsPane = sweepSettingsController.loadFXml("sweepSettingsPane.fxml");
+        Parent sweepSettingsPane = mainController.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml");
         controlBox.getChildren().add(0, sweepSettingsPane);
 
         btnContinuous.selectedProperty().addListener(this::onContinuousChanged);

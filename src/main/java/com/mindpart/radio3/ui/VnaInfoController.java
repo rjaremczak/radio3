@@ -1,7 +1,6 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.VnaStatistics;
-import com.mindpart.ui.FxUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.chart.XYChart;
@@ -13,7 +12,7 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2017.06.05
  */
-public class VnaInfoController extends BaseController {
+public class VnaInfoController {
 
     private Parent container;
 
@@ -28,8 +27,8 @@ public class VnaInfoController extends BaseController {
 
     private final VnaStatistics vnaStatistics = new VnaStatistics();
 
-    public VnaInfoController() {
-        this.container = loadFXml("vnaInfoPane.fxml");
+    public VnaInfoController(MainController mainController) {
+        this.container = mainController.loadFXml(this, "vnaInfoPane.fxml");
     }
 
     public void initialize() {

@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -22,10 +23,7 @@ import javafx.scene.shape.Circle;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +33,7 @@ import java.util.stream.Collectors;
  * Created by Robert Jaremczak
  * Date: 2016.02.04
  */
-public class MainController extends BaseController {
+public class MainController {
     private static final Logger logger = Logger.getLogger(MainController.class);
 
     @FXML
@@ -215,6 +213,11 @@ public class MainController extends BaseController {
         }
     }
 
+
+    public Parent loadFXml(Object controller, String fxml) {
+        return FxUtils.loadFXml(controller, fxml, ResourceBundle.getBundle("bundle"));
+    }
+
     public void initialize() throws IOException {
         nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, componentsTab);
 
@@ -226,8 +229,8 @@ public class MainController extends BaseController {
 
         vnaController = new VnaController(radio3, this);
         sweepController = new SweepController(radio3, this);
-        sweepTab.setContent(sweepController.loadFXml("sweepPane.fxml"));
-        vnaTab.setContent(vnaController.loadFXml("vnaPane.fxml"));
+        sweepTab.setContent(loadFXml(sweepController, "sweepPane.fxml"));
+        vnaTab.setContent(loadFXml(vnaController, "vnaPane.fxml"));
 
         vfoController = new VfoController(radio3);
         fMeterController = new FMeterController(radio3);

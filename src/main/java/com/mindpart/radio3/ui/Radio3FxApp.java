@@ -30,7 +30,7 @@ public class Radio3FxApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         Locale.setDefault(Locale.US);
 
-        radio3 = new Radio3(this::requestHandler, this::responseHandler);
+        radio3 = new Radio3(".radio3", this::requestHandler, this::responseHandler);
         mainController = new MainController(radio3);
 
         if(radio3.getConfiguration().getLogLevel() != null) {
@@ -39,7 +39,7 @@ public class Radio3FxApp extends Application {
         }
 
         primaryStage.setTitle("radio3 by SQ6DGT ("+ radio3.buildId()+")");
-        primaryStage.setScene(new Scene(mainController.loadFXml("main.fxml")));
+        primaryStage.setScene(new Scene(mainController.loadFXml(mainController, "main.fxml")));
         primaryStage.show();
     }
 

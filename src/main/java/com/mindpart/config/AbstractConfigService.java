@@ -1,10 +1,7 @@
 package com.mindpart.config;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.google.common.reflect.TypeToken;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -21,20 +18,18 @@ import java.nio.file.Paths;
 public abstract class AbstractConfigService<T> {
     private static final Logger logger = Logger.getLogger(AbstractConfigService.class);
 
-    private Path ownDirectory;
-    private Path configurationFile;
-    private String defaultsFileName;
-    private TypeToken<T> typeToken = new TypeToken<T>(getClass()) {};
+    private final Path ownDirectory;
+    private final Path configurationFile;
+    private final String defaultsFileName;
+    private final Class<T> theClass;
 
-    protected AbstractConfigService(String configFileName, String defaultsFileName) throws IOException {
-        ownDirectory = Paths.get(System.getProperty("user.home"), configFileName);
-        initDirectory(ownDirectory);
-        configurationFile = Paths.get(ownDirectory.toString(),configFileName);
-
+    protected AbstractConfigService(Class<T> theClass, String appDirectory, String configFileName, String defaultsFileName) throws IOException {
+        this.theClass = theClass;
         this.defaultsFileName = defaultsFileName;
-        if(!Files.exists(configurationFile, LinkOption.NOFOLLOW_LINKS)) {
-            save(loadDefaults());
-        }
+        this.ownDirectory = Paths.get(System.getProperty("user.home"), appDirectory);
+        initDirectory(ownDirectory);
+        this.configurationFile = Paths.get(ownDirectory.toString(),configFileName);
+        if(!Files.exists(configurationFile, LinkOption.NOFOLLOW_LINKS)) save(loadDefaults());
     }
 
     private void initDirectory(Path directory) throws IOException {
@@ -46,7 +41,7 @@ public abstract class AbstractConfigService<T> {
 
     public T load() throws IOException {
         try {
-            return new ObjectMapper().readValue(configurationFile.toFile(), (Class<T>) typeToken.getRawType());
+            return new ObjectMapper().readValue(configurationFile.toFile(), theClass);
         } catch (InvalidFormatException e) {
             logger.error("error parsing file "+configurationFile.getFileName()+", delete and replace with defaults");
             Files.delete(configurationFile);
@@ -66,7 +61,7 @@ public abstract class AbstractConfigService<T> {
 
     public T loadDefaults() throws IOException {
         InputStream is = getClass().getResourceAsStream(defaultsFileName);
-        return new ObjectMapper().readValue(is, (Class<T>) typeToken.getRawType());
+        return new ObjectMapper().readValue(is, theClass);
     }
 
 }

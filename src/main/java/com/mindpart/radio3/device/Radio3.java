@@ -3,6 +3,7 @@ package com.mindpart.radio3.device;
 import com.mindpart.radio3.*;
 import com.mindpart.radio3.config.Configuration;
 import com.mindpart.radio3.config.ConfigurationService;
+import com.mindpart.radio3.config.SweepProfilesService;
 import com.mindpart.radio3.ui.DeviceStatus;
 import com.mindpart.types.Frequency;
 import com.mindpart.bin.Binary;
@@ -31,6 +32,10 @@ public class Radio3 {
 
     private ConfigurationService configurationService;
     private Configuration configuration;
+
+    private SweepProfilesService sweepProfilesService;
+    private SweepProfiles sweepProfiles;
+
     private DataLink dataLink;
     private PingParser pingParser;
     private DeviceStateParser deviceStateParser;
@@ -50,8 +55,8 @@ public class Radio3 {
     private AtomicReference<Instant> lastResponseTime = new AtomicReference<>(Instant.MIN);
     private Duration keepAlivePeriod = Duration.ofSeconds(10);
 
-    public Radio3(Consumer<Frame> requestHandler, Consumer<Response> responseHandler) throws IOException {
-        initConfiguration();
+    public Radio3(String appDirectory, Consumer<Frame> requestHandler, Consumer<Response> responseHandler) throws IOException {
+        initConfiguration(appDirectory);
 
         dataLink = new DataLinkJssc();
         logger.info("dataLink: "+dataLink);
@@ -81,9 +86,12 @@ public class Radio3 {
         }, keepAlivePeriod.toMillis(), keepAlivePeriod.toMillis(), TimeUnit.MILLISECONDS);
     }
 
-    private void initConfiguration() throws IOException {
-        configurationService = new ConfigurationService();
+    private void initConfiguration(String appDirectory) throws IOException {
+        configurationService = new ConfigurationService(appDirectory);
         configuration = configurationService.load();
+
+        sweepProfilesService = new SweepProfilesService(appDirectory);
+        sweepProfiles = sweepProfilesService.load();
     }
 
     public Response<DeviceInfo> connect(String portName, HardwareRevision hardwareRevision, VfoType vfoType) {
@@ -248,6 +256,10 @@ public class Radio3 {
 
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    public SweepProfiles getSweepProfiles() {
+        return sweepProfiles;
     }
 
     public String buildId() {

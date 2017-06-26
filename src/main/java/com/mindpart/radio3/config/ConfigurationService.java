@@ -11,10 +11,10 @@ import java.util.Properties;
  * Date: 2016.10.08
  */
 public class ConfigurationService extends AbstractConfigService<Configuration> {
-    private String buildId;
+    private final String buildId;
 
-    public ConfigurationService() throws IOException {
-        super("configuration.json","default-configuration.json");
+    public ConfigurationService(String appDirectory) throws IOException {
+        super(Configuration.class, appDirectory, "configuration.json","default-configuration.json");
         Properties properties = new Properties();
         properties.load(getClass().getResourceAsStream("common.properties"));
         buildId = properties.getProperty("buildId");

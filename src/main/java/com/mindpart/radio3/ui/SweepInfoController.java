@@ -1,7 +1,6 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.SweepStatistics;
-import com.mindpart.ui.FxUtils;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.chart.XYChart;
@@ -13,7 +12,7 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2017.06.05
  */
-public class SweepInfoController extends BaseController {
+public class SweepInfoController {
 
     private Parent container;
 
@@ -28,8 +27,8 @@ public class SweepInfoController extends BaseController {
 
     private final SweepStatistics sweepStatistics = new SweepStatistics();
 
-    public SweepInfoController() {
-        this.container = loadFXml("sweepInfoPane.fxml");
+    public SweepInfoController(MainController mainController) {
+        this.container = mainController.loadFXml(this, "sweepInfoPane.fxml");
     }
 
     public void initialize() {

@@ -1,6 +1,7 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.SweepProfile;
+import com.mindpart.radio3.SweepProfiles;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.FrequencyField;
 import javafx.collections.FXCollections;
@@ -15,7 +16,7 @@ import java.util.List;
  * Created by Robert Jaremczak
  * Date: 2016.10.31
  */
-public class SweepSettingsController extends BaseController {
+public class SweepSettingsController {
     private static Logger logger = Logger.getLogger(SweepSettingsController.class);
 
     @FXML
@@ -34,8 +35,8 @@ public class SweepSettingsController extends BaseController {
     private Runnable rangeChangeListener = () -> {};
     private Runnable qualityChangeListener = () -> {};
 
-    public SweepSettingsController(List<SweepProfile> presets) {
-        this.presets.addAll(presets);
+    public SweepSettingsController(SweepProfiles sweepProfiles) {
+        this.presets.addAll(sweepProfiles.profiles);
     }
 
     private void initSweepSteps() {
