@@ -25,14 +25,14 @@
     <children>
       <ToolBar fx:id="toolBar">
          <items>
-            <ToggleButton fx:id="vfoAmp" mnemonicParsing="false" text="Amp" textOverrun="CLIP" />
+            <ToggleButton fx:id="vfoAmp" mnemonicParsing="false" text="%button.amp" textOverrun="CLIP" />
             <Separator orientation="VERTICAL" />
-            <Label text="Att:" textOverrun="CLIP" />
+            <Label text="%label.att" textOverrun="CLIP" />
             <ToggleButton fx:id="vfoAtt0" mnemonicParsing="false" text="6dB" textOverrun="CLIP" />
             <ToggleButton fx:id="vfoAtt1" mnemonicParsing="false" text="10dB" textOverrun="CLIP" />
             <ToggleButton fx:id="vfoAtt2" mnemonicParsing="false" text="20dB" textOverrun="CLIP" />
             <Separator orientation="VERTICAL" />
-            <Label text="Out:" />
+            <Label text="%label.out" />
             <ToggleButton fx:id="outVfo" mnemonicParsing="false" text="VFO" textOverrun="CLIP">
                <toggleGroup>
                   <ToggleGroup fx:id="vfoOut" />
@@ -45,7 +45,7 @@
             <children>
                 <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <tabs>
-                  <Tab fx:id="deviceTab" text="Device">
+                  <Tab fx:id="deviceTab" text="%tab.device">
                      <content>
                         <AnchorPane>
                            <children>
@@ -53,26 +53,26 @@
                                  <children>
                                     <ToolBar>
                                        <items>
-                                          <Label text="Hardware:" />
+                                          <Label text="%label.hardware" />
                                           <ChoiceBox fx:id="hardwareRevisions" />
                                           <Separator orientation="VERTICAL" />
-                                          <Label text="VFO:" />
+                                          <Label text="VFO" />
                                           <ChoiceBox fx:id="vfoType" />
                                           <Separator orientation="VERTICAL" />
-                                          <Label text="Port:" />
+                                          <Label text="Port" />
                                               <ChoiceBox fx:id="serialPorts" />
-                                              <Button fx:id="serialPortsRefresh" focusTraversable="false" mnemonicParsing="false" text="Refresh" />
+                                              <Button fx:id="serialPortsRefresh" focusTraversable="false" mnemonicParsing="false" text="%button.refresh" />
                                               <Button fx:id="btnConnect" defaultButton="true" mnemonicParsing="false" text="%button.connect" />
                                        </items>
                                     </ToolBar>
                                     <TableView fx:id="devicePropertiesTable">
                                        <columns>
-                                          <TableColumn editable="false" prefWidth="75.0" text="Property">
+                                          <TableColumn editable="false" prefWidth="75.0" text="%column.property">
                                              <cellValueFactory>
                                                 <PropertyValueFactory property="name" />
                                              </cellValueFactory>
                                           </TableColumn>
-                                          <TableColumn editable="false" sortable="false" text="Value">
+                                          <TableColumn editable="false" sortable="false" text="%column.value">
                                              <cellValueFactory>
                                                 <PropertyValueFactory property="value" />
                                              </cellValueFactory>
@@ -87,7 +87,7 @@
                                     </TableView>
                                     <HBox fx:id="deviceControlPane" alignment="CENTER" spacing="5.0">
                                        <children>
-                                          <Button fx:id="devicePropertiesRefresh" mnemonicParsing="false" text="Refresh" />
+                                          <Button fx:id="devicePropertiesRefresh" mnemonicParsing="false" text="%button.refresh" />
                                        </children>
                                     </HBox>
                                  </children>
@@ -95,27 +95,18 @@
                            </children>
                         </AnchorPane>
                      </content></Tab>
-                        <Tab fx:id="sweepTab" text="Sweep" />
+                        <Tab fx:id="sweepTab" text="%tab.sweep" />
                         <Tab fx:id="vnaTab" text="VNA" />
-                        <Tab fx:id="componentsTab" text="Components">
+                        <Tab fx:id="componentsTab" text="%tab.components">
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                     <children>
                                         <VBox fx:id="componentsBox" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <children>
-                                    <Label text="Probes and sampling">
-                                       <VBox.margin>
-                                          <Insets />
-                                       </VBox.margin>
-                                    </Label>
-                                    <Separator prefWidth="200.0">
-                                       <VBox.margin>
-                                          <Insets bottom="10.0" />
-                                       </VBox.margin></Separator>
                                                 <HBox alignment="CENTER_LEFT" spacing="5.0">
                                                     <children>
-                                                        <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#sampleAllProbes" text="Start" />
-                                                        <ToggleButton fx:id="continuousSamplingOfAllProbesBtn" mnemonicParsing="false" onAction="#doContinuousSamplingOfAllProbes" text="Continuous">
+                                                        <Button fx:id="sampleAllProbesBtn" mnemonicParsing="false" onAction="#sampleAllProbes" text="%button.start" />
+                                                        <ToggleButton fx:id="continuousSamplingOfAllProbesBtn" mnemonicParsing="false" onAction="#doContinuousSamplingOfAllProbes" text="%button.continuous">
                                                             <HBox.margin>
                                                                 <Insets />
                                                             </HBox.margin>
