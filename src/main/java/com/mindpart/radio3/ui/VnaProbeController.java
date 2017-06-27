@@ -19,7 +19,7 @@ public class VnaProbeController extends ComponentController {
     private Radio3 radio3;
 
     public VnaProbeController(Radio3 radio3) {
-        this.radio3 = this.radio3;
+        this.radio3 = radio3;
     }
 
     @Override

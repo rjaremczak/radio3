@@ -4,7 +4,7 @@ import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.ui.FxUtils;
-import com.mindpart.math.Range;
+import com.mindpart.discrete.Range;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -283,7 +283,7 @@ public class SweepController {
         Range range = new Range();
         for (int step = 0; step < receivedData.size(); step++) {
             XYChart.Data<Double, Double> received = receivedData.get(step);
-            double value = range.update(chartContext.process(step, received.getYValue()));
+            double value = range.record(chartContext.process(step, received.getYValue()));
             data.add(new XYChart.Data<>(received.getXValue(), value));
         }
 
