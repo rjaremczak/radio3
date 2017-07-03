@@ -9,12 +9,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <VBox xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepInfoController">
    <children>
       <Accordion nodeOrientation="LEFT_TO_RIGHT" VBox.vgrow="NEVER">
         <panes>
-          <TitledPane alignment="TOP_LEFT" animated="false" contentDisplay="TOP" text="General" textOverrun="CLIP">
+          <TitledPane alignment="TOP_LEFT" animated="false" contentDisplay="TOP" text="%stats.general.title" textOverrun="CLIP">
                <content>
                   <GridPane>
                      <columnConstraints>
@@ -34,7 +33,7 @@
                            </font>
                         </Label>
                         <Label text="max" textFill="GREY" GridPane.rowIndex="1" />
-                        <Label text="span" textFill="GREY" GridPane.rowIndex="2">
+                        <Label text="%stats.general.range" textFill="GREY" GridPane.rowIndex="2">
                            <font>
                               <Font name="Courier" size="13.0" />
                            </font>
@@ -58,7 +57,7 @@
                   </GridPane>
                </content>
             </TitledPane>
-          <TitledPane alignment="TOP_LEFT" animated="false" contentDisplay="TOP" expanded="false" text="Filter's Q" textOverrun="CLIP">
+          <TitledPane alignment="TOP_LEFT" animated="false" contentDisplay="TOP" expanded="false" text="%stats.q.title" textOverrun="CLIP">
                <content>
                   <GridPane>
                      <columnConstraints>
@@ -72,13 +71,16 @@
                         <RowConstraints fillHeight="false" />
                      </rowConstraints>
                      <children>
-                        <Label text="freq" textFill="GREY">
+                        <Label text="%stats.q.freq" textFill="GREY">
                            <font>
                               <Font name="Courier" size="13.0" />
                            </font>
                         </Label>
-                        <Label text="width" textFill="GREY" GridPane.rowIndex="1" />
-                        <Label text="Q" textFill="GREY" GridPane.rowIndex="2">
+                        <Label text="%stats.q.width" textFill="GREY" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Courier" size="13.0" />
+                           </font></Label>
+                        <Label text="%stats.q.value" textFill="GREY" GridPane.rowIndex="2">
                            <font>
                               <Font name="Courier" size="13.0" />
                            </font>

@@ -38,8 +38,8 @@
                       <RowConstraints vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button fx:id="btnStart" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="Start" GridPane.rowIndex="2" />
-                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="Continuous" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Button fx:id="btnStart" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="%button.start" GridPane.rowIndex="2" />
+                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="%button.continuous" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text=" " GridPane.rowIndex="1" />
                         <Label GridPane.rowIndex="1" />
                      </children>
@@ -57,10 +57,10 @@
                            <children>
                               <LineChart fx:id="swrChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <xAxis>
-                                    <NumberAxis fx:id="swrAxisX" autoRanging="false" label="Frequency [MHz]" />
+                                    <NumberAxis fx:id="swrAxisX" autoRanging="false" label="%axis.freq" />
                                  </xAxis>
                                  <yAxis>
-                                    <NumberAxis fx:id="swrAxisY" autoRanging="false" label="SWR" minWidth="-Infinity" prefWidth="70.0" tickUnit="0.5" upperBound="10.0" />
+                                    <NumberAxis fx:id="swrAxisY" autoRanging="false" label="%axis.swr" minWidth="-Infinity" prefWidth="70.0" tickUnit="0.5" upperBound="10.0" />
                                  </yAxis>
                                  <padding>
                                     <Insets left="5.0" top="5.0" />
@@ -75,7 +75,7 @@
                                     <NumberAxis fx:id="impedanceAxisX" autoRanging="false" forceZeroInRange="false" />
                                  </xAxis>
                                  <yAxis>
-                                    <NumberAxis fx:id="impedanceAxisY" forceZeroInRange="false" label="Impedance [Ω]" minWidth="-Infinity" prefWidth="70.0" />
+                                    <NumberAxis fx:id="impedanceAxisY" forceZeroInRange="false" label="%axis.impedance" minWidth="-Infinity" prefWidth="70.0" />
                                  </yAxis>
                                  <padding>
                                     <Insets left="5.0" top="5.0" />

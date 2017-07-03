@@ -38,11 +38,11 @@
                       <RowConstraints vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="Start" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <Label text="Input" />
+                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="%button.start" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Label text="%label.in" />
                         <ChoiceBox fx:id="sourceProbe" focusTraversable="false" GridPane.rowIndex="1" />
                         <ToggleButton fx:id="btnNormalize" mnemonicParsing="false" text="Norm" textOverrun="CLIP" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="Continuous" textOverrun="CLIP" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="%button.continuous" textOverrun="CLIP" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -54,10 +54,10 @@
                <children>
                   <LineChart fx:id="signalChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" HBox.hgrow="SOMETIMES">
                      <xAxis>
-                        <NumberAxis fx:id="signalAxisX" label="Frequency [MHz]" />
+                        <NumberAxis fx:id="signalAxisX" label="%axis.freq" />
                      </xAxis>
                      <yAxis>
-                        <NumberAxis fx:id="signalAxisY" label="Power [dBm]" prefWidth="70.0" />
+                        <NumberAxis fx:id="signalAxisY" label="%axis.power" prefWidth="70.0" />
                      </yAxis>
                   </LineChart>
                </children>
