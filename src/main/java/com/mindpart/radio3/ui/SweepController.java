@@ -1,10 +1,10 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.discrete.Range;
 import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.ui.FxUtils;
-import com.mindpart.discrete.Range;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -14,7 +14,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -83,7 +85,7 @@ public class SweepController {
     }
 
     private double[] receivedDataArray() {
-        return receivedData.stream().mapToDouble(d -> d.getYValue().doubleValue()).toArray();
+        return receivedData.stream().mapToDouble(XYChart.Data::getYValue).toArray();
     }
 
     private void initChartContext() {
@@ -92,15 +94,15 @@ public class SweepController {
 
         if(signalSource == SweepSignalSource.LOG_PROBE) {
             if(normalized) {
-                chartContext = new LogarithmicProbeNormContext(radio3.getLogarithmicParser()::parse, receivedDataArray());
+                chartContext = new LogarithmicProbeNormContext(radio3.getLogarithmicParser()::parse, receivedDataArray(), mainController.bundle.axisRelativePower);
             } else {
-                chartContext = new LogarithmicProbeContext(radio3.getLogarithmicParser()::parse);
+                chartContext = new LogarithmicProbeContext(radio3.getLogarithmicParser()::parse, mainController.bundle.axisPower);
             }
         } else if(signalSource == SweepSignalSource.LIN_PROBE) {
             if(normalized) {
-                chartContext = new LinearProbeNormContext(radio3.getLinearParser()::parse, receivedDataArray());
+                chartContext = new LinearProbeNormContext(radio3.getLinearParser()::parse, receivedDataArray(), mainController.bundle.axisRelativeVoltage);
             } else {
-                chartContext = new LinearProbeContext(radio3.getLinearParser()::parse);
+                chartContext = new LinearProbeContext(radio3.getLinearParser()::parse, mainController.bundle.axisVoltage);
             }
         } else {
             throw new IllegalStateException("source probe: "+sourceProbe.getValue());
@@ -126,7 +128,7 @@ public class SweepController {
             Frequency freq = scenePosToFrequency(scenePos);
             double value = valueFromSeries(signalDataSeries.get(0), freq.toMHz());
             Point2D selectionPos = new Point2D(scenePos.getX(), valueToRefPos(value).getY());
-            return new ChartMarker.SelectionData(selectionPos, "freq: "+freq+"\n" + chartContext.valueLabel()+": "+chartContext.format(value));
+            return new ChartMarker.SelectionData(selectionPos, "f = "+freq+"\n" + chartContext.valueLabel()+" = "+chartContext.format(value));
         }, () -> !btnContinuous.isSelected());
 
         chartMarker.setupRangeSelection(
@@ -250,10 +252,10 @@ public class SweepController {
         if(continuous) {
             disableUI();
             runSweepOnce(this::displayDataAndSweepAgain);
-            btnContinuous.setText("Stop");
+            btnContinuous.setText(mainController.bundle.buttonStop);
         } else {
             enableUI();
-            btnContinuous.setText("Continuous");
+            btnContinuous.setText(mainController.bundle.buttonContinuous);
         }
     }
 

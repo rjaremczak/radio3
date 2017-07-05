@@ -10,19 +10,21 @@ import java.util.function.Function;
  */
 public class LogarithmicProbeContext implements ChartContext<Integer, Double> {
     private Function<Integer, Double> parser;
+    private final String axisLabel;
 
-    public LogarithmicProbeContext(Function<Integer, Double> parser) {
+    public LogarithmicProbeContext(Function<Integer, Double> parser, String axisLabel) {
         this.parser = parser;
+        this.axisLabel = axisLabel;
     }
 
     @Override
     public String axisLabel() {
-        return "Power [dBm]";
+        return axisLabel;
     }
 
     @Override
     public String valueLabel() {
-        return "power";
+        return "P";
     }
 
     @Override

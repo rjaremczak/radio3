@@ -3,14 +3,12 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.FxUtils;
-import com.mindpart.utils.ResourceBundleUtils;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -139,13 +137,13 @@ public class MainController {
     private LinearProbeController linearProbeController;
     private VnaProbeController vnaProbeController;
 
-    private String txtButtonConnect;
-    private String txtButtonDisconnect;
-
     private volatile boolean continuousSamplingEnabled = false;
+
+    public final BundleData bundle;
 
     public MainController(Radio3 radio3) {
         this.radio3 = radio3;
+        bundle = new BundleData(radio3.getConfiguration().getLocale());
     }
 
     public void updateAvailablePorts() {
@@ -167,14 +165,14 @@ public class MainController {
     }
 
     private void updateOnConnect() {
-        btnConnect.setText(txtButtonDisconnect);
+        btnConnect.setText(bundle.buttonDisconnect);
         FxUtils.enableItems(toolBar, btnConnect, componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         FxUtils.disableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         updateDeviceStatus(DeviceStatus.READY);
     }
 
     private void updateOnDisconnect(DeviceStatus deviceStatus) {
-        btnConnect.setText(txtButtonConnect);
+        btnConnect.setText(bundle.buttonConnect);
         FxUtils.enableItems(btnConnect, serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         FxUtils.disableItems(toolBar, componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         deviceProperties.clear();
@@ -219,11 +217,7 @@ public class MainController {
 
 
     public Parent loadFXml(Object controller, String fxml) {
-        //ResourceBundle bundle = ResourceBundle.getBundle("bundle", radio3.getConfiguration().getLocale());
-        ResourceBundle bundle = ResourceBundleUtils.getBundle("bundle", radio3.getConfiguration().getLocale(), "UTF-8");
-        txtButtonConnect = bundle.getString("button.connect");
-        txtButtonDisconnect = bundle.getString("button.disconnect");
-        return FxUtils.loadFXml(controller, fxml, bundle);
+        return FxUtils.loadFXml(controller, fxml, bundle.getResourceBundle());
     }
 
     public void initialize() throws IOException {

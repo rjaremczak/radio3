@@ -9,14 +9,9 @@ import java.util.function.Function;
 public class LogarithmicProbeNormContext extends LogarithmicProbeContext {
     private double[] referenceData;
 
-    public LogarithmicProbeNormContext(Function<Integer, Double> parser, double[] referenceData) {
-        super(parser);
+    public LogarithmicProbeNormContext(Function<Integer, Double> parser, double[] referenceData, String axisLabel) {
+        super(parser, axisLabel);
         this.referenceData = referenceData;
-    }
-
-    @Override
-    public String axisLabel() {
-        return "Relative Power [dB]";
     }
 
     @Override

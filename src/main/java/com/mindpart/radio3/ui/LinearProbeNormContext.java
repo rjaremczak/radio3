@@ -9,14 +9,9 @@ import java.util.function.Function;
 public class LinearProbeNormContext extends LinearProbeContext {
     private double[] referenceData;
 
-    public LinearProbeNormContext(Function<Integer, Double> valueParser, double[] referenceData) {
-        super(valueParser);
+    public LinearProbeNormContext(Function<Integer, Double> valueParser, double[] referenceData, String axisLabel) {
+        super(valueParser, axisLabel);
         this.referenceData = referenceData;
-    }
-
-    @Override
-    public String axisLabel() {
-        return "Normalized Voltage [V]";
     }
 
     @Override

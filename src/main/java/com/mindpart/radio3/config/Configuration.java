@@ -55,4 +55,12 @@ public class Configuration {
     protected void setCreatedBy(String str) {
         createdBy = str;
     }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public String getLanguageTag() {
+        return languageTag;
+    }
 }

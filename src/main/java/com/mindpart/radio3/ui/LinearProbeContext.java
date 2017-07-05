@@ -10,19 +10,21 @@ import java.util.function.Function;
  */
 public class LinearProbeContext implements ChartContext<Integer, Double> {
     private Function<Integer,Double> valueParser;
+    private final String axisLabel;
 
-    public LinearProbeContext(Function<Integer,Double> valueParser) {
+    public LinearProbeContext(Function<Integer,Double> valueParser, String axisLabel) {
         this.valueParser = valueParser;
+        this.axisLabel = axisLabel;
     }
 
     @Override
     public String axisLabel() {
-        return "Voltage [V]";
+        return axisLabel;
     }
 
     @Override
     public String valueLabel() {
-        return "voltage";
+        return "V";
     }
 
     @Override
