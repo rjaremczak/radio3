@@ -86,7 +86,7 @@ public class VnaController {
     public VnaController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
         this.mainController = mainController;
-        this.sweepSettingsController = new SweepSettingsController(radio3.getSweepProfiles());
+        this.sweepSettingsController = new SweepSettingsController(mainController.bundle, radio3.getSweepProfiles());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {

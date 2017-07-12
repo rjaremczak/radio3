@@ -24,7 +24,7 @@
       <FrequencyField fx:id="startFrequencyField" alignment="CENTER_RIGHT" label="start frequency" prefColumnCount="8" promptText="from" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <FrequencyField fx:id="endFrequencyField" alignment="CENTER_RIGHT" label="end frequency" prefColumnCount="8" promptText="to" GridPane.columnIndex="2" GridPane.rowIndex="1" />
       <Label text="%label.freqRange" GridPane.columnIndex="1" GridPane.columnSpan="2" />
-      <Label text="%label.quality" GridPane.columnIndex="3" />
+      <Label text="%quality.label" GridPane.columnIndex="3" />
       <Label text="%label.presets" />
       <ChoiceBox fx:id="presetsChoiceBox" GridPane.rowIndex="1" />
       <ChoiceBox fx:id="sweepQuality" GridPane.columnIndex="3" GridPane.rowIndex="1" />

@@ -66,13 +66,16 @@
                                        </items>
                                     </ToolBar>
                                     <TableView fx:id="devicePropertiesTable">
+                                        <placeholder>
+                                            <Label text="%props.placeholder"/>
+                                        </placeholder>
                                        <columns>
-                                          <TableColumn editable="false" prefWidth="75.0" text="%column.property">
+                                          <TableColumn editable="false" prefWidth="75.0" text="%props.column.name">
                                              <cellValueFactory>
                                                 <PropertyValueFactory property="name" />
                                              </cellValueFactory>
                                           </TableColumn>
-                                          <TableColumn editable="false" sortable="false" text="%column.value">
+                                          <TableColumn editable="false" sortable="false" text="%props.column.value">
                                              <cellValueFactory>
                                                 <PropertyValueFactory property="value" />
                                              </cellValueFactory>

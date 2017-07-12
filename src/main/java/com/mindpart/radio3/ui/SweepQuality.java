@@ -5,9 +5,9 @@ package com.mindpart.radio3.ui;
  * Date: 2017.03.15
  */
 public enum SweepQuality {
-    BEST("Best", 1000, 2, 2),
-    BALANCED("Balanced", 500, 2, 2),
-    FAST("Fast", 100, 1, 1);
+    BEST("%quality.best", 1000, 2, 2),
+    BALANCED("%quality.balanced", 500, 2, 2),
+    FAST("%quality.fast", 100, 1, 1);
 
     private String name;
     private int steps;

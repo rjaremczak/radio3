@@ -8,9 +8,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
+import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * Created by Robert Jaremczak
@@ -31,15 +33,29 @@ public class SweepSettingsController {
     @FXML
     ChoiceBox<SweepProfile> presetsChoiceBox;
 
+    private BundleData bundleData;
     private ObservableList<SweepProfile> presets = FXCollections.observableArrayList();
     private Runnable rangeChangeListener = () -> {};
     private Runnable qualityChangeListener = () -> {};
 
-    public SweepSettingsController(SweepProfiles sweepProfiles) {
+    public SweepSettingsController(BundleData bundleData, SweepProfiles sweepProfiles) {
+        this.bundleData = bundleData;
         this.presets.addAll(sweepProfiles.profiles);
     }
 
     private void initSweepSteps() {
+        sweepQuality.setConverter(new StringConverter<SweepQuality>() {
+            @Override
+            public String toString(SweepQuality object) {
+                String str = object.toString();
+                return str.startsWith("%") ? bundleData.resolve(str.substring(1)) : str;
+            }
+
+            @Override
+            public SweepQuality fromString(String string) {
+                return null;
+            }
+        });
         sweepQuality.getItems().addAll(SweepQuality.values());
         sweepQuality.getSelectionModel().select(SweepQuality.BEST);
     }

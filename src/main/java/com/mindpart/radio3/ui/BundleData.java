@@ -23,19 +23,19 @@ public class BundleData {
 
     public BundleData(Locale locale) {
         resourceBundle = ResourceBundleUtils.getBundle("bundle", locale, "UTF-8");
-        buttonConnect = getString("button.connect");
-        buttonDisconnect = getString("button.disconnect");
-        buttonStop = getString("button.stop");
-        buttonContinuous = getString("button.continuous");
+        buttonConnect = resolve("button.connect");
+        buttonDisconnect = resolve("button.disconnect");
+        buttonStop = resolve("button.stop");
+        buttonContinuous = resolve("button.continuous");
 
-        axisPower = getString("axis.power");
-        axisRelativePower = getString("axis.relativePower");
-        axisVoltage = getString("axis.voltage");
-        axisRelativeVoltage = getString("axis.relativeVoltage");
+        axisPower = resolve("axis.power");
+        axisRelativePower = resolve("axis.relativePower");
+        axisVoltage = resolve("axis.voltage");
+        axisRelativeVoltage = resolve("axis.relativeVoltage");
     }
 
-    private String getString(String key) {
-        return resourceBundle.getString(key);
+    public String resolve(Object key) {
+        return resourceBundle.getString(key.toString());
     }
 
     public ResourceBundle getResourceBundle() {
