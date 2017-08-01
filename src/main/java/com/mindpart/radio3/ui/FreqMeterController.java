@@ -9,10 +9,10 @@ import javafx.event.ActionEvent;
  * Created by Robert Jaremczak
  * Date: 2016.03.24
  */
-public class FMeterController extends ComponentController {
+public class FreqMeterController extends ComponentController {
     private Radio3 radio3;
 
-    public FMeterController(Radio3 radio3) {
+    public FreqMeterController(Radio3 radio3) {
         this.radio3 = radio3;
     }
 

@@ -44,7 +44,7 @@ public class Radio3 {
     private LogarithmicParser logarithmicParser;
     private LinearParser linearParser;
     private VnaParser vnaParser;
-    private FMeterParser fMeterParser;
+    private FreqMeterParser freqMeterParser;
     private MultipleProbesParser multipleProbesParser;
     private SweepResponseParser sweepResponseParser;
 
@@ -71,8 +71,8 @@ public class Radio3 {
         logarithmicParser = new LogarithmicParser();
         linearParser = new LinearParser();
         vnaParser = new VnaParser();
-        fMeterParser = new FMeterParser(configuration.getFMeter());
-        multipleProbesParser = new MultipleProbesParser(logarithmicParser, linearParser, vnaParser, fMeterParser);
+        freqMeterParser = new FreqMeterParser(configuration.getFreqMeter());
+        multipleProbesParser = new MultipleProbesParser(logarithmicParser, linearParser, vnaParser, freqMeterParser);
         sweepResponseParser = new SweepResponseParser();
 
         initKeepAlive();
@@ -220,7 +220,7 @@ public class Radio3 {
     }
 
     public Response<Frequency> readFMeter() {
-        return performRequest(new Frame(FMETER_DATA), fMeterParser);
+        return performRequest(new Frame(FMETER_DATA), freqMeterParser);
     }
 
     public Response<ProbesValues> readAllProbes() {

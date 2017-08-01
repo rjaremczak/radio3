@@ -3,10 +3,8 @@ package com.mindpart.radio3.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mindpart.radio3.device.HardwareRevision;
 import com.mindpart.radio3.device.VfoType;
-import org.apache.log4j.Level;
 
 import java.util.Locale;
 
@@ -23,13 +21,13 @@ public class Configuration {
     private Locale locale;
 
     private String createdBy;
-    private String languageTag;
+    private String uiLocale;
     private HardwareRevision hardwareRevision = HardwareRevision.AUTODETECT;
     private VfoType vfoType = VfoType.NONE;
-    private FMeterConfig fMeter;
+    private FreqMeterConfig freqMeter;
 
     public Locale getLocale() {
-        return languageTag==null ? Locale.getDefault() : Locale.forLanguageTag(languageTag);
+        return uiLocale ==null ? Locale.getDefault() : Locale.forLanguageTag(uiLocale);
     }
 
     public HardwareRevision getHardwareRevision() {
@@ -40,8 +38,8 @@ public class Configuration {
         return vfoType;
     }
 
-    public FMeterConfig getFMeter() {
-        return fMeter;
+    public FreqMeterConfig getFreqMeter() {
+        return freqMeter;
     }
 
     public void setVfoType(VfoType vfoType) {
@@ -60,7 +58,7 @@ public class Configuration {
         return createdBy;
     }
 
-    public String getLanguageTag() {
-        return languageTag;
+    public String getUiLocale() {
+        return uiLocale;
     }
 }

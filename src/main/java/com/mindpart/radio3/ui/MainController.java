@@ -132,7 +132,7 @@ public class MainController {
     private VnaController vnaController;
     private SweepController sweepController;
     private VfoController vfoController;
-    private FMeterController fMeterController;
+    private FreqMeterController freqMeterController;
     private LogarithmicProbeController logarithmicProbeController;
     private LinearProbeController linearProbeController;
     private VnaProbeController vnaProbeController;
@@ -235,13 +235,13 @@ public class MainController {
         vnaTab.setContent(loadFXml(vnaController, "vnaPane.fxml"));
 
         vfoController = new VfoController(radio3);
-        fMeterController = new FMeterController(radio3);
+        freqMeterController = new FreqMeterController(radio3);
         logarithmicProbeController = new LogarithmicProbeController(radio3);
         linearProbeController = new LinearProbeController(radio3);
         vnaProbeController = new VnaProbeController(radio3);
 
         addFeatureBox(vfoController);
-        addFeatureBox(fMeterController);
+        addFeatureBox(freqMeterController);
         addFeatureBox(logarithmicProbeController);
         addFeatureBox(linearProbeController);
         addFeatureBox(vnaProbeController);
@@ -409,14 +409,14 @@ public class MainController {
         logarithmicProbeController.update(probesValues.getLogarithmic());
         linearProbeController.update(probesValues.getLinear());
         vnaProbeController.update(probesValues.getVnaResult());
-        fMeterController.update(probesValues.getFMeter());
+        freqMeterController.update(probesValues.getFMeter());
     }
 
     private void disableGetOnAllProbes(boolean disable) {
         logarithmicProbeController.disableMainButton(disable);
         linearProbeController.disableMainButton(disable);
         vnaProbeController.disableMainButton(disable);
-        fMeterController.disableMainButton(disable);
+        freqMeterController.disableMainButton(disable);
     }
 
     public void doContinuousSamplingOfAllProbes() {

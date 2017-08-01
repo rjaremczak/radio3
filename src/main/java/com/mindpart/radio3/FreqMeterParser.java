@@ -1,6 +1,6 @@
 package com.mindpart.radio3;
 
-import com.mindpart.radio3.config.FMeterConfig;
+import com.mindpart.radio3.config.FreqMeterConfig;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
 import com.mindpart.types.Frequency;
@@ -12,10 +12,10 @@ import static com.mindpart.radio3.device.FrameCommand.FMETER_DATA;
  * Created by Robert Jaremczak
  * Date: 2016.02.22
  */
-public class FMeterParser implements FrameParser<Frequency> {
-    private FMeterConfig config;
+public class FreqMeterParser implements FrameParser<Frequency> {
+    private FreqMeterConfig config;
 
-    public FMeterParser(FMeterConfig config) {
+    public FreqMeterParser(FreqMeterConfig config) {
         this.config = config;
     }
 

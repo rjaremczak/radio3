@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * Date: 2016.10.30
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
-public class FMeterConfig {
+public class FreqMeterConfig {
     public int multiplier;
     public int base;
 }

@@ -13,13 +13,13 @@ public class MultipleProbesParser implements FrameParser<ProbesValues> {
     private LogarithmicParser logarithmicParser;
     private LinearParser linearParser;
     private VnaParser vnaParser;
-    private FMeterParser fMeterParser;
+    private FreqMeterParser freqMeterParser;
 
-    public MultipleProbesParser(LogarithmicParser logarithmicParser, LinearParser linearParser, VnaParser vnaParser, FMeterParser fMeterParser) {
+    public MultipleProbesParser(LogarithmicParser logarithmicParser, LinearParser linearParser, VnaParser vnaParser, FreqMeterParser freqMeterParser) {
         this.logarithmicParser = logarithmicParser;
         this.linearParser = linearParser;
         this.vnaParser = vnaParser;
-        this.fMeterParser = fMeterParser;
+        this.freqMeterParser = freqMeterParser;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class MultipleProbesParser implements FrameParser<ProbesValues> {
                 logarithmicParser.parse(logarithmic),
                 linearParser.parse(linear),
                 vnaParser.calculateVnaResult(complexGain, complexPhase),
-                fMeterParser.parse(fMeter)
+                freqMeterParser.parse(fMeter)
         );
     }
 
