@@ -19,7 +19,7 @@ public class RangeTest {
     @Test
     public void testUpdate() {
         double v = -8.050183150183159;
-        range.record(v);
+        range.sample(v);
         assertTrue(range.isValid());
         assertEquals(v, range.min(), Double.MIN_VALUE);
         assertEquals(v, range.max(), Double.MIN_VALUE);

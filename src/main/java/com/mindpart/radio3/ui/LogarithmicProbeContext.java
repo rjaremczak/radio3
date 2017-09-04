@@ -9,7 +9,7 @@ import java.util.function.Function;
  * Date: 2017.06.03
  */
 public class LogarithmicProbeContext implements ChartContext<Integer, Double> {
-    private Function<Integer, Double> parser;
+    private final Function<Integer, Double> parser;
     private final String axisLabel;
 
     public LogarithmicProbeContext(Function<Integer, Double> parser, String axisLabel) {

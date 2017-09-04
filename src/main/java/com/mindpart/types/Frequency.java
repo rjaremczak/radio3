@@ -11,8 +11,8 @@ import java.text.ParsePosition;
 public class Frequency implements Comparable<Frequency> {
     private static final double VALUE_MHz = 1000000;
     private static final double VALUE_kHz = 1000;
-    private static final NumberFormat FORMAT_MHZ = new DecimalFormat("0.### MHz");
-    private static final NumberFormat FORMAT_KHZ = new DecimalFormat("0.### kHz");
+    private static final NumberFormat FORMAT_MHZ = new DecimalFormat("0.000 MHz");
+    private static final NumberFormat FORMAT_KHZ = new DecimalFormat("0.000 kHz");
     private static final NumberFormat FORMAT_HZ = new DecimalFormat("# Hz");
 
     public static final Frequency ZERO = Frequency.ofHz(0);

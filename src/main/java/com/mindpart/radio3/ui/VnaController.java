@@ -230,9 +230,9 @@ public class VnaController {
         for (int num = 0; num <= numSteps; num++) {
             VnaResult vnaResult = radio3.getVnaParser().calculateVnaResult(samples[0][num], samples[1][num]);
             double fMHz = Frequency.toMHz(freq);
-            swrData.add(new XYChart.Data<>(fMHz, swrRange.record(vnaResult.getSwr())));
-            rData.add(new XYChart.Data<>(fMHz, impedanceRange.record(vnaResult.getR())));
-            xData.add(new XYChart.Data<>(fMHz, impedanceRange.record(vnaResult.getX())));
+            swrData.add(new XYChart.Data<>(fMHz, swrRange.sample(vnaResult.getSwr())));
+            rData.add(new XYChart.Data<>(fMHz, impedanceRange.sample(vnaResult.getR())));
+            xData.add(new XYChart.Data<>(fMHz, impedanceRange.sample(vnaResult.getX())));
             freq += freqStep;
         }
 

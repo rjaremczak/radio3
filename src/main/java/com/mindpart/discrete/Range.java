@@ -8,7 +8,7 @@ public class Range {
     private double min = Double.MAX_VALUE;
     private double max = -Double.MAX_VALUE;
 
-    public double record(double v) {
+    public double sample(double v) {
         min = Math.min(min, v);
         max = Math.max(max, v);
         return v;

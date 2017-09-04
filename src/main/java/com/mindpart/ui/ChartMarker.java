@@ -19,6 +19,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static javafx.scene.input.MouseButton.PRIMARY;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.11.09
@@ -190,11 +192,13 @@ public class ChartMarker {
     }
 
     private void onMouseReleased(MouseEvent mouseEvent) {
-        hideChartMarker();
+        if(mouseEvent.getButton() == PRIMARY) {
+            hideChartMarker();
+        }
     }
 
     private void onMousePressedOrDragged(MouseEvent mouseEvent) {
-        if(isMouseOverChartArea(mouseEvent)) {
+        if(mouseEvent.getButton() == PRIMARY && isMouseOverChartArea(mouseEvent)) {
             showChartMarker(eventToRefPos(mouseEvent));
         } else {
             hideChartMarker();

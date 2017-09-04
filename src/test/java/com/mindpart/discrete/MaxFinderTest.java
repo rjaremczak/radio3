@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
  * Date: 2017.06.12
  */
 public class MaxFinderTest {
-    MaxFinder maxFinder = new MaxFinder();
+    MaxCheck maxFinder = new MaxCheck();
 
     @Test
     public void testConstructor() {
@@ -17,21 +17,21 @@ public class MaxFinderTest {
     }
 
     private void assertMaximum(int expectedNumber, double expectedValue) {
-        assertEquals(expectedNumber, maxFinder.getSample().getNumber(), Double.MIN_VALUE);
-        assertEquals(expectedValue, maxFinder.getSample().getValue(), Double.MIN_VALUE);
+        assertEquals(expectedNumber, maxFinder.getSampleValue(), Double.MIN_VALUE);
+        assertEquals(expectedValue, maxFinder.getSampleValue(), Double.MIN_VALUE);
     }
 
     @Test
     public void testMaximum() {
-        maxFinder.record(0, 31.0);
+        maxFinder.sample(0, 31.0);
         assertTrue(maxFinder.isFound());
         assertMaximum(0, 31.0);
 
-        maxFinder.record(1, 35.0);
+        maxFinder.sample(1, 35.0);
         assertMaximum(1, 35.0);
 
-        maxFinder.record(2, 43.0);
-        maxFinder.record(3, 1.0);
+        maxFinder.sample(2, 43.0);
+        maxFinder.sample(3, 1.0);
         assertMaximum(2, 43.0);
     }
 }

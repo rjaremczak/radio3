@@ -34,12 +34,12 @@ public class VnaInfoController {
     public void initialize() {
     }
 
-    public void update(ChartContext<Integer, Double> chartContext, List<XYChart.Data<Number, Number>> data) {
+    public void update(ChartContext<Integer, Double> chartValueContext, List<XYChart.Data<Number, Number>> data) {
         if(data!=null && !data.isEmpty()) {
             vnaStatistics.update(data);
-            minSwr.setText(chartContext.format(vnaStatistics.getMinSwr()));
-            maxSwr.setText(chartContext.format(vnaStatistics.getMaxSwr()));
-            avgSwr.setText(chartContext.format(vnaStatistics.getAvgSwr()));
+            minSwr.setText(chartValueContext.format(vnaStatistics.getMinSwr()));
+            maxSwr.setText(chartValueContext.format(vnaStatistics.getMaxSwr()));
+            avgSwr.setText(chartValueContext.format(vnaStatistics.getAvgSwr()));
         } else {
             minSwr.setText("");
             maxSwr.setText("");
