@@ -286,10 +286,9 @@ public class SweepController {
         for (int step = 0; step < receivedData.length; step++) {
             double value = range.sample(chartContext.process(step, receivedData[step]));
             data.add(new XYChart.Data<>(receivedFreq[step], value));
-            sweepInfoController.sample(step, value);
         }
 
-        sweepInfoController.update(i -> Frequency.ofMHz(receivedFreq[i]).format(), chartContext);
+        sweepInfoController.update(receivedData, receivedFreq, i -> Frequency.ofMHz(receivedFreq[i]).format(), chartContext);
         signalDataSeries.add(chartSeries);
         signalAxisX.setForceZeroInRange(false);
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, receivedDataInfo.getFreqStart(), receivedDataInfo.getFreqEnd());

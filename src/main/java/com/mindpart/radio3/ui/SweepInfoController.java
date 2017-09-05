@@ -2,6 +2,8 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.discrete.MaxCheck;
 import com.mindpart.discrete.MinCheck;
+import com.mindpart.discrete.QAnalyser;
+import com.mindpart.types.Frequency;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -47,34 +49,46 @@ public class SweepInfoController {
     Label qValue;
 
     private Parent container;
-    private MinCheck minCheck = new MinCheck();
-    private MaxCheck maxCheck = new MaxCheck();
 
     public void clear() {
-        minCheck.reset();
-        maxCheck.reset();
-
         minValue.setText(NA);
         minFreq.setText(NA);
         maxValue.setText(NA);
         maxFreq.setText(NA);
         spanValue.setText(NA);
 
+        clearQData();
+    }
+
+    private void clearQData() {
         qFreq.setText(NA);
         qBandwidth.setText(NA);
         qValue.setText(NA);
-    }
-
-    public void sample(int number, double value) {
-        minCheck.sample(number, value);
-        maxCheck.sample(number, value);
     }
 
     public SweepInfoController(MainController mainController) {
         this.container = mainController.loadFXml(this, "sweepInfoPane.fxml");
     }
 
-    public void update(Function<Integer,String> freqSampleFormatter, ChartContext<Integer, Double> chartValueContext) {
+    public void update(double[] data, double[] freq, Function<Integer,String> freqSampleFormatter, ChartContext<Integer, Double> chartValueContext) {
+        MinCheck minCheck = new MinCheck();
+        MaxCheck maxCheck = new MaxCheck();
+
+        for(int i=0; i<data.length; i++) {
+            minCheck.sample(i, data[i]);
+            maxCheck.sample(i, data[i]);
+        }
+
+        clearQData();
+        if(chartValueContext instanceof LogarithmicProbeContext) {
+            QAnalyser qAnalyser = new QAnalyser(data, freq);
+            if(minCheck.isFound() && qAnalyser.analyseLowPeak(minCheck.getSampleNumber(), 3.0) ) {
+                qFreq.setText(Frequency.ofMHz(qAnalyser.getPeakFreq()).format());
+                qBandwidth.setText(Frequency.ofMHz(qAnalyser.getBandwidth()).format());
+                qValue.setText(Double.toString(qAnalyser.getQ()));
+            }
+        }
+
         minValue.setText(chartValueContext.format(minCheck.getSampleValue()));
         minFreq.setText(freqSampleFormatter.apply(minCheck.getSampleNumber()));
         maxValue.setText(chartValueContext.format(maxCheck.getSampleValue()));
