@@ -16,6 +16,7 @@ public class BundleData {
     public final String buttonDisconnect;
     public final String buttonStop;
     public final String buttonContinuous;
+
     public final String axisPower;
     public final String axisRelativePower;
     public final String axisVoltage;

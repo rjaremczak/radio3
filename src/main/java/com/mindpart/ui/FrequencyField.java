@@ -1,5 +1,6 @@
 package com.mindpart.ui;
 
+import com.mindpart.radio3.ui.BundleData;
 import com.mindpart.types.Frequency;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 /**
@@ -24,6 +26,11 @@ public class FrequencyField extends TextField {
     private Frequency frequency;
     private String lastValue;
     private String label;
+
+    private String textMalformed;
+    private String textMalformedDetails;
+    private String textOutOfRange;
+    private String textOutOfRangeDetails;
 
     private volatile boolean inActionEvent = false;
 
@@ -79,7 +86,7 @@ public class FrequencyField extends TextField {
         try {
             parsed = Frequency.ofMHz(IN_FORMAT.parse(str).doubleValue());
         } catch (NumberFormatException|ParseException e) {
-            FxUtils.alertInputError(getLabel(), "malformed y", "must be a valid frequency");
+            FxUtils.alertInputError(getLabel(), textMalformed, textMalformedDetails);
             setText(lastValue);
             return false;
         }
@@ -95,7 +102,7 @@ public class FrequencyField extends TextField {
             return true;
         } else {
             try {
-                FxUtils.alertInputError(getLabel(), "y value of range", "must be between "+min+" and "+max);
+                FxUtils.alertInputError(getLabel(), textOutOfRange, String.format(textOutOfRangeDetails, min, max));
                 setText(lastValue);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -112,6 +119,13 @@ public class FrequencyField extends TextField {
         lastValue = getText();
         this.frequency = frequency;
         format();
+    }
+
+    public void initFromBundle(BundleData bundle) {
+        textMalformed = bundle.resolve("frequencyField.malformed");
+        textMalformedDetails = bundle.resolve("frequencyField.malformed.details");
+        textOutOfRange = bundle.resolve("frequencyField.outOfRange");
+        textOutOfRangeDetails = bundle.resolve("frequencyField.outOfRange.details");
     }
 
     private void format() {

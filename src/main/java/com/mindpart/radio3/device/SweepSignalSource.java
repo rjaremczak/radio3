@@ -5,8 +5,8 @@ package com.mindpart.radio3.device;
  * Date: 2016.11.18
  */
 public enum SweepSignalSource {
-    LOG_PROBE("Logarithmic",1, "Power [dBm]"),
-    LIN_PROBE("Linear",1, "Power [mW]"),
+    LOG_PROBE("LOG",1, "Power [dBm]"),
+    LIN_PROBE("LIN",1, "Power [mW]"),
     VNA("VNA", 2, "SWR", "Phase [°]");
 
     private int numSeries;

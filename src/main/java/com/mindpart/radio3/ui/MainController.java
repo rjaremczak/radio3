@@ -477,9 +477,11 @@ public class MainController {
                 new Stop(1.0, color)));
     }
 
+    
+
     void updateDeviceStatus(DeviceStatus deviceStatus) {
         updateMainIndicator(deviceStatus.getMainIndicatorColor());
         String portName = radio3.isConnected() ? "("+ radio3.getPortName()+") " : "";
-        this.deviceStatus.setText(portName + deviceStatus.toString());
+        this.deviceStatus.setText(portName + deviceStatus.format(bundle));
     }
 }

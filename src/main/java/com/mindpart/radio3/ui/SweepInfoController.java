@@ -4,11 +4,18 @@ import com.mindpart.discrete.MaxCheck;
 import com.mindpart.discrete.MinCheck;
 import com.mindpart.discrete.QAnalyser;
 import com.mindpart.types.Frequency;
+import com.mindpart.ui.VerticalRuler;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.function.Function;
 
 /**
@@ -16,6 +23,7 @@ import java.util.function.Function;
  * Date: 2017.06.05
  */
 public class SweepInfoController {
+    private static final NumberFormat FORMAT_Q = new DecimalFormat("0.0");
     private static final String NA = "-";
 
     @FXML
@@ -48,7 +56,10 @@ public class SweepInfoController {
     @FXML
     Label qValue;
 
-    private Parent container;
+    private final Parent container;
+    private final VerticalRuler qFreqRuler;
+    private final VerticalRuler qBandwidthStartRuler;
+    private final VerticalRuler qBandwidthEndRuler;
 
     public void clear() {
         minValue.setText(NA);
@@ -57,20 +68,33 @@ public class SweepInfoController {
         maxFreq.setText(NA);
         spanValue.setText(NA);
 
-        clearQData();
+        clearQPane();
     }
 
-    private void clearQData() {
+    private void clearQPane() {
         qFreq.setText(NA);
         qBandwidth.setText(NA);
         qValue.setText(NA);
+
+        qFreqRuler.hide();
+        qBandwidthStartRuler.hide();
+        qBandwidthEndRuler.hide();
     }
 
-    public SweepInfoController(MainController mainController) {
+    public SweepInfoController(MainController mainController, Pane chartParent, XYChart<Number, Number> chart) {
         this.container = mainController.loadFXml(this, "sweepInfoPane.fxml");
+        this.qFreqRuler = new VerticalRuler(chartParent, chart, Color.DARKBLUE);
+        this.qBandwidthStartRuler = new VerticalRuler(chartParent, chart, Color.web("#0000FF", 0.2));
+        this.qBandwidthEndRuler = new VerticalRuler(chartParent, chart, Color.web("#0000FF", 0.2));
+
+        qPane.expandedProperty().addListener(this::qPaneVisibilityListener);
     }
 
-    public void update(double[] data, double[] freq, Function<Integer,String> freqSampleFormatter, ChartContext<Integer, Double> chartValueContext) {
+    private void qPaneVisibilityListener(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean expanded) {
+        clearQPane();
+    }
+
+    public void update(double[] freq, double[] data, Function<Integer,String> freqSampleFormatter, ChartContext<Integer, Double> chartValueContext) {
         MinCheck minCheck = new MinCheck();
         MaxCheck maxCheck = new MaxCheck();
 
@@ -79,21 +103,30 @@ public class SweepInfoController {
             maxCheck.sample(i, data[i]);
         }
 
-        clearQData();
-        if(chartValueContext instanceof LogarithmicProbeContext) {
-            QAnalyser qAnalyser = new QAnalyser(data, freq);
-            if(minCheck.isFound() && qAnalyser.analyseLowPeak(minCheck.getSampleNumber(), 3.0) ) {
-                qFreq.setText(Frequency.ofMHz(qAnalyser.getPeakFreq()).format());
-                qBandwidth.setText(Frequency.ofMHz(qAnalyser.getBandwidth()).format());
-                qValue.setText(Double.toString(qAnalyser.getQ()));
-            }
-        }
-
         minValue.setText(chartValueContext.format(minCheck.getSampleValue()));
         minFreq.setText(freqSampleFormatter.apply(minCheck.getSampleNumber()));
         maxValue.setText(chartValueContext.format(maxCheck.getSampleValue()));
         maxFreq.setText(freqSampleFormatter.apply(maxCheck.getSampleNumber()));
         spanValue.setText(chartValueContext.format(maxCheck.getSampleValue() - minCheck.getSampleValue()));
+
+        if(qPane.isExpanded() && chartValueContext instanceof LogarithmicProbeContext) {
+            QAnalyser qAnalyser = new QAnalyser(data, freq);
+            if (minCheck.isFound() && qAnalyser.analyseLowPeak(minCheck.getSampleNumber(), 3.0)) {
+                qFreq.setText(Frequency.ofMHz(qAnalyser.getPeakFreq()).format());
+                qBandwidth.setText(Frequency.ofMHz(qAnalyser.getBandwidth()).format());
+                qValue.setText(FORMAT_Q.format(qAnalyser.getQ()));
+
+                qBandwidthStartRuler.update(qAnalyser.getStartFreq());
+                qBandwidthEndRuler.update(qAnalyser.getEndFreq());
+                qFreqRuler.update(qAnalyser.getPeakFreq());
+
+                qBandwidthStartRuler.show();
+                qBandwidthEndRuler.show();
+                qFreqRuler.show();
+            } else {
+                clearQPane();
+            }
+        }
     }
 
     public Parent getContainer() {

@@ -11,9 +11,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 
-import java.util.List;
-import java.util.ResourceBundle;
-
 /**
  * Created by Robert Jaremczak
  * Date: 2016.10.31
@@ -63,9 +60,12 @@ public class SweepSettingsController {
     public void initialize() {
         initSweepSteps();
 
+        startFrequencyField.initFromBundle(bundleData);
+        startFrequencyField.setMinSupplier(() -> Frequency.ofMHz(0.1));
         startFrequencyField.setMaxSupplier(() -> endFrequencyField.getFrequency());
         startFrequencyField.setChangeListener(this::internalRangeChangeListener);
 
+        endFrequencyField.initFromBundle(bundleData);
         endFrequencyField.setMinSupplier(() -> startFrequencyField.getFrequency());
         endFrequencyField.setMaxSupplier(() -> Frequency.ofMHz(150));
         endFrequencyField.setChangeListener(this::internalRangeChangeListener);

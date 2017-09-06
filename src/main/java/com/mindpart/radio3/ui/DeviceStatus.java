@@ -10,20 +10,18 @@ import java.time.format.DateTimeFormatter;
  * Date: 2017.03.23
  */
 public enum DeviceStatus {
-    DISCONNECTED("disconnected", Color.GRAY),
-    READY("ready", Color.LIGHTGREEN),
-    ERROR("error", Color.RED),
-    PROCESSING("processing", Color.ORANGE),
-    CONNECTING("connecting", Color.GREENYELLOW),
-    DISCONNECTING("disconnecting", Color.GREENYELLOW);
+    DISCONNECTED(Color.GRAY),
+    READY(Color.LIGHTGREEN),
+    ERROR(Color.RED),
+    PROCESSING(Color.ORANGE),
+    CONNECTING(Color.GREENYELLOW),
+    DISCONNECTING(Color.GREENYELLOW);
 
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    private String name;
     private Color mainIndicatorColor;
 
-    DeviceStatus(String name, Color mainIndicatorColor) {
-        this.name = name;
+    DeviceStatus(Color mainIndicatorColor) {
         this.mainIndicatorColor = mainIndicatorColor;
     }
 
@@ -31,7 +29,9 @@ public enum DeviceStatus {
         return mainIndicatorColor;
     }
 
-    public String toString() {
-        return name + (this == DISCONNECTED ? "" : " (last response: " + timeFormatter.format(LocalDateTime.now()) +")");
+    public String format(BundleData bundleData) {
+        String name = bundleData.resolve("device.status."+name().toLowerCase());
+        String lastResponse = bundleData.resolve("device.status.lastActivity");
+        return name + (this == DISCONNECTED ? "" : " ("+lastResponse+": " + timeFormatter.format(LocalDateTime.now()) +")");
     }
 }
