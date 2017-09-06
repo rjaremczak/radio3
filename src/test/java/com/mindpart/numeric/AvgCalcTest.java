@@ -1,4 +1,4 @@
-package com.mindpart.discrete;
+package com.mindpart.numeric;
 
 import org.junit.Test;
 

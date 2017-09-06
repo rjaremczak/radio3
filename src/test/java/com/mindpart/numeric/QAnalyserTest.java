@@ -1,4 +1,4 @@
-package com.mindpart.discrete;
+package com.mindpart.numeric;
 
 import org.junit.Test;
 
@@ -16,23 +16,21 @@ public class QAnalyserTest {
 
     @Test
     public void testLowPeak() {
-        assertTrue(qAnalyser.analyseLowPeak(5, 3));
+        assertTrue(qAnalyser.analyseLowPeak(3));
         assertEquals(1.4, qAnalyser.getStartFreq(), MIN_VALUE);
         assertEquals(1.5, qAnalyser.getPeakFreq(), MIN_VALUE);
         assertEquals(1.8, qAnalyser.getEndFreq(), MIN_VALUE);
         assertEquals(0.4, qAnalyser.getBandwidth(), 1E-6);
         assertEquals(1.5 / 0.4, qAnalyser.getQ(), 0.01);
-        assertFalse(qAnalyser.analyseLowPeak(2, 3));
     }
 
     @Test
     public void testHighPeak() {
-        assertTrue(qAnalyser.analyseHighPeak(19, 3));
+        assertTrue(qAnalyser.analyseHighPeak(3));
         assertEquals(2.5, qAnalyser.getStartFreq(), MIN_VALUE);
         assertEquals(2.9, qAnalyser.getPeakFreq(), MIN_VALUE);
         assertEquals(3.0, qAnalyser.getEndFreq(), MIN_VALUE);
         assertEquals(0.5, qAnalyser.getBandwidth(), 1E-6);
         assertEquals(2.9 / 0.5, qAnalyser.getQ(), 0.01);
-        assertFalse(qAnalyser.analyseHighPeak(11, 3));
     }
 }

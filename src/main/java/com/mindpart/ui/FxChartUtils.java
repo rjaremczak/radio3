@@ -1,6 +1,6 @@
 package com.mindpart.ui;
 
-import com.mindpart.discrete.Range;
+import com.mindpart.numeric.Range;
 import javafx.scene.chart.NumberAxis;
 
 import static com.mindpart.math.MathUtils.ceil;

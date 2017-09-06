@@ -9,7 +9,7 @@ import com.mindpart.types.Frequency;
 import com.mindpart.types.SWR;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.ui.FxUtils;
-import com.mindpart.discrete.Range;
+import com.mindpart.numeric.Range;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.discrete.Range;
+import com.mindpart.numeric.Range;
 import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.ChartMarker;

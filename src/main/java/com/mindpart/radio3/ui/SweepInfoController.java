@@ -1,8 +1,8 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.discrete.MaxCheck;
-import com.mindpart.discrete.MinCheck;
-import com.mindpart.discrete.QAnalyser;
+import com.mindpart.numeric.MaxCheck;
+import com.mindpart.numeric.MinCheck;
+import com.mindpart.numeric.QAnalyser;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.VerticalRuler;
 import javafx.beans.value.ObservableValue;
@@ -111,7 +111,7 @@ public class SweepInfoController {
 
         if(qPane.isExpanded() && chartValueContext instanceof LogarithmicProbeContext) {
             QAnalyser qAnalyser = new QAnalyser(data, freq);
-            if (minCheck.isFound() && qAnalyser.analyseLowPeak(minCheck.getSampleNumber(), 3.0)) {
+            if (minCheck.isFound() && qAnalyser.analyseLowPeak(3.0)) {
                 qFreq.setText(Frequency.ofMHz(qAnalyser.getPeakFreq()).format());
                 qBandwidth.setText(Frequency.ofMHz(qAnalyser.getBandwidth()).format());
                 qValue.setText(FORMAT_Q.format(qAnalyser.getQ()));
