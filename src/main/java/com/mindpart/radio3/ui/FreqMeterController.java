@@ -10,15 +10,17 @@ import javafx.event.ActionEvent;
  * Date: 2016.03.24
  */
 public class FreqMeterController extends ComponentController {
-    private Radio3 radio3;
+    private final Radio3 radio3;
+    private final BundleData bundle;
 
-    public FreqMeterController(Radio3 radio3) {
+    public FreqMeterController(Radio3 radio3, BundleData bundle) {
         this.radio3 = radio3;
+        this.bundle = bundle;
     }
 
     @Override
     public void initialize() {
-        setUpAsProbe("F-Meter", "Frequency");
+        setUp(bundle.resolve("label.freqMeter"), bundle.resolve("label.frequency"), false, bundle.buttonGet);
     }
 
     @Override

@@ -14,10 +14,12 @@ import java.text.NumberFormat;
 public class LogarithmicProbeController extends ComponentController {
     private static final NumberFormat fmtPower = new DecimalFormat("0.000");
 
-    private Radio3 radio3;
+    private final Radio3 radio3;
+    private final BundleData bundle;
 
-    public LogarithmicProbeController(Radio3 radio3) {
+    public LogarithmicProbeController(Radio3 radio3, BundleData bundle) {
         this.radio3 = radio3;
+        this.bundle = bundle;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class LogarithmicProbeController extends ComponentController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("Logarithmic Probe", "Power");
+        setUp(bundle.resolve("label.logProbe"), bundle.resolve("label.power"), false, bundle.buttonGet);
     }
 
     public void update(double power) {

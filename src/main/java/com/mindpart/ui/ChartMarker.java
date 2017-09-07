@@ -42,6 +42,7 @@ public class ChartMarker {
     private Consumer<XYChart.Data<Number, Number>> rangeEndHandler = null;
     private volatile boolean rangeStarted = false;
     private Supplier<Boolean> clickActive = () -> false;
+    private Supplier<Boolean> rangeActive = () -> false;
 
     static public class SelectionData {
         Point2D pos;
@@ -90,13 +91,15 @@ public class ChartMarker {
         referencePane.getChildren().addAll(rangeStartRuler, rangeEndRuler);
     }
 
-    public void initialize(Pane referencePane, XYChart<Number, Number> chart, Function<Point2D, SelectionData> selectionFunction, Supplier<Boolean> clickActive) {
+    public void initialize(Pane referencePane, XYChart<Number, Number> chart, Function<Point2D, SelectionData> selectionFunction,
+                           Supplier<Boolean> clickActive, Supplier<Boolean> rangeActive) {
         this.referencePane = referencePane;
         this.chart = chart;
         this.chartAxisX = (NumberAxis) chart.getXAxis();
         this.chartAxisY = (NumberAxis) chart.getYAxis();
         this.selectionHandler = selectionFunction;
         this.clickActive = clickActive;
+        this.rangeActive = rangeActive;
 
         initSelectionLabel();
         initSelectionPopup();
@@ -233,7 +236,7 @@ public class ChartMarker {
         Point2D refPos = eventToRefPos(event);
         if(!chartBounds.contains(refPos)) { return; }
 
-        if(event.getButton() == MouseButton.SECONDARY) {
+        if(rangeActive.get() && event.getButton() == MouseButton.SECONDARY) {
             if(isRangeSelection()) { handleRangeSelection(refPos, event); }
         }
     }

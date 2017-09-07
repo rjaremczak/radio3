@@ -14,10 +14,12 @@ import java.text.NumberFormat;
 public class LinearProbeController extends ComponentController {
     private static final NumberFormat fmtPower = new DecimalFormat("0.000");
 
-    private Radio3 radio3;
+    private final Radio3 radio3;
+    private final BundleData bundle;
 
-    public LinearProbeController(Radio3 radio3) {
+    public LinearProbeController(Radio3 radio3, BundleData bundle) {
         this.radio3 = radio3;
+        this.bundle = bundle;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class LinearProbeController extends ComponentController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("Linear Probe", "Vrms");
+        setUp(bundle.resolve("label.linProbe"), bundle.resolve("label.voltage"), false, bundle.buttonGet);
     }
 
     public void update(double power) {

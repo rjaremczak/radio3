@@ -234,11 +234,11 @@ public class MainController {
         sweepTab.setContent(loadFXml(sweepController, "sweepPane.fxml"));
         vnaTab.setContent(loadFXml(vnaController, "vnaPane.fxml"));
 
-        vfoController = new VfoController(radio3);
-        freqMeterController = new FreqMeterController(radio3);
-        logarithmicProbeController = new LogarithmicProbeController(radio3);
-        linearProbeController = new LinearProbeController(radio3);
-        vnaProbeController = new VnaProbeController(radio3);
+        vfoController = new VfoController(radio3, bundle);
+        freqMeterController = new FreqMeterController(radio3, bundle);
+        logarithmicProbeController = new LogarithmicProbeController(radio3, bundle);
+        linearProbeController = new LinearProbeController(radio3, bundle);
+        vnaProbeController = new VnaProbeController(radio3, bundle);
 
         addFeatureBox(vfoController);
         addFeatureBox(freqMeterController);
@@ -424,12 +424,12 @@ public class MainController {
             FxUtils.disableItems(sampleAllProbesBtn, btnConnect, deviceTab, sweepTab, vnaTab);
             disableGetOnAllProbes(true);
             continuousSamplingEnabled = true;
-            continuousSamplingOfAllProbesBtn.setText("Stop");
+            continuousSamplingOfAllProbesBtn.setText(bundle.buttonStart);
         } else {
             FxUtils.enableItems(sampleAllProbesBtn, btnConnect, deviceTab, sweepTab, vnaTab);
             disableGetOnAllProbes(false);
             continuousSamplingEnabled = false;
-            continuousSamplingOfAllProbesBtn.setText("Continuous");
+            continuousSamplingOfAllProbesBtn.setText(bundle.buttonContinuous);
         }
     }
 
@@ -438,20 +438,24 @@ public class MainController {
     }
 
     private void updateDeviceProperties(DeviceInfo di) {
-        devicePropertiesMap.put("Hardware", di.name+" ("+di.hardwareRevision+")");
-        devicePropertiesMap.put("Firmware", di.buildId);
-        devicePropertiesMap.put("VFO", di.vfoType.toString());
-        devicePropertiesMap.put("Baud rate", Long.toString(di.baudRate));
+        devicePropertiesMap.put(bundle.resolve("device.prop.hardware"), di.name+" ("+di.hardwareRevision+")");
+        devicePropertiesMap.put(bundle.resolve("device.prop.firmware"), di.buildId);
+        devicePropertiesMap.put(bundle.resolve("device.prop.vfoType"), di.vfoType.toString());
+        devicePropertiesMap.put(bundle.resolve("device.prop.baudRate"), Long.toString(di.baudRate));
         updateDeviceProperties();
     }
 
+    private String formatOnOff(boolean on) {
+        return on ? bundle.textOn : bundle.textOff;
+    }
+
     private void updateDeviceProperties(DeviceState ds) {
-        devicePropertiesMap.put("Time since reset", ds.timeMs + " ms");
-        devicePropertiesMap.put("VFO output", ds.vfoOut.toString());
-        devicePropertiesMap.put("VFO amplifier", ds.vfoAmp.toString());
-        devicePropertiesMap.put("VFO attenuator stage 0", Boolean.toString(ds.vfoAtt0));
-        devicePropertiesMap.put("VFO attenuator stage 1", Boolean.toString(ds.vfoAtt1));
-        devicePropertiesMap.put("VFO attenuator stage 2", Boolean.toString(ds.vfoAtt2));
+        devicePropertiesMap.put(bundle.resolve("device.prop.uptime"), ds.timeMs + " ms");
+        devicePropertiesMap.put(bundle.resolve("device.prop.vfoOut"), ds.vfoOut.toString());
+        devicePropertiesMap.put(bundle.resolve("device.prop.amplifier"), formatOnOff(ds.vfoAmp == VfoAmp.ON));
+        devicePropertiesMap.put(bundle.resolve("device.prop.attStage0"), formatOnOff(ds.vfoAtt0));
+        devicePropertiesMap.put(bundle.resolve("device.prop.attStage1"), formatOnOff(ds.vfoAtt1));
+        devicePropertiesMap.put(bundle.resolve("device.prop.attStage2"), formatOnOff(ds.vfoAtt2));
         updateDeviceProperties();
     }
 

@@ -16,10 +16,12 @@ public class VnaProbeController extends ComponentController {
     private static final NumberFormat FORMAT_SWR = new DecimalFormat("0.0");
     private static final NumberFormat FORMAT_RX = new DecimalFormat("0.0");
 
-    private Radio3 radio3;
+    private final Radio3 radio3;
+    private final BundleData bundle;
 
-    public VnaProbeController(Radio3 radio3) {
+    public VnaProbeController(Radio3 radio3, BundleData bundle) {
         this.radio3 = radio3;
+        this.bundle = bundle;
     }
 
     @Override
@@ -30,7 +32,7 @@ public class VnaProbeController extends ComponentController {
 
     @Override
     public void initialize() {
-        setUpAsProbe("VNA Probe", "Impedance");
+        setUp(bundle.resolve("label.vnaProbe"), bundle.resolve("label.impedance"), false, bundle.buttonGet);
     }
 
     public void update(VnaResult vnaResult) {

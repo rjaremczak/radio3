@@ -24,6 +24,8 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import static com.mindpart.radio3.device.SweepSignalSource.LIN_PROBE;
+import static com.mindpart.radio3.device.SweepSignalSource.LOG_PROBE;
 import static com.mindpart.ui.FxChartUtils.rangeAxis;
 import static com.mindpart.ui.FxUtils.valueFromSeries;
 
@@ -88,13 +90,13 @@ public class SweepController {
         boolean normalized = btnNormalize.isSelected();
         SweepSignalSource signalSource = sourceProbe.getValue();
 
-        if(signalSource == SweepSignalSource.LOG_PROBE) {
+        if(signalSource == LOG_PROBE) {
             if(normalized) {
                 chartContext = new LogarithmicProbeNormContext(radio3.getLogarithmicParser()::parse, receivedData, mainController.bundle.axisRelativePower);
             } else {
                 chartContext = new LogarithmicProbeContext(radio3.getLogarithmicParser()::parse, mainController.bundle.axisPower);
             }
-        } else if(signalSource == SweepSignalSource.LIN_PROBE) {
+        } else if(signalSource == LIN_PROBE) {
             if(normalized) {
                 chartContext = new LinearProbeNormContext(radio3.getLinearParser()::parse, receivedData, mainController.bundle.axisRelativeVoltage);
             } else {
@@ -124,7 +126,7 @@ public class SweepController {
             double value = valueFromSeries(signalDataSeries.get(0), freq.toMHz());
             Point2D selectionPos = new Point2D(scenePos.getX(), valueToRefPos(value).getY());
             return new ChartMarker.SelectionData(selectionPos, "f = "+freq+"\n" + chartContext.valueLabel()+" = "+ chartContext.format(value));
-        }, () -> !btnContinuous.isSelected());
+        }, () -> !btnContinuous.isSelected(), () -> !btnNormalize.isSelected());
 
         chartMarker.setupRangeSelection(
                 data -> sweepSettingsController.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
@@ -177,11 +179,12 @@ public class SweepController {
         initChartContext();
         updateNormButton();
         sweepInfoController.clear();
+        sweepInfoController.enableQPane(source == LOG_PROBE);
     }
 
     private void initInputProbeList() {
-        sourceProbe.getItems().add(SweepSignalSource.LOG_PROBE);
-        sourceProbe.getItems().add(SweepSignalSource.LIN_PROBE);
+        sourceProbe.getItems().add(LOG_PROBE);
+        sourceProbe.getItems().add(LIN_PROBE);
         sourceProbe.getSelectionModel().selectFirst();
         sourceProbe.getSelectionModel().selectedItemProperty().addListener(this::inputSourceChangeListener);
     }

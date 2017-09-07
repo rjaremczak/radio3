@@ -84,8 +84,8 @@ public class SweepInfoController {
     public SweepInfoController(MainController mainController, Pane chartParent, XYChart<Number, Number> chart) {
         this.container = mainController.loadFXml(this, "sweepInfoPane.fxml");
         this.qFreqRuler = new VerticalRuler(chartParent, chart, Color.DARKBLUE);
-        this.qBandwidthStartRuler = new VerticalRuler(chartParent, chart, Color.web("#0000FF", 0.2));
-        this.qBandwidthEndRuler = new VerticalRuler(chartParent, chart, Color.web("#0000FF", 0.2));
+        this.qBandwidthStartRuler = new VerticalRuler(chartParent, chart, Color.DARKBLUE.deriveColor(1, 1, 1, 0.4));
+        this.qBandwidthEndRuler = new VerticalRuler(chartParent, chart, Color.DARKBLUE.deriveColor(1, 1, 1, 0.4));
 
         qPane.expandedProperty().addListener(this::qPaneVisibilityListener);
     }
@@ -110,8 +110,8 @@ public class SweepInfoController {
         spanValue.setText(chartValueContext.format(maxCheck.getSampleValue() - minCheck.getSampleValue()));
 
         if(qPane.isExpanded() && chartValueContext instanceof LogarithmicProbeContext) {
-            QAnalyser qAnalyser = new QAnalyser(data, freq);
-            if (minCheck.isFound() && qAnalyser.analyseLowPeak(3.0)) {
+            QAnalyser qAnalyser = new QAnalyser(freq, data);
+            if (qAnalyser.findLowestPeak(3.0) || qAnalyser.findHighestPeak(3.0)) {
                 qFreq.setText(Frequency.ofMHz(qAnalyser.getPeakFreq()).format());
                 qBandwidth.setText(Frequency.ofMHz(qAnalyser.getBandwidth()).format());
                 qValue.setText(FORMAT_Q.format(qAnalyser.getQ()));
@@ -131,5 +131,9 @@ public class SweepInfoController {
 
     public Parent getContainer() {
         return container;
+    }
+
+    public void enableQPane(boolean enable) {
+        qPane.setVisible(enable);
     }
 }

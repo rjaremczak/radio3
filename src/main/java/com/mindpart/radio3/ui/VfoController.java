@@ -9,15 +9,17 @@ import javafx.event.ActionEvent;
  * Date: 2016.03.24
  */
 public class VfoController extends ComponentController {
-    private Radio3 radio3;
+    private final Radio3 radio3;
+    private final BundleData bundle;
 
-    public VfoController(Radio3 radio3) {
+    public VfoController(Radio3 radio3, BundleData bundle) {
         this.radio3 = radio3;
+        this.bundle = bundle;
     }
 
     @Override
     public void initialize() {
-        setUp("VFO", "Frequency", true, "Set");
+        setUp(bundle.resolve("label.vfo"), bundle.resolve("label.frequency"), true, bundle.buttonSet);
     }
 
 

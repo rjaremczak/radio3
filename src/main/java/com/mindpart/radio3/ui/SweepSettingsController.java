@@ -82,8 +82,12 @@ public class SweepSettingsController {
         sweepQuality.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> qualityChangeListener.run());
     }
 
-    void internalRangeChangeListener() {
+    private void clearPreset() {
         presetsChoiceBox.getSelectionModel().clearSelection();
+    }
+
+    void internalRangeChangeListener() {
+        clearPreset();
         rangeChangeListener.run();
     }
 
@@ -92,6 +96,7 @@ public class SweepSettingsController {
     }
 
     public void setStartFrequency(Frequency frequency) {
+        clearPreset();
         if(!startFrequencyField.isDisabled()) { startFrequencyField.setFrequency(frequency); }
     }
 
@@ -100,6 +105,7 @@ public class SweepSettingsController {
     }
 
     public void setEndFrequency(Frequency frequency) {
+        clearPreset();
         if(!endFrequencyField.isDisabled()) { endFrequencyField.setFrequency(frequency); }
     }
 

@@ -112,7 +112,7 @@ public class VnaController {
             double x = valueFromSeries(impedanceDataSeries.get(1), freq.toMHz());
             Point2D selectionPos = new Point2D(scenePos.getX(), swrToLocalPos(swr).getY());
             return new ChartMarker.SelectionData(selectionPos , "f = "+freq+"\nSWR = "+swr+"\nZ = "+RX_FORMAT.format(r)+" + j"+RX_FORMAT.format(x)+" Ω");
-        }, () -> !btnContinuous.isSelected());
+        }, () -> !btnContinuous.isSelected(), () -> true);
 
         chartMarker.setupRangeSelection(
                 data -> sweepSettingsController.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
@@ -164,10 +164,10 @@ public class VnaController {
         if(continuous) {
             disableUI();
             runSweepOnce(this::displayDataAndSweepAgain);
-            btnContinuous.setText("Stop");
+            btnContinuous.setText(mainController.bundle.buttonStop);
         } else {
             enableUI();
-            btnContinuous.setText("Continuous");
+            btnContinuous.setText(mainController.bundle.buttonContinuous);
         }
     }
 

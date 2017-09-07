@@ -6,7 +6,6 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 
 /**
@@ -33,8 +32,12 @@ public class VerticalRuler {
         ruler.setStroke(color);
         ruler.setSmooth(false);
         this.referencePane.getChildren().add(ruler);
-        this.chart.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> updateChartBounds());
-        
+        this.chart.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> {
+            updateChartBounds();
+            update();
+        });
+
+        updateChartBounds();
         hide();
     }
 
@@ -46,11 +49,10 @@ public class VerticalRuler {
         ruler.setVisible(true);
     }
 
-    public void updateChartBounds() {
+    private void updateChartBounds() {
         Bounds xBounds = referencePane.sceneToLocal(chartAxisX.localToScene(chartAxisX.getBoundsInLocal()));
         Bounds yBounds = referencePane.sceneToLocal(chartAxisY.localToScene(chartAxisY.getBoundsInLocal()));
         chartBounds = new BoundingBox(xBounds.getMinX(), yBounds.getMinY(), 0, xBounds.getWidth(), yBounds.getHeight(), 0);
-        update();
     }
 
     private void update() {
