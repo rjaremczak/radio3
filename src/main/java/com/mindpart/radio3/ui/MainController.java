@@ -441,7 +441,6 @@ public class MainController {
         devicePropertiesMap.put(bundle.resolve("device.prop.hardware"), di.name+" ("+di.hardwareRevision+")");
         devicePropertiesMap.put(bundle.resolve("device.prop.firmware"), di.buildId);
         devicePropertiesMap.put(bundle.resolve("device.prop.vfoType"), di.vfoType.toString());
-        devicePropertiesMap.put(bundle.resolve("device.prop.baudRate"), Long.toString(di.baudRate));
         updateDeviceProperties();
     }
 
