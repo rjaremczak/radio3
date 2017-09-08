@@ -54,7 +54,7 @@ public class SweepSettingsController {
             }
         });
         sweepQuality.getItems().addAll(SweepQuality.values());
-        sweepQuality.getSelectionModel().select(SweepQuality.BEST);
+        sweepQuality.getSelectionModel().select(SweepQuality.FAST);
     }
 
     public void initialize() {

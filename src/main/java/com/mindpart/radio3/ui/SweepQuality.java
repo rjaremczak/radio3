@@ -7,7 +7,7 @@ package com.mindpart.radio3.ui;
 public enum SweepQuality {
     BEST("%quality.best", 1000, 2, 2),
     BALANCED("%quality.balanced", 500, 2, 2),
-    FAST("%quality.fast", 100, 1, 1);
+    FAST("%quality.fast", 250, 1, 2);
 
     private String name;
     private int steps;

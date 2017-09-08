@@ -201,7 +201,7 @@ public class ChartMarker {
     }
 
     private void onMousePressedOrDragged(MouseEvent mouseEvent) {
-        if(mouseEvent.getButton() == PRIMARY && isMouseOverChartArea(mouseEvent)) {
+        if(clickActive.get() && mouseEvent.getButton() == PRIMARY && isMouseOverChartArea(mouseEvent)) {
             showChartMarker(eventToRefPos(mouseEvent));
         } else {
             hideChartMarker();

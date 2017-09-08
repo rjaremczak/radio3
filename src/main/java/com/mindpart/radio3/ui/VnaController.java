@@ -217,8 +217,8 @@ public class VnaController {
         clear();
 
         XYChart.Series<Number, Number> swrSeries = createSeries("SWR");
-        XYChart.Series<Number, Number> rSeries = createSeries("R - resistance");
-        XYChart.Series<Number, Number> xSeries = createSeries("X - reactance");
+        XYChart.Series<Number, Number> rSeries = createSeries("R");
+        XYChart.Series<Number, Number> xSeries = createSeries("X");
 
         ObservableList<XYChart.Data<Number, Number>> swrData = swrSeries.getData();
         ObservableList<XYChart.Data<Number, Number>> rData = rSeries.getData();

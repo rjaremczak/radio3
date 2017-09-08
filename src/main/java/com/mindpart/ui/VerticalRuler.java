@@ -32,10 +32,7 @@ public class VerticalRuler {
         ruler.setStroke(color);
         ruler.setSmooth(false);
         this.referencePane.getChildren().add(ruler);
-        this.chart.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> {
-            updateChartBounds();
-            update();
-        });
+        this.chart.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> updateChartBounds());
 
         updateChartBounds();
         hide();
@@ -53,12 +50,7 @@ public class VerticalRuler {
         Bounds xBounds = referencePane.sceneToLocal(chartAxisX.localToScene(chartAxisX.getBoundsInLocal()));
         Bounds yBounds = referencePane.sceneToLocal(chartAxisY.localToScene(chartAxisY.getBoundsInLocal()));
         chartBounds = new BoundingBox(xBounds.getMinX(), yBounds.getMinY(), 0, xBounds.getWidth(), yBounds.getHeight(), 0);
-    }
 
-    private void update() {
-        double posX = referencePane.sceneToLocal(chartAxisX.localToScene(chartAxisX.getDisplayPosition(selectedFrequency),0)).getX();
-        ruler.setStartX(posX);
-        ruler.setEndX(posX);
         ruler.setStartY(chartBounds.getMinY());
         ruler.setEndY(chartBounds.getMaxY());
     }
@@ -66,5 +58,11 @@ public class VerticalRuler {
     public void update(double frequency) {
         selectedFrequency = frequency;
         update();
+    }
+
+    private void update() {
+        double posX = referencePane.sceneToLocal(chartAxisX.localToScene(chartAxisX.getDisplayPosition(selectedFrequency),0)).getX();
+        ruler.setStartX(posX);
+        ruler.setEndX(posX);
     }
 }

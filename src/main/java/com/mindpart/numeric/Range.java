@@ -5,8 +5,19 @@ package com.mindpart.numeric;
  * Date: 2016.09.06
  */
 public class Range {
-    private double min = Double.MAX_VALUE;
-    private double max = -Double.MAX_VALUE;
+    private double min;
+    private double max;
+
+    public Range(double min, double max) {
+        this.min = min;
+        this.max = max;
+    }
+
+    public Range() {
+        this.min = Double.MAX_VALUE;
+        this.max = -Double.MAX_VALUE;
+
+    }
 
     public double sample(double v) {
         min = Math.min(min, v);

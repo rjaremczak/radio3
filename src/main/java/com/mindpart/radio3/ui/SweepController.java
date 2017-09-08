@@ -302,6 +302,7 @@ public class SweepController {
                 rangeAxis(signalAxisY, range, 6, 1);
         }
 
+        signalChart.layout();
         sweepInfoController.update(receivedFreq, processedData, i -> Frequency.ofMHz(receivedFreq[i]).format(), chartContext);
     }
 
@@ -322,5 +323,7 @@ public class SweepController {
         signalDataSeries.clear();
         sweepInfoController.clear();
         clearReceivedData();
+        FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, sweepSettingsController.getStartFrequency().toHz(), sweepSettingsController.getEndFrequency().toHz());
+        rangeAxis(signalAxisY, new Range(-40.0, 20.0), 6, 1);
     }
 }

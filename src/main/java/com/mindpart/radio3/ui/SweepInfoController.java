@@ -114,7 +114,7 @@ public class SweepInfoController {
             if (qAnalyser.findLowestPeak(3.0) || qAnalyser.findHighestPeak(3.0)) {
                 qFreq.setText(Frequency.ofMHz(qAnalyser.getPeakFreq()).format());
                 qBandwidth.setText(Frequency.ofMHz(qAnalyser.getBandwidth()).format());
-                qValue.setText(FORMAT_Q.format(qAnalyser.getQ()));
+                qValue.setText(FORMAT_Q.format(qAnalyser.getQ()) + "    ");
 
                 qBandwidthStartRuler.update(qAnalyser.getStartFreq());
                 qBandwidthEndRuler.update(qAnalyser.getEndFreq());
