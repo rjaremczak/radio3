@@ -6,10 +6,10 @@ import java.util.function.Function;
  * Created by Robert Jaremczak
  * Date: 2017.06.03
  */
-public class LinearProbeNormContext extends LinearProbeContext {
+public class LinProbeNormProcessor extends LinProbeProcessor {
     private double[] referenceData;
 
-    public LinearProbeNormContext(Function<Integer, Double> valueParser, double[] referenceData, String axisLabel) {
+    public LinProbeNormProcessor(Function<Integer, Double> valueParser, double[] referenceData, String axisLabel) {
         super(valueParser, axisLabel);
         this.referenceData = referenceData;
     }

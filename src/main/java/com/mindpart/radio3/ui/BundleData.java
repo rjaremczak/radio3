@@ -1,6 +1,7 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.utils.ResourceBundleUtils;
+import javafx.util.StringConverter;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -10,7 +11,8 @@ import java.util.ResourceBundle;
  * Date: 2017.07.05
  */
 public class BundleData {
-    private ResourceBundle resourceBundle;
+    private final ResourceBundle resourceBundle;
+    private final StringConverter genericStringConverter;
 
     public final String buttonConnect;
     public final String buttonDisconnect;
@@ -45,6 +47,18 @@ public class BundleData {
 
         textOn = resolve("text.on");
         textOff = resolve("text.off");
+
+        genericStringConverter = new StringConverter() {
+            @Override
+            public String toString(Object object) {
+                return resolve(object);
+            }
+
+            @Override
+            public Object fromString(String string) {
+                return null;
+            }
+        };
     }
 
     public String resolve(Object key) {
@@ -53,5 +67,9 @@ public class BundleData {
 
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
+    }
+
+    public StringConverter getGenericStringConverter() {
+        return genericStringConverter;
     }
 }

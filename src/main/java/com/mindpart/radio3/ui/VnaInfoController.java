@@ -34,7 +34,7 @@ public class VnaInfoController {
     public void initialize() {
     }
 
-    public void update(ChartContext<Integer, Double> chartValueContext, List<XYChart.Data<Number, Number>> data) {
+    public void update(ValueProcessor<Integer, Double> chartValueContext, List<XYChart.Data<Number, Number>> data) {
         if(data!=null && !data.isEmpty()) {
             vnaStatistics.update(data);
             minSwr.setText(chartValueContext.format(vnaStatistics.getMinSwr()));

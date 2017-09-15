@@ -4,7 +4,7 @@ package com.mindpart.numeric;
  * Created by Robert Jaremczak
  * Date: 2017.09.04
  */
-public class QAnalyser {
+public class QFactorCalc {
     private final double[] freq;
     private final double[] data;
     private final SlopeFinder slopeFinder;
@@ -14,14 +14,14 @@ public class QAnalyser {
     private int peakSample;
     private int endSample;
 
-    public QAnalyser(double[] freq, double[] data) {
+    public QFactorCalc(double[] freq, double[] data) {
         this.freq = freq;
         this.data = data;
         this.slopeFinder = new SlopeFinder(this.data);
         this.localExtremaFinder = new LocalExtremaFinder(data);
     }
 
-    public boolean findLowestPeak(double minDepth) {
+    public boolean checkBandStop(double minDepth) {
         Extremum extremum = localExtremaFinder.getLowestMinimum();
         if(extremum!=null) {
             int peak = extremum.getNumber();
@@ -38,7 +38,7 @@ public class QAnalyser {
         return false;
     }
 
-    public boolean findHighestPeak(double minHeight) {
+    public boolean checkBandPass(double minHeight) {
         Extremum extremum = localExtremaFinder.getHighestMaximum();
         if(extremum!=null) {
             int peak = extremum.getNumber();
@@ -55,23 +55,23 @@ public class QAnalyser {
         return false;
     }
 
-    public double getStartFreq() {
+    public double getBandStart() {
         return freq[startSample];
     }
 
-    public double getPeakFreq() {
+    public double getBandPeak() {
         return freq[peakSample];
     }
 
-    public double getEndFreq() {
+    public double getBandEnd() {
         return freq[endSample];
     }
 
     public double getBandwidth() {
-        return getEndFreq() - getStartFreq();
+        return getBandEnd() - getBandStart();
     }
 
-    public double getQ() {
-        return getPeakFreq() / getBandwidth();
+    public double getQFactor() {
+        return getBandPeak() / getBandwidth();
     }
 }

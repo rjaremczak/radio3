@@ -4,6 +4,7 @@ import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.SweepProfiles;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.FrequencyField;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -41,18 +42,7 @@ public class SweepSettingsController {
     }
 
     private void initSweepSteps() {
-        sweepQuality.setConverter(new StringConverter<SweepQuality>() {
-            @Override
-            public String toString(SweepQuality object) {
-                String str = object.toString();
-                return str.startsWith("%") ? bundleData.resolve(str.substring(1)) : str;
-            }
-
-            @Override
-            public SweepQuality fromString(String string) {
-                return null;
-            }
-        });
+        sweepQuality.setConverter(bundleData.getGenericStringConverter());
         sweepQuality.getItems().addAll(SweepQuality.values());
         sweepQuality.getSelectionModel().select(SweepQuality.FAST);
     }
@@ -79,7 +69,11 @@ public class SweepSettingsController {
             }
         });
         presetsChoiceBox.getSelectionModel().selectFirst();
-        sweepQuality.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> qualityChangeListener.run());
+        sweepQuality.getSelectionModel().selectedItemProperty().addListener(this::onSweepQualityChange);
+    }
+
+    private void onSweepQualityChange(ObservableValue<? extends SweepQuality> ob, SweepQuality old, SweepQuality current) {
+        qualityChangeListener.run();
     }
 
     private void clearPreset() {

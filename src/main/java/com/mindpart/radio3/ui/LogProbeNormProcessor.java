@@ -6,10 +6,10 @@ import java.util.function.Function;
  * Created by Robert Jaremczak
  * Date: 2017.06.03
  */
-public class LogarithmicProbeNormContext extends LogarithmicProbeContext {
+public class LogProbeNormProcessor extends LogProbeProcessor {
     private double[] referenceData;
 
-    public LogarithmicProbeNormContext(Function<Integer, Double> parser, double[] referenceData, String axisLabel) {
+    public LogProbeNormProcessor(Function<Integer, Double> parser, double[] referenceData, String axisLabel) {
         super(parser, axisLabel);
         this.referenceData = referenceData;
     }

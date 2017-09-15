@@ -26,7 +26,7 @@ import com.mindpart.bin.Binary;
  14 - one byte size (-14) followed by payload (size of 0 means 14 bytes)
 
  format C:
- 15 - two byte size (-269) followed by payload (size of 0 means 269 bytes)
+ 15 - two bytes size (-269) followed by payload (size of 0 means 269 bytes)
 
  - additional crc8 appended at the end of the frame
 
@@ -139,5 +139,9 @@ class FrameHeader {
 
     public FrameCommand getCommand() {
         return command;
+    }
+
+    public int getTotalFrameSize() {
+        return 2 + getSizeBytesCount() + getPayloadSize() + 1;
     }
 }

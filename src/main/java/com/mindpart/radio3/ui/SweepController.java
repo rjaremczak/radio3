@@ -14,6 +14,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ToggleButton;
@@ -72,14 +73,13 @@ public class SweepController {
     private SweepSettingsController sweepSettingsController;
     private ChartMarker chartMarker = new ChartMarker();
     private MainController mainController;
-    private ChartContext<Integer,Double> chartContext;
-    private SweepInfoController sweepInfoController;
+    private RangeToolController rangeToolController;
+    private FilterToolController filterToolController;
 
+    private Accordion chartToolParent;
     private SweepDataInfo receivedDataInfo;
-    private double[] receivedData;
-    private double[] processedData;
-    private double[] receivedFreq;
-    
+    private ChartContext chartContext = new ChartContext();
+
     public SweepController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
         this.mainController = mainController;
@@ -92,21 +92,21 @@ public class SweepController {
 
         if(signalSource == LOG_PROBE) {
             if(normalized) {
-                chartContext = new LogarithmicProbeNormContext(radio3.getLogarithmicParser()::parse, receivedData, mainController.bundle.axisRelativePower);
+                chartContext.valueProcessor = new LogProbeNormProcessor(radio3.getLogarithmicParser()::parse, chartContext.receivedData, mainController.bundle.axisRelativePower);
             } else {
-                chartContext = new LogarithmicProbeContext(radio3.getLogarithmicParser()::parse, mainController.bundle.axisPower);
+                chartContext.valueProcessor = new LogProbeProcessor(radio3.getLogarithmicParser()::parse, mainController.bundle.axisPower);
             }
         } else if(signalSource == LIN_PROBE) {
             if(normalized) {
-                chartContext = new LinearProbeNormContext(radio3.getLinearParser()::parse, receivedData, mainController.bundle.axisRelativeVoltage);
+                chartContext.valueProcessor = new LinProbeNormProcessor(radio3.getLinearParser()::parse, chartContext.receivedData, mainController.bundle.axisRelativeVoltage);
             } else {
-                chartContext = new LinearProbeContext(radio3.getLinearParser()::parse, mainController.bundle.axisVoltage);
+                chartContext.valueProcessor = new LinProbeProcessor(radio3.getLinearParser()::parse, mainController.bundle.axisVoltage);
             }
         } else {
             throw new IllegalStateException("source probe: "+sourceProbe.getValue());
         }
         
-        signalAxisY.setLabel(chartContext.axisLabel());
+        signalAxisY.setLabel(chartContext.valueProcessor.axisLabel());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -125,7 +125,7 @@ public class SweepController {
             Frequency freq = scenePosToFrequency(scenePos);
             double value = valueFromSeries(signalDataSeries.get(0), freq.toMHz());
             Point2D selectionPos = new Point2D(scenePos.getX(), valueToRefPos(value).getY());
-            return new ChartMarker.SelectionData(selectionPos, "f = "+freq+"\n" + chartContext.valueLabel()+" = "+ chartContext.format(value));
+            return new ChartMarker.SelectionData(selectionPos, "f = "+freq+"\n" + chartContext.valueProcessor.valueLabel()+" = "+ chartContext.valueProcessor.format(value));
         }, () -> !btnContinuous.isSelected(), () -> !btnNormalize.isSelected());
 
         chartMarker.setupRangeSelection(
@@ -147,23 +147,29 @@ public class SweepController {
         initInputProbeList();
         initChartContext();
 
-        sweepInfoController = new SweepInfoController(mainController, anchorPane, signalChart);
-        chartBox.getChildren().add(sweepInfoController.getContainer());
+        chartToolParent = new Accordion();
+        chartToolParent.setMinWidth(180);
 
+        rangeToolController = new RangeToolController(mainController.bundle, chartContext);
+        chartToolParent.getPanes().add(rangeToolController.getTitledPane());
+        chartToolParent.setExpandedPane(rangeToolController.getTitledPane());
+
+        filterToolController = new FilterToolController(mainController.bundle, anchorPane, signalChart, chartContext);
+        chartToolParent.getPanes().add(filterToolController.getTitledPane());
+
+        chartBox.getChildren().add(new VBox(chartToolParent));
+        
         updateNormButton();
     }
 
     private void sweepSettingsChangeListener() {
         clear();
         updateNormButton();
-    }
-
-    private final boolean receivedDataReady() {
-        return receivedData != null && receivedFreq != null;
+        onSweepOnce();
     }
 
     private void normalizeChangeListener(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean normalized) {
-        if(!receivedDataReady()) {
+        if(!chartContext.isReady()) {
             btnNormalize.setSelected(false);
             return;
         }
@@ -178,8 +184,9 @@ public class SweepController {
         clear();
         initChartContext();
         updateNormButton();
-        sweepInfoController.clear();
-        sweepInfoController.enableQPane(source == LOG_PROBE);
+        rangeToolController.clear();
+        filterToolController.clear();
+        filterToolController.setDisable(source != LOG_PROBE);
     }
 
     private void initInputProbeList() {
@@ -228,10 +235,9 @@ public class SweepController {
         receivedDataInfo = ad.toInfo();
         int samples[] = ad.getData()[0];
         long freq = ad.getFreqStart();
-        initReceivedData(samples.length);
+        chartContext.init(samples.length);
         for (int step = 0; step <= ad.getNumSteps(); step++) {
-            receivedData[step] = chartContext.parse(samples[step]);
-            receivedFreq[step] = Frequency.toMHz(freq);
+            chartContext.setReceivedData(step, samples[step], Frequency.toMHz(freq));
             freq += ad.getFreqStep();
         }
 
@@ -270,13 +276,14 @@ public class SweepController {
     }
 
     private void updateNormButton() {
-        btnNormalize.setDisable(receivedDataReady());
+        btnNormalize.setDisable(chartContext.isReady());
     }
 
     private void updateChart() {
         chartMarker.clear();
         signalDataSeries.clear();
-        sweepInfoController.clear();
+        rangeToolController.clear();
+        filterToolController.clear();
 
         if(receivedDataInfo==null) { return; }
 
@@ -285,10 +292,10 @@ public class SweepController {
         ObservableList<XYChart.Data<Number, Number>> data = chartSeries.getData();
 
         Range range = new Range();
-        for (int step = 0; step < receivedData.length; step++) {
-            double processed = range.sample(chartContext.process(step, receivedData[step]));
-            processedData[step] = processed;
-            data.add(new XYChart.Data<>(receivedFreq[step], processed));
+        for (int step = 0; step < chartContext.getDataSize(); step++) {
+            double processed = chartContext.setAndGetProcessedData(step);
+            range.sample(processed);
+            data.add(new XYChart.Data<>(chartContext.receivedFreq[step], processed));
         }
 
         signalDataSeries.add(chartSeries);
@@ -301,28 +308,17 @@ public class SweepController {
             default:
                 rangeAxis(signalAxisY, range, 6, 1);
         }
-
-        signalChart.layout();
-        sweepInfoController.update(receivedFreq, processedData, i -> Frequency.ofMHz(receivedFreq[i]).format(), chartContext);
-    }
-
-    private void initReceivedData(int length) {
-        receivedData = new double[length];
-        receivedFreq = new double[length];
-        processedData = new double[length];
-    }
-
-    private void clearReceivedData() {
-        receivedFreq = null;
-        receivedData = null;
-        processedData = null;
+        
+        rangeToolController.update();
+        filterToolController.update();
     }
 
     void clear() {
         chartMarker.clear();
         signalDataSeries.clear();
-        sweepInfoController.clear();
-        clearReceivedData();
+        rangeToolController.clear();
+        filterToolController.clear();
+        chartContext.clear();
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, sweepSettingsController.getStartFrequency().toHz(), sweepSettingsController.getEndFrequency().toHz());
         rangeAxis(signalAxisY, new Range(-40.0, 20.0), 6, 1);
     }

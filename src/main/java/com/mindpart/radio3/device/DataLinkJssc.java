@@ -135,7 +135,8 @@ public class DataLinkJssc implements DataLink {
             flushBuffers();
             long t0 = System.currentTimeMillis();
             receivedFrameLatch = new CountDownLatch(1);
-            serialPort.writeBytes(request.toBytes());
+            byte[] bytes = request.toBytes();
+            serialPort.writeBytes(bytes);
             receivedFrameLatch.await(TIMEOUT_MS, TimeUnit.MILLISECONDS);
             Exception exception = receiveExceptionRef.getAndSet(null);
             if(exception != null) {

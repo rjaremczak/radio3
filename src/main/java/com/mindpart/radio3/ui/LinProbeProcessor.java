@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.types.Power;
+import com.mindpart.types.Voltage;
 
 import java.util.function.Function;
 
@@ -8,12 +8,12 @@ import java.util.function.Function;
  * Created by Robert Jaremczak
  * Date: 2017.06.03
  */
-public class LogarithmicProbeContext implements ChartContext<Integer, Double> {
-    private final Function<Integer, Double> parser;
+public class LinProbeProcessor implements ValueProcessor<Integer, Double> {
+    private Function<Integer,Double> valueParser;
     private final String axisLabel;
 
-    public LogarithmicProbeContext(Function<Integer, Double> parser, String axisLabel) {
-        this.parser = parser;
+    public LinProbeProcessor(Function<Integer,Double> valueParser, String axisLabel) {
+        this.valueParser = valueParser;
         this.axisLabel = axisLabel;
     }
 
@@ -24,21 +24,21 @@ public class LogarithmicProbeContext implements ChartContext<Integer, Double> {
 
     @Override
     public String valueLabel() {
-        return "P";
+        return "V";
     }
 
     @Override
     public Double parse(Integer rawData) {
-        return parser.apply(rawData);
+        return valueParser.apply(rawData);
     }
 
     @Override
     public String format(Double value) {
-        return Power.ofDBm(value).formatDBm();
+        return Voltage.ofVolt(value).format();
     }
 
     @Override
-    public Double process(int arg, Double value) {
+    public Double process(int sampleNum, Double value) {
         return value;
     }
 }

@@ -2,12 +2,42 @@ package com.mindpart.radio3.ui;
 
 /**
  * Created by Robert Jaremczak
- * Date: 2017.06.02
+ * Date: 2017.09.15
  */
-public interface ChartContext<R,T> {
-    String axisLabel();
-    String valueLabel();
-    T parse(R rawData);
-    String format(T value);
-    T process(int arg, T value);
+class ChartContext {
+    double[] receivedData;
+    double[] processedData;
+    double[] receivedFreq;
+    ValueProcessor<Integer,Double> valueProcessor;
+
+    void init(int length) {
+        receivedData = new double[length];
+        receivedFreq = new double[length];
+        processedData = new double[length];
+    }
+
+    void clear() {
+        receivedFreq = null;
+        receivedData = null;
+        processedData = null;
+    }
+
+    final boolean isReady() {
+        return receivedData != null && receivedFreq != null;
+    }
+
+    public void setReceivedData(int step, int data, double freq) {
+        receivedData[step] = valueProcessor.parse(data);
+        receivedFreq[step] = freq;
+    }
+
+    double setAndGetProcessedData(int step) {
+        double processed = valueProcessor.process(step, receivedData[step]);
+        processedData[step] = processed;
+        return processed;
+    }
+
+    int getDataSize() {
+        return receivedData.length;
+    }
 }
