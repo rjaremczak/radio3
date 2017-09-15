@@ -52,7 +52,7 @@ public class FilterToolController {
 
         propertyGrid = new PropertyGrid();
         propertyGrid.addProperty(bundle.resolve("info.bandfilter.type"), filterInfoTypeChoiceBox);
-        propertyGrid.addRow(new Label());
+        propertyGrid.addRow();
         
         bandPeakFreq = propertyGrid.addProperty(bundle.resolve("info.bandfilter.freq"));
         bandwidth = propertyGrid.addProperty(bundle.resolve("info.bandfilter.width"));

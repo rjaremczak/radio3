@@ -54,6 +54,12 @@ public class PropertyGrid {
         gridPane.add(item, 0, rowCounter++, 3, 1);
     }
 
+    public void addRow() {
+        Label label = new Label();
+        label.setFont(Font.font("Courier", 6));
+        gridPane.add(label, 0, rowCounter++, 3, 1);
+    }
+
     public Node getNode() {
         return gridPane;
     }

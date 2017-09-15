@@ -27,8 +27,10 @@ public class RangeToolController {
         propertyGrid = new PropertyGrid();
         minValue = propertyGrid.addProperty("min");
         minFreq = propertyGrid.addProperty(bundle.resolve("info.ranges.freq"));
+        propertyGrid.addRow();
         maxValue = propertyGrid.addProperty("max");
         maxFreq = propertyGrid.addProperty(bundle.resolve("info.ranges.freq"));
+        propertyGrid.addRow();
         spanValue = propertyGrid.addProperty(bundle.resolve("info.ranges.range"));
 
         titledPane = new TitledPane(bundle.resolve("info.ranges.title"), propertyGrid.getNode());
