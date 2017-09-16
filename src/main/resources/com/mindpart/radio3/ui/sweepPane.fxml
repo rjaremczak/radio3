@@ -51,16 +51,6 @@
                </children>
             </HBox>
             <HBox fx:id="chartBox" VBox.vgrow="SOMETIMES">
-               <children>
-                  <LineChart fx:id="signalChart" animated="false" horizontalZeroLineVisible="false" legendVisible="false" verticalZeroLineVisible="false" HBox.hgrow="SOMETIMES">
-                     <xAxis>
-                        <NumberAxis fx:id="signalAxisX" label="%axis.freq" />
-                     </xAxis>
-                     <yAxis>
-                        <NumberAxis fx:id="signalAxisY" label="%axis.power" prefWidth="70.0" />
-                     </yAxis>
-                  </LineChart>
-               </children>
             </HBox>
          </children>
          <padding>

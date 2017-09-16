@@ -20,6 +20,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -60,9 +61,6 @@ public class SweepController {
     ToggleButton btnContinuous;
 
     @FXML
-    LineChart<Number, Number> signalChart;
-
-    @FXML
     NumberAxis signalAxisX;
 
     @FXML
@@ -79,6 +77,7 @@ public class SweepController {
     private Accordion chartToolParent;
     private SweepDataInfo receivedDataInfo;
     private ChartContext chartContext = new ChartContext();
+    private LineChart<Number, Number> signalChart;
 
     public SweepController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
@@ -118,7 +117,19 @@ public class SweepController {
         return anchorPane.sceneToLocal(signalAxisY.localToScene(0, signalAxisY.getDisplayPosition(value)));
     }
 
+    private void initSignalChart() {
+        signalAxisX = new NumberAxis(mainController.bundle.resolve("axis.freq"), 0, 52, 5);
+        signalAxisY = new NumberAxis(mainController.bundle.resolve("axis.power"), -40, 10, 5);
+        signalChart = new LineChart<>(signalAxisX, signalAxisY);
+        signalChart.legendVisibleProperty().setValue(false);
+        signalChart.setAnimated(false);
+        chartBox.getChildren().add(signalChart);
+        HBox.setHgrow(signalChart, Priority.ALWAYS);
+    }
+
     public void initialize() throws IOException {
+        initSignalChart();
+
         chartMarker.initialize(anchorPane, signalChart, scenePos -> {
             if(signalDataSeries.isEmpty()) return null;
             
