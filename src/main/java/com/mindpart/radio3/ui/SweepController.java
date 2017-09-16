@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.Range;
 import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
@@ -14,6 +15,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -77,7 +79,7 @@ public class SweepController {
     private Accordion chartToolParent;
     private SweepDataInfo receivedDataInfo;
     private ChartContext chartContext = new ChartContext();
-    private LineChart<Number, Number> signalChart;
+    private EnhancedLineChart<Number, Number> signalChart;
 
     public SweepController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
@@ -120,11 +122,14 @@ public class SweepController {
     private void initSignalChart() {
         signalAxisX = new NumberAxis(mainController.bundle.resolve("axis.freq"), 0, 52, 5);
         signalAxisY = new NumberAxis(mainController.bundle.resolve("axis.power"), -40, 10, 5);
-        signalChart = new LineChart<>(signalAxisX, signalAxisY);
+        signalChart = new EnhancedLineChart<>(signalAxisX, signalAxisY);
         signalChart.legendVisibleProperty().setValue(false);
         signalChart.setAnimated(false);
         chartBox.getChildren().add(signalChart);
         HBox.setHgrow(signalChart, Priority.ALWAYS);
+
+        signalChart.addHorizontalRuler(new Data<>(0, 1));
+        signalChart.addVerticalRuler(new Data<>(12, 0));
     }
 
     public void initialize() throws IOException {
@@ -300,13 +305,13 @@ public class SweepController {
 
         XYChart.Series<Number, Number> chartSeries = new XYChart.Series<>();
         chartSeries.setName(receivedDataInfo.getSource().getSeriesTitle(0));
-        ObservableList<XYChart.Data<Number, Number>> data = chartSeries.getData();
+        ObservableList<Data<Number, Number>> data = chartSeries.getData();
 
         Range range = new Range();
         for (int step = 0; step < chartContext.getDataSize(); step++) {
             double processed = chartContext.setAndGetProcessedData(step);
             range.sample(processed);
-            data.add(new XYChart.Data<>(chartContext.receivedFreq[step], processed));
+            data.add(new Data<>(chartContext.receivedFreq[step], processed));
         }
 
         signalDataSeries.add(chartSeries);
