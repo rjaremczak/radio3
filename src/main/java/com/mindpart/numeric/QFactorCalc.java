@@ -1,5 +1,7 @@
 package com.mindpart.numeric;
 
+import java.util.List;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2017.09.04
@@ -21,35 +23,41 @@ public class QFactorCalc {
         this.localExtremaFinder = new LocalExtremaFinder(data);
     }
 
-    public boolean checkBandStop(double minDepth) {
-        Extremum extremum = localExtremaFinder.getLowestMinimum();
-        if(extremum!=null) {
-            int peak = extremum.getNumber();
-            double threshold = data[peak] + minDepth;
-            if(slopeFinder.findRisingBackward(peak, threshold)) {
-                startSample = slopeFinder.getSampleNumber();
-                if(slopeFinder.findRisingForward(peak, threshold)) {
-                    endSample = slopeFinder.getSampleNumber();
-                    peakSample = peak;
-                    return true;
-                }
+    public boolean findBandStop(double minDepth) {
+        for(int minimum : localExtremaFinder.getMinimaFromLowest()) {
+            if(checkBandStop(minimum, minDepth)) return true;
+        }
+        return false;
+    }
+
+    private boolean checkBandStop(int peak, double minDepth) {
+        double threshold = data[peak] + minDepth;
+        if(slopeFinder.findRisingBackward(peak, threshold)) {
+            startSample = slopeFinder.getSampleNumber();
+            if(slopeFinder.findRisingForward(peak, threshold)) {
+                endSample = slopeFinder.getSampleNumber();
+                peakSample = peak;
+                return true;
             }
         }
         return false;
     }
 
-    public boolean checkBandPass(double minHeight) {
-        Extremum extremum = localExtremaFinder.getHighestMaximum();
-        if(extremum!=null) {
-            int peak = extremum.getNumber();
-            double threshold = data[peak] - minHeight;
-            if(slopeFinder.findFallingBackward(peak, threshold)) {
-                startSample = slopeFinder.getSampleNumber();
-                if(slopeFinder.findFallingForward(peak, threshold)) {
-                    endSample = slopeFinder.getSampleNumber();
-                    peakSample = peak;
-                    return true;
-                }
+    public boolean findBandPass(double minDepth) {
+        for(int maximum : localExtremaFinder.getMaximaFromHighest()) {
+            if(checkBandPass(maximum, minDepth)) return true;
+        }
+        return false;
+    }
+
+    private boolean checkBandPass(int peak, double minHeight) {
+        double threshold = data[peak] - minHeight;
+        if(slopeFinder.findFallingBackward(peak, threshold)) {
+            startSample = slopeFinder.getSampleNumber();
+            if(slopeFinder.findFallingForward(peak, threshold)) {
+                endSample = slopeFinder.getSampleNumber();
+                peakSample = peak;
+                return true;
             }
         }
         return false;

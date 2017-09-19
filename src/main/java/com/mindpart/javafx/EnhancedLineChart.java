@@ -14,48 +14,50 @@ import javafx.scene.shape.Line;
  */
 public class EnhancedLineChart<X,Y> extends LineChart<X,Y> {
 
-    private final ObservableList<Data<X,Y>> horizontalRulers;
-    private final ObservableList<Data<X,Y>> verticalRulers;
+    private final ObservableList<ChartRuler<Y>> horizontalRulers;
+    private final ObservableList<ChartRuler<X>> verticalRulers;
 
     public EnhancedLineChart(Axis<X> xAxis, Axis<Y> yAxis) {
         super(xAxis, yAxis);
         legendVisibleProperty().setValue(false);
         setAnimated(false);
 
-        horizontalRulers = FXCollections.observableArrayList(data -> new Observable[] { data.YValueProperty() });
+        horizontalRulers = FXCollections.observableArrayList(ruler -> new Observable[] { ruler.valueProperty() });
         horizontalRulers.addListener((InvalidationListener) observable -> layoutPlotChildren());
         
-        verticalRulers = FXCollections.observableArrayList(data -> new Observable[] { data.XValueProperty() });
+        verticalRulers = FXCollections.observableArrayList(ruler -> new Observable[] { ruler.valueProperty() });
         verticalRulers.addListener((InvalidationListener) observable -> layoutPlotChildren());
     }
 
-    private void addRuler(ObservableList<Data<X,Y>> list, Data<X,Y> ruler) {
-        Line line = new Line();
-        ruler.setNode(line);
-        getPlotChildren().add(line);
-        list.add(ruler);
+    public void addHorizontalRuler(ChartRuler<Y> chartRuler) {
+        assert !horizontalRulers.contains(chartRuler);
+
+        getPlotChildren().add(chartRuler.getNode());
+        horizontalRulers.add(chartRuler);
     }
 
-    public void addHorizontalRuler(Data<X,Y> ruler) {
-        addRuler(horizontalRulers, ruler);
+    public void addVerticalRuler(ChartRuler<X> chartRuler) {
+        assert !verticalRulers.contains(chartRuler);
+        
+        getPlotChildren().add(chartRuler.getNode());
+        verticalRulers.add(chartRuler);
     }
 
-    public void addVerticalRuler(Data<X,Y> ruler) {
-        addRuler(verticalRulers, ruler);
-    }
-
-    private void removeRuler(ObservableList<Data<X,Y>> list, Data<X,Y> ruler) {
-        getPlotChildren().remove(ruler);
-        ruler.setNode(null);
+    private <T extends Object> void removeRuler(ObservableList<ChartRuler<T>> list, ChartRuler<T> ruler) {
+        getPlotChildren().remove(ruler.getNode());
         list.remove(ruler);
     }
 
-    public void removeHorizontalRuler(Data<X,Y> ruler) {
+    public void removeHorizontalRuler(ChartRuler<Y> ruler) {
+        getPlotChildren().remove(ruler.getNode());
         horizontalRulers.remove(ruler);
     }
 
-    public void removeVerticalRuler(Data<X,Y> ruler) {
-        verticalRulers.remove(ruler);
+    public void removeVerticalRuler(ChartRuler<X> ruler) {
+        if(ruler!=null) {
+            getPlotChildren().remove(ruler.getNode());
+            horizontalRulers.remove(ruler);
+        }
     }
 
     @Override
@@ -66,7 +68,7 @@ public class EnhancedLineChart<X,Y> extends LineChart<X,Y> {
             Line line = (Line) ruler.getNode();
             line.setStartX(0);
             line.setEndX(getBoundsInLocal().getWidth());
-            double ypos = getYAxis().getDisplayPosition(ruler.getYValue()) + 0.5;
+            double ypos = getYAxis().getDisplayPosition(ruler.getValue()) + 0.5;
             line.setStartY(ypos);
             line.setEndY(ypos);
             line.toFront();
@@ -74,7 +76,7 @@ public class EnhancedLineChart<X,Y> extends LineChart<X,Y> {
 
         verticalRulers.forEach(ruler -> {
             Line line = (Line) ruler.getNode();
-            double xpos = getXAxis().getDisplayPosition(ruler.getXValue()) + 0.5;
+            double xpos = getXAxis().getDisplayPosition(ruler.getValue()) + 0.5;
             line.setStartX(xpos);
             line.setEndX(xpos);
             line.setStartY(0);

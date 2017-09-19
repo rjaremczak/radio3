@@ -1,20 +1,23 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.javafx.ChartRuler;
+import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.QFactorCalc;
 import com.mindpart.types.Frequency;
-import com.mindpart.ui.VerticalRuler;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import static com.mindpart.radio3.ui.FilterInfoType.BANDPASS;
 import static com.mindpart.radio3.ui.FilterInfoType.BANDSTOP;
@@ -33,22 +36,22 @@ public class FilterToolController {
     private final Label bandPeakFreq;
     private final Label bandwidth;
     private final Label qFactor;
-    private final VerticalRuler rulerBandwidthStart;
-    private final VerticalRuler rulerBandwidthEnd;
-    private final VerticalRuler rulerPeakFreq;
-    private final Pane referencePane;
+    private final EnhancedLineChart<Number, Number> signalChart;
     private final ChartContext chartContext;
+    private final ChartRuler<Number> rulerBandwidthStart;
+    private final ChartRuler<Number> rulerBandwidthEnd;
+    private final ChartRuler<Number> rulerPeakFreq;
+    private final Collection<ChartRuler<Number>> allRulers = new ArrayList<>();
+    private final ChoiceBox<FilterInfoType> filterInfoTypeChoiceBox;
 
-    private ChoiceBox<FilterInfoType> filterInfoTypeChoiceBox;
-
-    public FilterToolController(BundleData bundle, Pane referencePane, XYChart<Number, Number> chart, ChartContext chartContext) {
-        this.referencePane = referencePane;
+    public FilterToolController(BundleData bundle, EnhancedLineChart<Number, Number> signalChart, ChartContext chartContext) {
+        this.signalChart = signalChart;
         this.chartContext = chartContext;
         
         filterInfoTypeChoiceBox = new ChoiceBox<>(FXCollections.observableArrayList(BANDSTOP, BANDPASS));
         filterInfoTypeChoiceBox.setConverter(bundle.getGenericStringConverter());
         filterInfoTypeChoiceBox.getSelectionModel().select(BANDSTOP);
-        filterInfoTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener(this::onChangeFilterInfoType);
+        filterInfoTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener(this::onChangeFilterType);
 
         propertyGrid = new PropertyGrid();
         propertyGrid.addProperty(bundle.resolve("info.bandfilter.type"), filterInfoTypeChoiceBox);
@@ -58,71 +61,97 @@ public class FilterToolController {
         bandwidth = propertyGrid.addProperty(bundle.resolve("info.bandfilter.width"));
         qFactor = propertyGrid.addProperty(bundle.resolve("info.bandfilter.q"));
 
-        rulerBandwidthStart = new VerticalRuler(referencePane, chart, RULER_SIDE_COLOR);
-        rulerPeakFreq = new VerticalRuler(referencePane, chart, RULER_MAIN_COLOR);
-        rulerBandwidthEnd = new VerticalRuler(referencePane, chart, RULER_SIDE_COLOR);
-
         titledPane = new TitledPane(bundle.resolve("info.bandfilter.title"), propertyGrid.getNode());
         titledPane.setAlignment(Pos.TOP_LEFT);
         titledPane.setAnimated(false);
         titledPane.expandedProperty().addListener(this::onExpandedListener);
 
+        rulerBandwidthStart = chartRuler(RULER_SIDE_COLOR);
+        rulerPeakFreq = chartRuler(RULER_MAIN_COLOR);
+        rulerBandwidthEnd = chartRuler(RULER_SIDE_COLOR);
+        allRulers.addAll(Arrays.asList(rulerBandwidthStart, rulerBandwidthEnd, rulerPeakFreq));
+    }
+
+    private ChartRuler<Number> chartRuler(Color color) {
+        Line line = new Line();
+        line.setStroke(color);
+        return new ChartRuler<>(0, line);
     }
 
     private void onExpandedListener(ObservableValue<? extends Boolean> ob, Boolean old, Boolean expanded) {
-        clear();
         if(expanded) {
+            on();
             update();
+        } else {
+            off();
         }
     }
 
-    private void onChangeFilterInfoType(ObservableValue<? extends FilterInfoType> ob, FilterInfoType old, FilterInfoType current) {
+    private void onChangeFilterType(ObservableValue<? extends FilterInfoType> ob, FilterInfoType old, FilterInfoType current) {
         clear();
-        update(current);
+        update();
+    }
+
+    public void off() {
+        clear();
+        removeRulers();
+    }
+
+    public void on() {
+        addRulers();
+        clear();
     }
 
     public void setDisable(boolean disable) {
-        titledPane.setExpanded(!disable);
+        titledPane.setExpanded(false);
         titledPane.setDisable(disable);
     }
 
-    private void qUpdateAndShow(QFactorCalc qFactorCalc) {
+    private void show(QFactorCalc qFactorCalc) {
         bandPeakFreq.setText(Frequency.ofMHz(qFactorCalc.getBandPeak()).format());
         bandwidth.setText(Frequency.ofMHz(qFactorCalc.getBandwidth()).format());
         qFactor.setText(FORMAT_Q_FACTOR.format(qFactorCalc.getQFactor()) + "    ");
 
-        referencePane.layout();
+        rulerBandwidthStart.setValue(qFactorCalc.getBandStart());
+        rulerBandwidthEnd.setValue(qFactorCalc.getBandEnd());
+        rulerPeakFreq.setValue(qFactorCalc.getBandPeak());
 
-        rulerBandwidthStart.updateAndShow(qFactorCalc.getBandStart());
-        rulerBandwidthEnd.updateAndShow(qFactorCalc.getBandEnd());
-        rulerPeakFreq.updateAndShow(qFactorCalc.getBandPeak());
+        showRulers(true);
     }
 
     public void update() {
-        update(filterInfoTypeChoiceBox.getSelectionModel().getSelectedItem());
-    }
-    
-    private void update(FilterInfoType filterInfoType) {
-        if(titledPane.isExpanded() && chartContext.valueProcessor instanceof LogProbeProcessor) {
+        if(titledPane.isExpanded()) {
             QFactorCalc qFactorCalc = new QFactorCalc(chartContext.receivedFreq, chartContext.processedData);
-            switch (filterInfoType) {
+            switch (filterInfoTypeChoiceBox.getSelectionModel().getSelectedItem()) {
                 case BANDPASS:
-                    if(qFactorCalc.checkBandPass(3.0)) qUpdateAndShow(qFactorCalc);
+                    if(qFactorCalc.findBandPass(3.0)) show(qFactorCalc); else clear();
                     break;
                 case BANDSTOP:
-                    if(qFactorCalc.checkBandStop(3.0)) qUpdateAndShow(qFactorCalc);
+                    if(qFactorCalc.findBandStop(3.0)) show(qFactorCalc); else clear();
                     break;
+                default:
+                    clear();
             }
         }
+    }
+
+    private void addRulers() {
+        allRulers.forEach(signalChart::addVerticalRuler);
+    }
+
+    private void removeRulers() {
+        allRulers.forEach(signalChart::removeVerticalRuler);
+    }
+
+    private void showRulers(boolean visible) {
+        allRulers.forEach(r -> r.getNode().setVisible(visible));
     }
 
     public void clear() {
         bandPeakFreq.setText("");
         bandwidth.setText("");
         qFactor.setText("");
-        rulerBandwidthStart.hide();
-        rulerBandwidthEnd.hide();
-        rulerPeakFreq.hide();
+        showRulers(false);
     }
 
     public TitledPane getTitledPane() {

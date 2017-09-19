@@ -17,7 +17,7 @@ public final class FxChartUtils {
 
     private FxChartUtils() {}
 
-    public static void rangeAxis(NumberAxis axis, double min, double max, double tickUnit) {
+    public static void autoRangeAxis(NumberAxis axis, double min, double max, double tickUnit) {
         axis.setAutoRanging(false);
         axis.setLowerBound(min);
         axis.setUpperBound(max);
@@ -26,21 +26,21 @@ public final class FxChartUtils {
         axis.setMinorTickCount(5);
     }
 
-    public static void rangeAxis(NumberAxis axis, Range range, double minSpan, double minLimit, double maxLimit, double minGrid) {
+    public static void autoRangeAxis(NumberAxis axis, Range range, double minSpan, double minLimit, double maxLimit, double minGrid) {
         final double dspan = minSpan / 2;
         if(range.isValid()) {
             double rangeMid = round(range.mid());
             double rangeMin = max(minLimit, range.span() < minSpan ? rangeMid - dspan : floor(range.min(), minGrid));
             double rangeMax = min(maxLimit,  range.span() < minSpan ? rangeMid + dspan : ceil(range.max(), minGrid));
             double tickUnit = tickUnit(rangeMax - rangeMin, NUM_TICKS);
-            rangeAxis(axis, rangeMin, rangeMax, tickUnit);
+            autoRangeAxis(axis, rangeMin, rangeMax, tickUnit);
         } else {
             axis.setAutoRanging(true);
             axis.setForceZeroInRange(false);
         }
     }
 
-    public static void rangeAxis(NumberAxis axis, Range range, double minSpan, double minGrid) {
-        rangeAxis(axis, range, minSpan, -Double.MAX_VALUE, Double.MAX_VALUE, minGrid);
+    public static void autoRangeAxis(NumberAxis axis, Range range, double minSpan, double minGrid) {
+        autoRangeAxis(axis, range, minSpan, -Double.MAX_VALUE, Double.MAX_VALUE, minGrid);
     }
 }

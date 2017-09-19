@@ -5,6 +5,7 @@ import com.mindpart.numeric.Range;
 import com.mindpart.radio3.device.*;
 import com.mindpart.types.Frequency;
 import com.mindpart.ui.ChartMarker;
+import com.mindpart.ui.FxChartUtils;
 import com.mindpart.ui.FxUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -12,7 +13,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
@@ -30,7 +30,6 @@ import java.util.function.Consumer;
 
 import static com.mindpart.radio3.device.SweepSignalSource.LIN_PROBE;
 import static com.mindpart.radio3.device.SweepSignalSource.LOG_PROBE;
-import static com.mindpart.ui.FxChartUtils.rangeAxis;
 import static com.mindpart.ui.FxUtils.valueFromSeries;
 
 /**
@@ -39,34 +38,28 @@ import static com.mindpart.ui.FxUtils.valueFromSeries;
  */
 public class SweepController {
     @FXML
-    AnchorPane anchorPane;
+    private AnchorPane anchorPane;
 
     @FXML
-    VBox vBox;
+    private VBox vBox;
 
     @FXML
-    HBox controlBox;
+    private HBox controlBox;
 
     @FXML
-    HBox chartBox;
+    private HBox chartBox;
 
     @FXML
-    ChoiceBox<SweepSignalSource> sourceProbe;
+    private ChoiceBox<SweepSignalSource> sourceProbe;
 
     @FXML
-    ToggleButton btnNormalize;
+    private ToggleButton btnNormalize;
 
     @FXML
-    Button btnOnce;
+    private Button btnOnce;
 
     @FXML
-    ToggleButton btnContinuous;
-
-    @FXML
-    NumberAxis signalAxisX;
-
-    @FXML
-    NumberAxis signalAxisY;
+    private ToggleButton btnContinuous;
 
     private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
@@ -80,6 +73,8 @@ public class SweepController {
     private SweepDataInfo receivedDataInfo;
     private ChartContext chartContext = new ChartContext();
     private EnhancedLineChart<Number, Number> signalChart;
+    private NumberAxis signalAxisX;
+    private NumberAxis signalAxisY;
 
     public SweepController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
@@ -127,13 +122,13 @@ public class SweepController {
         signalChart.setAnimated(false);
         chartBox.getChildren().add(signalChart);
         HBox.setHgrow(signalChart, Priority.ALWAYS);
-
-        signalChart.addHorizontalRuler(new Data<>(0, 1));
-        signalChart.addVerticalRuler(new Data<>(12, 0));
     }
 
+    @FXML
     public void initialize() throws IOException {
         initSignalChart();
+
+        anchorPane.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> anchorPane.requestLayout());
 
         chartMarker.initialize(anchorPane, signalChart, scenePos -> {
             if(signalDataSeries.isEmpty()) return null;
@@ -170,7 +165,7 @@ public class SweepController {
         chartToolParent.getPanes().add(rangeToolController.getTitledPane());
         chartToolParent.setExpandedPane(rangeToolController.getTitledPane());
 
-        filterToolController = new FilterToolController(mainController.bundle, anchorPane, signalChart, chartContext);
+        filterToolController = new FilterToolController(mainController.bundle, signalChart, chartContext);
         chartToolParent.getPanes().add(filterToolController.getTitledPane());
 
         chartBox.getChildren().add(new VBox(chartToolParent));
@@ -201,7 +196,7 @@ public class SweepController {
         initChartContext();
         updateNormButton();
         rangeToolController.clear();
-        filterToolController.clear();
+        filterToolController.off();
         filterToolController.setDisable(source != LOG_PROBE);
     }
 
@@ -306,25 +301,23 @@ public class SweepController {
         XYChart.Series<Number, Number> chartSeries = new XYChart.Series<>();
         chartSeries.setName(receivedDataInfo.getSource().getSeriesTitle(0));
         ObservableList<Data<Number, Number>> data = chartSeries.getData();
-
+        signalDataSeries.add(chartSeries);
+        
         Range range = new Range();
         for (int step = 0; step < chartContext.getDataSize(); step++) {
             double processed = chartContext.setAndGetProcessedData(step);
             range.sample(processed);
             data.add(new Data<>(chartContext.receivedFreq[step], processed));
         }
-
-        signalDataSeries.add(chartSeries);
-        signalAxisX.setForceZeroInRange(false);
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, receivedDataInfo.getFreqStart(), receivedDataInfo.getFreqEnd());
         switch (sourceProbe.getValue()) {
             case LIN_PROBE:
-                rangeAxis(signalAxisY, range, 0.02, 0.01);
+                FxChartUtils.autoRangeAxis(signalAxisY, range, 0.02, 0.01);
                 break;
             default:
-                rangeAxis(signalAxisY, range, 6, 1);
+                FxChartUtils.autoRangeAxis(signalAxisY, range, 6, 1);
         }
-        
+
         rangeToolController.update();
         filterToolController.update();
     }
@@ -335,7 +328,5 @@ public class SweepController {
         rangeToolController.clear();
         filterToolController.clear();
         chartContext.clear();
-        FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, sweepSettingsController.getStartFrequency().toHz(), sweepSettingsController.getEndFrequency().toHz());
-        rangeAxis(signalAxisY, new Range(-40.0, 20.0), 6, 1);
     }
 }

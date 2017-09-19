@@ -26,6 +26,7 @@ public final class FrequencyAxisUtils {
         axis.setLowerBound(f0);
         axis.setUpperBound(f1);
         axis.setTickUnit(autoTickUnit(f1 - f0));
+        axis.setForceZeroInRange(false);
     }
 
 }

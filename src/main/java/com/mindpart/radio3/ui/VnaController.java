@@ -8,6 +8,7 @@ import com.mindpart.radio3.device.SweepSignalSource;
 import com.mindpart.types.Frequency;
 import com.mindpart.types.SWR;
 import com.mindpart.ui.ChartMarker;
+import com.mindpart.ui.FxChartUtils;
 import com.mindpart.ui.FxUtils;
 import com.mindpart.numeric.Range;
 import javafx.application.Platform;
@@ -30,7 +31,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.function.Consumer;
 
-import static com.mindpart.ui.FxChartUtils.rangeAxis;
+import static com.mindpart.ui.FxChartUtils.autoRangeAxis;
 import static com.mindpart.ui.FxUtils.valueFromSeries;
 
 /**
@@ -122,11 +123,11 @@ public class VnaController {
         impedanceChart.setData(impedanceDataSeries);
         impedanceChart.setCreateSymbols(false);
 
-        rangeAxis(swrAxisX, 1, 55, 2.5);
-        rangeAxis(swrAxisY, 0, 200, 10);
+        FxChartUtils.autoRangeAxis(swrAxisX, 1, 55, 2.5);
+        FxChartUtils.autoRangeAxis(swrAxisY, 0, 200, 10);
 
-        rangeAxis(impedanceAxisX, 1, 55, 2.5);
-        rangeAxis(impedanceAxisY, 0, 1000, 50);
+        FxChartUtils.autoRangeAxis(impedanceAxisX, 1, 55, 2.5);
+        FxChartUtils.autoRangeAxis(impedanceAxisY, 0, 1000, 50);
 
         Parent sweepSettingsPane = mainController.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml");
         controlBox.getChildren().add(0, sweepSettingsPane);
@@ -238,8 +239,8 @@ public class VnaController {
 
         swrChart.getData().add(swrSeries);
         impedanceChart.getData().addAll(rSeries, xSeries);
-        rangeAxis(swrAxisY, swrRange, 2, 0, Double.MAX_VALUE, 1);
-        rangeAxis(impedanceAxisY, impedanceRange, 10, 0, Double.MAX_VALUE, 1);
+        autoRangeAxis(swrAxisY, swrRange, 2, 0, Double.MAX_VALUE, 1);
+        autoRangeAxis(impedanceAxisY, impedanceRange, 10, 0, Double.MAX_VALUE, 1);
     }
 
     void clear() {

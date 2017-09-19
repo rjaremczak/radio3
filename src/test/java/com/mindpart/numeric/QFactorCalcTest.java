@@ -3,7 +3,8 @@ package com.mindpart.numeric;
 import org.junit.Test;
 
 import static java.lang.Double.MIN_VALUE;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Robert Jaremczak
@@ -16,7 +17,7 @@ public class QFactorCalcTest {
 
     @Test
     public void testLowPeak() {
-        assertTrue(qFactorCalc.checkBandStop(3));
+        assertTrue(qFactorCalc.findBandStop(3));
         assertEquals(1.4, qFactorCalc.getBandStart(), MIN_VALUE);
         assertEquals(1.5, qFactorCalc.getBandPeak(), MIN_VALUE);
         assertEquals(1.8, qFactorCalc.getBandEnd(), MIN_VALUE);
@@ -26,7 +27,7 @@ public class QFactorCalcTest {
 
     @Test
     public void testHighPeak() {
-        assertTrue(qFactorCalc.checkBandPass(3));
+        assertTrue(qFactorCalc.findBandPass(3));
         assertEquals(2.5, qFactorCalc.getBandStart(), MIN_VALUE);
         assertEquals(2.9, qFactorCalc.getBandPeak(), MIN_VALUE);
         assertEquals(3.0, qFactorCalc.getBandEnd(), MIN_VALUE);

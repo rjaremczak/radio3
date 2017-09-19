@@ -1,10 +1,7 @@
 package com.mindpart.numeric;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import static com.mindpart.numeric.Extremum.Type.MAXIMUM;
-import static com.mindpart.numeric.Extremum.Type.MINIMUM;
 import static org.junit.Assert.*;
 
 /**
@@ -17,28 +14,28 @@ public class LocalExtremaFinderTest {
 
     @Test
     public void testFindMinima() {
-        assertFalse(localExtremaFinder.getExtrema().isEmpty());
-        assertTrue(localExtremaFinder.getExtrema().contains(new Extremum(9, MINIMUM)));
-        assertTrue(localExtremaFinder.getExtrema().contains(new Extremum(17, MINIMUM)));
-        assertFalse(localExtremaFinder.getExtrema().contains(new Extremum(0, MINIMUM)));
+        assertFalse(localExtremaFinder.getMinima().isEmpty());
+        assertTrue(localExtremaFinder.getMinima().contains(9));
+        assertTrue(localExtremaFinder.getMinima().contains(17));
+        assertFalse(localExtremaFinder.getMinima().contains(0));
     }
 
     @Test
     public void testFindMaxima() {
-        assertFalse(localExtremaFinder.getExtrema().isEmpty());
-        assertTrue(localExtremaFinder.getExtrema().contains(new Extremum(4, MAXIMUM)));
-        assertTrue(localExtremaFinder.getExtrema().contains(new Extremum(13, MAXIMUM)));
-        assertFalse(localExtremaFinder.getExtrema().contains(new Extremum(2, MAXIMUM)));
-        assertFalse(localExtremaFinder.getExtrema().contains(new Extremum(21, MAXIMUM)));
+        assertFalse(localExtremaFinder.getMaxima().isEmpty());
+        assertTrue(localExtremaFinder.getMaxima().contains(4));
+        assertTrue(localExtremaFinder.getMaxima().contains(13));
+        assertFalse(localExtremaFinder.getMaxima().contains(2));
+        assertFalse(localExtremaFinder.getMaxima().contains(21));
     }
 
     @Test
     public void testFindLowestMinimum() {
-        assertEquals(new Extremum(17, MINIMUM), localExtremaFinder.getLowestMinimum());
+        assertEquals(17, (int)localExtremaFinder.getMinimaFromLowest().get(0));
     }
 
     @Test
     public void testFindHighestMaximum() {
-        assertEquals(new Extremum(4, MAXIMUM), localExtremaFinder.getHighestMaximum());
+        assertEquals(4, (int)localExtremaFinder.getMaximaFromHighest().get(0));
     }
 }
