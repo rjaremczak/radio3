@@ -3,6 +3,7 @@ package com.mindpart.javafx;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 /**
@@ -14,18 +15,16 @@ public class ChartSpanMarker<T> {
     private final ObjectProperty<T> maxValueProperty;
     private final Rectangle rectangle;
 
-    public ChartSpanMarker() {
-        minValueProperty = new SimpleObjectProperty<>();
-        maxValueProperty = new SimpleObjectProperty<>();
+    public ChartSpanMarker(T min, T max, Color fill) {
+        minValueProperty = new SimpleObjectProperty<>(min);
+        maxValueProperty = new SimpleObjectProperty<>(max);
         rectangle = new Rectangle();
+        rectangle.setFill(fill);
     }
 
-    public void setMinValue(T value) {
-        minValueProperty.setValue(value);
-    }
-
-    public void setMaxValueProperty(T value) {
-        maxValueProperty.setValue(value);
+    public void setSpan(T min, T max) {
+        minValueProperty.setValue(min);
+        maxValueProperty.setValue(max);
     }
 
     public T getMinValue() {
@@ -46,7 +45,7 @@ public class ChartSpanMarker<T> {
 
     public void update(double x0, double y0, double x1, double y1) {
         rectangle.setX(x0);
-        rectangle.setY(y1);
+        rectangle.setY(y0);
         rectangle.setWidth(x1 - x0);
         rectangle.setHeight(y1 - y0);
         rectangle.toFront();

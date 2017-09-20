@@ -1,6 +1,7 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.javafx.ChartRuler;
+import com.mindpart.javafx.ChartSpanMarker;
 import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.QFactorCalc;
 import com.mindpart.types.Frequency;
@@ -29,7 +30,7 @@ import static com.mindpart.radio3.ui.FilterInfoType.BANDSTOP;
 public class FilterToolController {
     private static final NumberFormat FORMAT_Q_FACTOR = new DecimalFormat("0.0");
     private static final Color RULER_MAIN_COLOR = Color.DARKBLUE;
-    private static final Color RULER_SIDE_COLOR = Color.DARKBLUE.deriveColor(0, 1, 1, 0.3);
+    private static final Color RULER_SIDE_COLOR = Color.DARKBLUE.deriveColor(0, 1, 1, 0.1);
 
     private final TitledPane titledPane;
     private final PropertyGrid propertyGrid;
@@ -41,6 +42,7 @@ public class FilterToolController {
     private final ChartRuler<Number> rulerBandwidthStart;
     private final ChartRuler<Number> rulerBandwidthEnd;
     private final ChartRuler<Number> rulerPeakFreq;
+    private final ChartSpanMarker<Number> bandwidthMarker;
     private final Collection<ChartRuler<Number>> allRulers = new ArrayList<>();
     private final ChoiceBox<FilterInfoType> filterInfoTypeChoiceBox;
 
@@ -69,7 +71,9 @@ public class FilterToolController {
         rulerBandwidthStart = chartRuler(RULER_SIDE_COLOR);
         rulerPeakFreq = chartRuler(RULER_MAIN_COLOR);
         rulerBandwidthEnd = chartRuler(RULER_SIDE_COLOR);
-        allRulers.addAll(Arrays.asList(rulerBandwidthStart, rulerBandwidthEnd, rulerPeakFreq));
+        allRulers.addAll(Arrays.asList(rulerPeakFreq));//, rulerBandwidthStart, rulerBandwidthEnd));
+
+        bandwidthMarker = new ChartSpanMarker<>(0, 0, RULER_SIDE_COLOR);
     }
 
     private ChartRuler<Number> chartRuler(Color color) {
@@ -112,9 +116,10 @@ public class FilterToolController {
         bandwidth.setText(Frequency.ofMHz(qFactorCalc.getBandwidth()).format());
         qFactor.setText(FORMAT_Q_FACTOR.format(qFactorCalc.getQFactor()) + "    ");
 
-        rulerBandwidthStart.setValue(qFactorCalc.getBandStart());
-        rulerBandwidthEnd.setValue(qFactorCalc.getBandEnd());
-        rulerPeakFreq.setValue(qFactorCalc.getBandPeak());
+        rulerBandwidthStart.setPosition(qFactorCalc.getBandStart());
+        rulerBandwidthEnd.setPosition(qFactorCalc.getBandEnd());
+        rulerPeakFreq.setPosition(qFactorCalc.getBandPeak());
+        bandwidthMarker.setSpan(qFactorCalc.getBandStart(), qFactorCalc.getBandEnd());
 
         showRulers(true);
     }
@@ -137,14 +142,17 @@ public class FilterToolController {
 
     private void addRulers() {
         allRulers.forEach(signalChart::addVerticalRuler);
+        signalChart.addSpanMarker(bandwidthMarker);
     }
 
     private void removeRulers() {
         allRulers.forEach(signalChart::removeVerticalRuler);
+        signalChart.removeSpanMarker(bandwidthMarker);
     }
 
     private void showRulers(boolean visible) {
         allRulers.forEach(r -> r.getNode().setVisible(visible));
+        bandwidthMarker.getNode().setVisible(visible);
     }
 
     public void clear() {

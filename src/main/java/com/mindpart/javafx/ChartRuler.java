@@ -17,7 +17,7 @@ public class ChartRuler<T> {
         this.line = line;
     }
 
-    public void setValue(T value) {
+    public void setPosition(T value) {
         valueProperty.setValue(value);
     }
 

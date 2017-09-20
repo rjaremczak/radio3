@@ -20,6 +20,7 @@ public class EnhancedLineChart<X,Y> extends LineChart<X,Y> {
     public EnhancedLineChart(Axis<X> xAxis, Axis<Y> yAxis) {
         super(xAxis, yAxis);
         legendVisibleProperty().setValue(false);
+        horizontalZeroLineVisibleProperty().setValue(false);
         setAnimated(false);
 
         horizontalRulers = FXCollections.observableArrayList(ruler -> new Observable[] { ruler.valueProperty() });
@@ -70,36 +71,36 @@ public class EnhancedLineChart<X,Y> extends LineChart<X,Y> {
         spanMarkers.add(marker);
     }
 
-    public void removeSmapMarker(ChartSpanMarker<X> marker) {
+    public void removeSpanMarker(ChartSpanMarker<X> marker) {
         getPlotChildren().remove(marker.getNode());
         spanMarkers.remove(marker);
     }
 
     private void layoutHorizontalRulers() {
         horizontalRulers.forEach(ruler -> {
-            double ypos = getYAxis().getDisplayPosition(ruler.getValue()) + 0.5;
+            double ypos = getYAxis().getDisplayPosition(ruler.getValue());
             ruler.update(0, ypos, getBoundsInLocal().getWidth(), ypos);
         });
     }
 
     private void layoutVerticalRulers() {
         verticalRulers.forEach(ruler -> {
-                double xpos = getXAxis().getDisplayPosition(ruler.getValue()) + 0.5;
+                double xpos = getXAxis().getDisplayPosition(ruler.getValue());
                 ruler.update(xpos, 0, xpos, getBoundsInLocal().getHeight());
         });
     }
 
     private void layoutSpanMarkers() {
         spanMarkers.forEach(marker -> marker.update(
-                getXAxis().getDisplayPosition(marker.getMinValue()) + 0.5, 0,
-                getXAxis().getDisplayPosition(marker.getMaxValue()) + 0.5, getBoundsInLocal().getHeight()));
+                getXAxis().getDisplayPosition(marker.getMinValue()), 0,
+                getXAxis().getDisplayPosition(marker.getMaxValue()), getBoundsInLocal().getHeight()));
     }
 
     @Override
     protected void layoutPlotChildren() {
         super.layoutPlotChildren();
+        layoutSpanMarkers();
         layoutVerticalRulers();
         layoutHorizontalRulers();
-        layoutSpanMarkers();
     }
 }
