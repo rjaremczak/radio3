@@ -2,7 +2,7 @@ package com.mindpart.javafx;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.Node;
+import javafx.scene.shape.Line;
 
 /**
  * Created by Robert Jaremczak
@@ -10,11 +10,11 @@ import javafx.scene.Node;
  */
 public class ChartRuler<T> {
     private final ObjectProperty<T> valueProperty;
-    private Node node;
+    private final Line line;
 
-    public ChartRuler(T value, Node node) {
+    public ChartRuler(T value, Line line) {
         this.valueProperty = new SimpleObjectProperty<>(value);
-        this.node = node;
+        this.line = line;
     }
 
     public void setValue(T value) {
@@ -29,11 +29,15 @@ public class ChartRuler<T> {
         return valueProperty;
     }
 
-    public Node getNode() {
-        return node;
+    public Line getNode() {
+        return line;
     }
 
-    public void setNode(Node node) {
-        this.node = node;
+    public void update(double startX, double startY, double endX, double endY) {
+        line.setStartX(startX);
+        line.setStartY(startY);
+        line.setEndX(endX);
+        line.setEndY(endY);
+        line.toFront();
     }
 }

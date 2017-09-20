@@ -302,7 +302,7 @@ public class SweepController {
         chartSeries.setName(receivedDataInfo.getSource().getSeriesTitle(0));
         ObservableList<Data<Number, Number>> data = chartSeries.getData();
         signalDataSeries.add(chartSeries);
-        
+
         Range range = new Range();
         for (int step = 0; step < chartContext.getDataSize(); step++) {
             double processed = chartContext.setAndGetProcessedData(step);

@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
-import javafx.scene.shape.Line;
 
 /**
  * Created by Robert Jaremczak
@@ -16,6 +15,7 @@ public class EnhancedLineChart<X,Y> extends LineChart<X,Y> {
 
     private final ObservableList<ChartRuler<Y>> horizontalRulers;
     private final ObservableList<ChartRuler<X>> verticalRulers;
+    private final ObservableList<ChartSpanMarker<X>> spanMarkers;
 
     public EnhancedLineChart(Axis<X> xAxis, Axis<Y> yAxis) {
         super(xAxis, yAxis);
@@ -27,6 +27,9 @@ public class EnhancedLineChart<X,Y> extends LineChart<X,Y> {
         
         verticalRulers = FXCollections.observableArrayList(ruler -> new Observable[] { ruler.valueProperty() });
         verticalRulers.addListener((InvalidationListener) observable -> layoutPlotChildren());
+
+        spanMarkers = FXCollections.observableArrayList(marker -> new Observable[] { marker.minValueProperty(), marker.maxValueProperty() });
+        spanMarkers.addListener((InvalidationListener) observable -> layoutPlotChildren());
     }
 
     public void addHorizontalRuler(ChartRuler<Y> chartRuler) {
@@ -60,28 +63,43 @@ public class EnhancedLineChart<X,Y> extends LineChart<X,Y> {
         }
     }
 
+    public void addSpanMarker(ChartSpanMarker<X> marker) {
+        assert !spanMarkers.contains(marker);
+
+        getPlotChildren().add(marker.getNode());
+        spanMarkers.add(marker);
+    }
+
+    public void removeSmapMarker(ChartSpanMarker<X> marker) {
+        getPlotChildren().remove(marker.getNode());
+        spanMarkers.remove(marker);
+    }
+
+    private void layoutHorizontalRulers() {
+        horizontalRulers.forEach(ruler -> {
+            double ypos = getYAxis().getDisplayPosition(ruler.getValue()) + 0.5;
+            ruler.update(0, ypos, getBoundsInLocal().getWidth(), ypos);
+        });
+    }
+
+    private void layoutVerticalRulers() {
+        verticalRulers.forEach(ruler -> {
+                double xpos = getXAxis().getDisplayPosition(ruler.getValue()) + 0.5;
+                ruler.update(xpos, 0, xpos, getBoundsInLocal().getHeight());
+        });
+    }
+
+    private void layoutSpanMarkers() {
+        spanMarkers.forEach(marker -> marker.update(
+                getXAxis().getDisplayPosition(marker.getMinValue()) + 0.5, 0,
+                getXAxis().getDisplayPosition(marker.getMaxValue()) + 0.5, getBoundsInLocal().getHeight()));
+    }
+
     @Override
     protected void layoutPlotChildren() {
         super.layoutPlotChildren();
-
-        horizontalRulers.forEach(ruler -> {
-            Line line = (Line) ruler.getNode();
-            line.setStartX(0);
-            line.setEndX(getBoundsInLocal().getWidth());
-            double ypos = getYAxis().getDisplayPosition(ruler.getValue()) + 0.5;
-            line.setStartY(ypos);
-            line.setEndY(ypos);
-            line.toFront();
-        });
-
-        verticalRulers.forEach(ruler -> {
-            Line line = (Line) ruler.getNode();
-            double xpos = getXAxis().getDisplayPosition(ruler.getValue()) + 0.5;
-            line.setStartX(xpos);
-            line.setEndX(xpos);
-            line.setStartY(0);
-            line.setEndY(getBoundsInLocal().getHeight());
-            line.toFront();
-        });
+        layoutVerticalRulers();
+        layoutHorizontalRulers();
+        layoutSpanMarkers();
     }
 }
