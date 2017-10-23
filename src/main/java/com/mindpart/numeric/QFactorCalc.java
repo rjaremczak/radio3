@@ -1,7 +1,5 @@
 package com.mindpart.numeric;
 
-import java.util.List;
-
 /**
  * Created by Robert Jaremczak
  * Date: 2017.09.04
@@ -12,9 +10,9 @@ public class QFactorCalc {
     private final SlopeFinder slopeFinder;
     private final LocalExtremaFinder localExtremaFinder;
 
-    private int startSample;
-    private int peakSample;
-    private int endSample;
+    private double bandStart;
+    private double bandPeak;
+    private double bandEnd;
 
     public QFactorCalc(double[] freq, double[] data) {
         this.freq = freq;
@@ -33,10 +31,10 @@ public class QFactorCalc {
     private boolean checkBandStop(int peak, double minDepth) {
         double threshold = data[peak] + minDepth;
         if(slopeFinder.findRisingBackward(peak, threshold)) {
-            startSample = slopeFinder.getSampleNumber();
+            bandStart = slopeFinder.linearInterpolation(freq, threshold);
             if(slopeFinder.findRisingForward(peak, threshold)) {
-                endSample = slopeFinder.getSampleNumber();
-                peakSample = peak;
+                bandEnd = slopeFinder.linearInterpolation(freq, threshold);
+                bandPeak = freq[peak];
                 return true;
             }
         }
@@ -53,10 +51,10 @@ public class QFactorCalc {
     private boolean checkBandPass(int peak, double minHeight) {
         double threshold = data[peak] - minHeight;
         if(slopeFinder.findFallingBackward(peak, threshold)) {
-            startSample = slopeFinder.getSampleNumber();
+            bandStart = slopeFinder.linearInterpolation(freq, threshold);
             if(slopeFinder.findFallingForward(peak, threshold)) {
-                endSample = slopeFinder.getSampleNumber();
-                peakSample = peak;
+                bandEnd = slopeFinder.linearInterpolation(freq, threshold);
+                bandPeak = freq[peak];
                 return true;
             }
         }
@@ -64,22 +62,22 @@ public class QFactorCalc {
     }
 
     public double getBandStart() {
-        return freq[startSample];
+        return bandStart;
     }
 
     public double getBandPeak() {
-        return freq[peakSample];
+        return bandPeak;
     }
 
     public double getBandEnd() {
-        return freq[endSample];
+        return bandEnd;
     }
 
     public double getBandwidth() {
-        return getBandEnd() - getBandStart();
+        return bandEnd - bandStart;
     }
 
     public double getQFactor() {
-        return getBandPeak() / getBandwidth();
+        return bandPeak / getBandwidth();
     }
 }

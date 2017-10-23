@@ -19,9 +19,9 @@ public class Configuration {
 
     @JsonIgnore
     private Locale locale;
-
     private String createdBy;
     private String uiLocale;
+    private boolean keepAlive = false;
     private HardwareRevision hardwareRevision = HardwareRevision.AUTODETECT;
     private VfoType vfoType = VfoType.NONE;
     private FreqMeterConfig freqMeter;
@@ -60,5 +60,9 @@ public class Configuration {
 
     public String getUiLocale() {
         return uiLocale;
+    }
+
+    public boolean isKeepAlive() {
+        return keepAlive;
     }
 }
