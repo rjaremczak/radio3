@@ -1,4 +1,4 @@
-package com.mindpart.utils;
+package com.mindpart.util;
 
 import java.io.IOException;
 import java.io.InputStream;

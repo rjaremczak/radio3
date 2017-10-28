@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.ui.ValueField;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -29,7 +30,7 @@ public class PropertyGrid {
             new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, SOMETIMES, null, false));
     }
 
-    public void addProperty(String name, Node item) {
+    public <T extends Node> T addProperty(String name, T item) {
         Label nameLabel = new Label(name);
         nameLabel.setFont(Font.font("Courier", 13));
         nameLabel.setTextFill(Color.GRAY);
@@ -37,6 +38,12 @@ public class PropertyGrid {
         gridPane.add(nameLabel, 0, rowCounter);
         gridPane.add(item, 2, rowCounter);
         rowCounter++;
+        return item;
+    }
+
+    public <V, T extends ValueField<V>> T addProperty(String name, T valueField) {
+        addProperty(name, valueField.getNode());
+        return valueField;
     }
 
     public Label addProperty(String name) {

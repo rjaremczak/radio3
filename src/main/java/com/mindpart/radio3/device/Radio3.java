@@ -5,7 +5,7 @@ import com.mindpart.radio3.config.Configuration;
 import com.mindpart.radio3.config.ConfigurationService;
 import com.mindpart.radio3.config.SweepProfilesService;
 import com.mindpart.radio3.ui.DeviceStatus;
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Frequency;
 import com.mindpart.bin.Binary;
 import com.mindpart.bin.BinaryBuilder;
 import org.apache.log4j.Logger;

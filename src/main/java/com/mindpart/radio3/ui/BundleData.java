@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.utils.ResourceBundleUtils;
+import com.mindpart.util.ResourceBundleUtils;
 import javafx.util.StringConverter;
 
 import java.util.Locale;

@@ -1,6 +1,6 @@
 package com.mindpart.radio3;
 
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Frequency;
 import javafx.scene.chart.XYChart;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Frequency;
 import javafx.scene.chart.NumberAxis;
 
 /**

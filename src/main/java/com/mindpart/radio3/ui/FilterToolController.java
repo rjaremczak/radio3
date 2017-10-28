@@ -4,13 +4,14 @@ import com.mindpart.javafx.ChartRuler;
 import com.mindpart.javafx.ChartSpanMarker;
 import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.QFactorCalc;
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Capacitance;
+import com.mindpart.type.Frequency;
+import com.mindpart.ui.IntegerField;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
@@ -37,6 +38,10 @@ public class FilterToolController {
     private final Label bandPeakFreq;
     private final Label bandwidth;
     private final Label qFactor;
+    private final IntegerField capacitance;
+    private final Label inductance;
+    private final Label resistance;
+
     private final EnhancedLineChart<Number, Number> signalChart;
     private final ChartContext chartContext;
     private final ChartRuler<Number> rulerBandwidthStart;
@@ -62,6 +67,15 @@ public class FilterToolController {
         bandPeakFreq = propertyGrid.addProperty(bundle.resolve("info.bandfilter.freq"));
         bandwidth = propertyGrid.addProperty(bundle.resolve("info.bandfilter.width"));
         qFactor = propertyGrid.addProperty(bundle.resolve("info.bandfilter.q"));
+        propertyGrid.addRow();
+
+        capacitance = propertyGrid.addProperty("C [pF]", new IntegerField());
+        inductance = propertyGrid.addProperty("L [nH]");
+        resistance = propertyGrid.addProperty("R [Ω]");
+        capacitance.valueProperty().addListener((observable, oldValue, newValue) -> {
+            inductance.setText(Integer.toString(newValue));
+            resistance.setText(Integer.toString(newValue));
+        });
 
         titledPane = new TitledPane(bundle.resolve("info.bandfilter.title"), propertyGrid.getNode());
         titledPane.setAlignment(Pos.TOP_LEFT);
@@ -71,7 +85,7 @@ public class FilterToolController {
         rulerBandwidthStart = chartRuler(RULER_SIDE_COLOR);
         rulerPeakFreq = chartRuler(RULER_MAIN_COLOR);
         rulerBandwidthEnd = chartRuler(RULER_SIDE_COLOR);
-        allRulers.addAll(Arrays.asList(rulerPeakFreq));//, rulerBandwidthStart, rulerBandwidthEnd));
+        allRulers.addAll(Arrays.asList(rulerPeakFreq));
 
         bandwidthMarker = new ChartSpanMarker<>(0, 0, RULER_SIDE_COLOR);
     }
@@ -125,7 +139,7 @@ public class FilterToolController {
     }
 
     public void update() {
-        if(titledPane.isExpanded()) {
+        if(titledPane.isExpanded() && chartContext.isReady()) {
             QFactorCalc qFactorCalc = new QFactorCalc(chartContext.receivedFreq, chartContext.processedData);
             switch (filterInfoTypeChoiceBox.getSelectionModel().getSelectedItem()) {
                 case BANDPASS:

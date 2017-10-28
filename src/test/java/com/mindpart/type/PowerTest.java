@@ -1,4 +1,4 @@
-package com.mindpart.types;
+package com.mindpart.type;
 
 import org.junit.Test;
 

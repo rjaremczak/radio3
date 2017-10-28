@@ -2,7 +2,7 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.numeric.MaxCheck;
 import com.mindpart.numeric.MinCheck;
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Frequency;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;

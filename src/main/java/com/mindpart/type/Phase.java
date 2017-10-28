@@ -1,4 +1,4 @@
-package com.mindpart.types;
+package com.mindpart.type;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

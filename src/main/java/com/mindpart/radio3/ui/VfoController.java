@@ -1,7 +1,7 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.device.Radio3;
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Frequency;
 import javafx.event.ActionEvent;
 
 /**

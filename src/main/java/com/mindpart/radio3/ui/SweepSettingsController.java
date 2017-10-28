@@ -2,14 +2,13 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.SweepProfiles;
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Frequency;
 import com.mindpart.ui.FrequencyField;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
-import javafx.util.StringConverter;
 import org.apache.log4j.Logger;
 
 /**

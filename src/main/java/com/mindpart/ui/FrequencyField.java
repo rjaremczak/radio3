@@ -1,7 +1,7 @@
 package com.mindpart.ui;
 
 import com.mindpart.radio3.ui.BundleData;
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Frequency;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextField;
 import org.apache.commons.lang3.StringUtils;
@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 /**

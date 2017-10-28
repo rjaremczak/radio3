@@ -1,7 +1,7 @@
 package com.mindpart.radio3.device;
 
 import com.mindpart.radio3.VnaResult;
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Frequency;
 
 /**
  * Created by Robert Jaremczak

@@ -3,7 +3,7 @@ package com.mindpart.radio3.ui;
 import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.Range;
 import com.mindpart.radio3.device.*;
-import com.mindpart.types.Frequency;
+import com.mindpart.type.Frequency;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.ui.FxChartUtils;
 import com.mindpart.ui.FxUtils;
