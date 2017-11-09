@@ -42,7 +42,7 @@ public class PropertyGrid {
     }
 
     public <V, T extends ValueField<V>> T addProperty(String name, T valueField) {
-        addProperty(name, valueField.getNode());
+        addProperty(name, valueField);
         return valueField;
     }
 

@@ -14,7 +14,7 @@ public class Voltage {
     private static final NumberFormat FORMAT_V = new DecimalFormat("0.000 V");
     private static final NumberFormat FORMAT_mV = new DecimalFormat("0.0 mV");
 
-    private double volt;
+    private final double volt;
 
     private Voltage(double volt) {
         this.volt = volt;

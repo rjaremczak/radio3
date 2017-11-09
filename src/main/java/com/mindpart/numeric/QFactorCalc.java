@@ -1,5 +1,9 @@
 package com.mindpart.numeric;
 
+import com.mindpart.type.Capacitance;
+import com.mindpart.type.Inductance;
+import com.mindpart.type.Resistance;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2017.09.04
@@ -13,6 +17,8 @@ public class QFactorCalc {
     private double bandStart;
     private double bandPeak;
     private double bandEnd;
+
+    private double omega;
 
     public QFactorCalc(double[] freq, double[] data) {
         this.freq = freq;

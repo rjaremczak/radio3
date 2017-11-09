@@ -4,14 +4,14 @@ import com.mindpart.javafx.ChartRuler;
 import com.mindpart.javafx.ChartSpanMarker;
 import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.QFactorCalc;
-import com.mindpart.type.Capacitance;
 import com.mindpart.type.Frequency;
 import com.mindpart.ui.IntegerField;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TitledPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
@@ -23,6 +23,8 @@ import java.util.Collection;
 
 import static com.mindpart.radio3.ui.FilterInfoType.BANDPASS;
 import static com.mindpart.radio3.ui.FilterInfoType.BANDSTOP;
+import static com.mindpart.type.MetricPrefix.NANO;
+import static com.mindpart.type.MetricPrefix.PICO;
 
 /**
  * Created by Robert Jaremczak
@@ -30,6 +32,9 @@ import static com.mindpart.radio3.ui.FilterInfoType.BANDSTOP;
  */
 public class FilterToolController {
     private static final NumberFormat FORMAT_Q_FACTOR = new DecimalFormat("0.0");
+    private static final NumberFormat FORMAT_nH = new DecimalFormat("0.0  nH");
+    private static final NumberFormat FORMAT_OHM = new DecimalFormat("0.0   Ω");
+
     private static final Color RULER_MAIN_COLOR = Color.DARKBLUE;
     private static final Color RULER_SIDE_COLOR = Color.DARKBLUE.deriveColor(0, 1, 1, 0.1);
 
@@ -51,6 +56,8 @@ public class FilterToolController {
     private final Collection<ChartRuler<Number>> allRulers = new ArrayList<>();
     private final ChoiceBox<FilterInfoType> filterInfoTypeChoiceBox;
 
+    private QFactorCalc qFactorCalc;
+
     public FilterToolController(BundleData bundle, EnhancedLineChart<Number, Number> signalChart, ChartContext chartContext) {
         this.signalChart = signalChart;
         this.chartContext = chartContext;
@@ -69,13 +76,12 @@ public class FilterToolController {
         qFactor = propertyGrid.addProperty(bundle.resolve("info.bandfilter.q"));
         propertyGrid.addRow();
 
-        capacitance = propertyGrid.addProperty("C [pF]", new IntegerField());
-        inductance = propertyGrid.addProperty("L [nH]");
-        resistance = propertyGrid.addProperty("R [Ω]");
-        capacitance.valueProperty().addListener((observable, oldValue, newValue) -> {
-            inductance.setText(Integer.toString(newValue));
-            resistance.setText(Integer.toString(newValue));
-        });
+        capacitance = propertyGrid.addProperty("C [pF]", new IntegerField(true));
+        propertyGrid.addRow();
+
+        inductance = propertyGrid.addProperty("L");
+        resistance = propertyGrid.addProperty("R");
+        capacitance.valueProperty().addListener((observable, oldValue, newValue) -> updateLR());
 
         titledPane = new TitledPane(bundle.resolve("info.bandfilter.title"), propertyGrid.getNode());
         titledPane.setAlignment(Pos.TOP_LEFT);
@@ -125,7 +131,7 @@ public class FilterToolController {
         titledPane.setDisable(disable);
     }
 
-    private void show(QFactorCalc qFactorCalc) {
+    private void show() {
         bandPeakFreq.setText(Frequency.ofMHz(qFactorCalc.getBandPeak()).format());
         bandwidth.setText(Frequency.ofMHz(qFactorCalc.getBandwidth()).format());
         qFactor.setText(FORMAT_Q_FACTOR.format(qFactorCalc.getQFactor()) + "    ");
@@ -135,18 +141,33 @@ public class FilterToolController {
         rulerPeakFreq.setPosition(qFactorCalc.getBandPeak());
         bandwidthMarker.setSpan(qFactorCalc.getBandStart(), qFactorCalc.getBandEnd());
 
+        updateLR();
+
         showRulers(true);
+    }
+
+    private void updateLR() {
+        Integer c_pF = capacitance.getValue();
+        if(c_pF!=null && qFactorCalc!=null) {
+            double c = PICO.toBase(c_pF);
+            double omega = 2 * Math.PI * qFactorCalc.getBandPeak() * 1E6;
+            double l = 1 / (omega * omega * c);
+            double r = qFactorCalc.getQFactor() * omega * l;
+
+            inductance.setText(FORMAT_nH.format(NANO.fromBase(l)));
+            resistance.setText(FORMAT_OHM.format(r));
+        }
     }
 
     public void update() {
         if(titledPane.isExpanded() && chartContext.isReady()) {
-            QFactorCalc qFactorCalc = new QFactorCalc(chartContext.receivedFreq, chartContext.processedData);
+            qFactorCalc = new QFactorCalc(chartContext.receivedFreq, chartContext.processedData);
             switch (filterInfoTypeChoiceBox.getSelectionModel().getSelectedItem()) {
                 case BANDPASS:
-                    if(qFactorCalc.findBandPass(3.0)) show(qFactorCalc); else clear();
+                    if(qFactorCalc.findBandPass(3.0)) show(); else clear();
                     break;
                 case BANDSTOP:
-                    if(qFactorCalc.findBandStop(3.0)) show(qFactorCalc); else clear();
+                    if(qFactorCalc.findBandStop(3.0)) show(); else clear();
                     break;
                 default:
                     clear();
@@ -173,6 +194,8 @@ public class FilterToolController {
         bandPeakFreq.setText("");
         bandwidth.setText("");
         qFactor.setText("");
+        inductance.setText("");
+        resistance.setText("");
         showRulers(false);
     }
 
