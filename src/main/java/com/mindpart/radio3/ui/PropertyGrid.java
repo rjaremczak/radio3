@@ -4,9 +4,12 @@ import com.mindpart.ui.ValueField;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
@@ -19,6 +22,10 @@ import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
  * Date: 2017.09.14
  */
 public class PropertyGrid {
+    private static final Font LABEL_FONT = Font.font("Courier", 13);
+    private static final Paint LABEL_COLOR = Color.GRAY;
+    private static final Font VALUE_FONT = Font.font("Courier", FontWeight.BOLD, 13);
+
     private final GridPane gridPane;
     private int rowCounter = 0;
 
@@ -32,8 +39,18 @@ public class PropertyGrid {
 
     public <T extends Node> T addProperty(String name, T item) {
         Label nameLabel = new Label(name);
-        nameLabel.setFont(Font.font("Courier", 13));
-        nameLabel.setTextFill(Color.GRAY);
+        nameLabel.setFont(LABEL_FONT);
+        nameLabel.setTextFill(LABEL_COLOR);
+
+        if(item instanceof Spinner) {
+            ((Spinner)item).getEditor().setFont(VALUE_FONT);
+        } else if(item instanceof Label) {
+            ((Label)item).setFont(VALUE_FONT);
+        } else if(item instanceof TextField) {
+            ((TextField)item).setFont(VALUE_FONT);
+        }
+
+        GridPane.setHalignment(item, HPos.RIGHT);
 
         gridPane.add(nameLabel, 0, rowCounter);
         gridPane.add(item, 2, rowCounter);
@@ -41,16 +58,9 @@ public class PropertyGrid {
         return item;
     }
 
-    public <V, T extends ValueField<V>> T addProperty(String name, T valueField) {
-        addProperty(name, valueField);
-        return valueField;
-    }
-
     public Label addProperty(String name) {
         Label valueLabel = new Label();
-        valueLabel.setFont(Font.font("Courier", FontWeight.BOLD, 13));
         addProperty(name, valueLabel);
-        GridPane.setHalignment(valueLabel, HPos.RIGHT);
         return valueLabel;
     }
 

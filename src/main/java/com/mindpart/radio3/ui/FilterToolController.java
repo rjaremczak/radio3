@@ -4,7 +4,6 @@ import com.mindpart.javafx.ChartRuler;
 import com.mindpart.javafx.ChartSpanMarker;
 import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.QFactorCalc;
-import com.mindpart.type.Frequency;
 import com.mindpart.ui.IntegerField;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -14,6 +13,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -31,9 +32,9 @@ import static com.mindpart.type.MetricPrefix.PICO;
  * Date: 2017.09.11
  */
 public class FilterToolController {
-    private static final NumberFormat FORMAT_Q_FACTOR = new DecimalFormat("0.0");
-    private static final NumberFormat FORMAT_nH = new DecimalFormat("0.0  nH");
-    private static final NumberFormat FORMAT_OHM = new DecimalFormat("0.0   Ω");
+    private static final NumberFormat FORMAT_FREQ = new DecimalFormat("0.000000");
+    private static final NumberFormat FORMAT_L = new DecimalFormat("0.0");
+    private static final NumberFormat FORMAT_R = new DecimalFormat("0.0");
 
     private static final Color RULER_MAIN_COLOR = Color.DARKBLUE;
     private static final Color RULER_SIDE_COLOR = Color.DARKBLUE.deriveColor(0, 1, 1, 0.1);
@@ -71,16 +72,17 @@ public class FilterToolController {
         propertyGrid.addProperty(bundle.resolve("info.bandfilter.type"), filterInfoTypeChoiceBox);
         propertyGrid.addRow();
         
-        bandPeakFreq = propertyGrid.addProperty(bundle.resolve("info.bandfilter.freq"));
-        bandwidth = propertyGrid.addProperty(bundle.resolve("info.bandfilter.width"));
-        qFactor = propertyGrid.addProperty(bundle.resolve("info.bandfilter.q"));
+        bandPeakFreq = propertyGrid.addProperty("f₀ [MHz]");
+        bandwidth = propertyGrid.addProperty("B [MHz]");
+        qFactor = propertyGrid.addProperty("Q");
         propertyGrid.addRow();
 
-        capacitance = propertyGrid.addProperty("C [pF]", new IntegerField(true));
+        capacitance = propertyGrid.addProperty("C [pF]", new IntegerField());
+        capacitance.getEditor().setFont(Font.font("Courier", FontWeight.BOLD, 13));
         propertyGrid.addRow();
 
-        inductance = propertyGrid.addProperty("L");
-        resistance = propertyGrid.addProperty("R");
+        inductance = propertyGrid.addProperty("L [nH]");
+        resistance = propertyGrid.addProperty("R [Ω]");
         capacitance.valueProperty().addListener((observable, oldValue, newValue) -> updateLR());
 
         titledPane = new TitledPane(bundle.resolve("info.bandfilter.title"), propertyGrid.getNode());
@@ -132,9 +134,9 @@ public class FilterToolController {
     }
 
     private void show() {
-        bandPeakFreq.setText(Frequency.ofMHz(qFactorCalc.getBandPeak()).format());
-        bandwidth.setText(Frequency.ofMHz(qFactorCalc.getBandwidth()).format());
-        qFactor.setText(FORMAT_Q_FACTOR.format(qFactorCalc.getQFactor()) + "    ");
+        bandPeakFreq.setText(FORMAT_FREQ.format(qFactorCalc.getBandPeak()));
+        bandwidth.setText(FORMAT_FREQ.format(qFactorCalc.getBandwidth()));
+        qFactor.setText(Long.toString(Math.round(qFactorCalc.getQFactor())));
 
         rulerBandwidthStart.setPosition(qFactorCalc.getBandStart());
         rulerBandwidthEnd.setPosition(qFactorCalc.getBandEnd());
@@ -152,10 +154,10 @@ public class FilterToolController {
             double c = PICO.toBase(c_pF);
             double omega = 2 * Math.PI * qFactorCalc.getBandPeak() * 1E6;
             double l = 1 / (omega * omega * c);
-            double r = qFactorCalc.getQFactor() * omega * l;
+            double r = (omega * l) / qFactorCalc.getQFactor();
 
-            inductance.setText(FORMAT_nH.format(NANO.fromBase(l)));
-            resistance.setText(FORMAT_OHM.format(r));
+            inductance.setText(FORMAT_L.format(NANO.fromBase(l)));
+            resistance.setText(FORMAT_R.format(r));
         }
     }
 
