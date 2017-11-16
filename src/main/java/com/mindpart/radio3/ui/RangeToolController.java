@@ -7,11 +7,17 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2017.09.15
  */
 public class RangeToolController {
+    private static final NumberFormat FORMAT_FREQ = new DecimalFormat("0.000000");
+    private static final NumberFormat FORMAT_VALUE = new DecimalFormat("0.0");
+
     private final TitledPane titledPane;
     private final PropertyGrid propertyGrid;
     private final Label minValue;
@@ -25,13 +31,13 @@ public class RangeToolController {
         this.chartContext = chartContext;
 
         propertyGrid = new PropertyGrid();
-        minValue = propertyGrid.addProperty("min");
-        minFreq = propertyGrid.addProperty(bundle.resolve("info.ranges.freq"));
+        minValue = propertyGrid.addProperty("min [dBm]");
+        minFreq = propertyGrid.addProperty("f min [MHz]");
         propertyGrid.addRow();
-        maxValue = propertyGrid.addProperty("max");
-        maxFreq = propertyGrid.addProperty(bundle.resolve("info.ranges.freq"));
+        maxValue = propertyGrid.addProperty("max [dBm]");
+        maxFreq = propertyGrid.addProperty("f max [MHz]");
         propertyGrid.addRow();
-        spanValue = propertyGrid.addProperty(bundle.resolve("info.ranges.range"));
+        spanValue = propertyGrid.addProperty("Δf [MHz]");
 
         titledPane = new TitledPane(bundle.resolve("info.ranges.title"), propertyGrid.getNode());
         titledPane.setAlignment(Pos.TOP_LEFT);
@@ -55,11 +61,11 @@ public class RangeToolController {
             maxCheck.sample(i, chartContext.processedData[i]);
         }
 
-        minValue.setText(chartContext.valueProcessor.format(minCheck.getSampleValue()));
-        minFreq.setText(Frequency.ofMHz(chartContext.receivedFreq[minCheck.getSampleNumber()]).format());
-        maxValue.setText(chartContext.valueProcessor.format(maxCheck.getSampleValue()));
-        maxFreq.setText(Frequency.ofMHz(chartContext.receivedFreq[maxCheck.getSampleNumber()]).format());
-        spanValue.setText(chartContext.valueProcessor.format(maxCheck.getSampleValue() - minCheck.getSampleValue()));
+        minValue.setText(FORMAT_VALUE.format(minCheck.getSampleValue()));
+        minFreq.setText(FORMAT_FREQ.format(chartContext.receivedFreq[minCheck.getSampleNumber()]));
+        maxValue.setText(FORMAT_VALUE.format(maxCheck.getSampleValue()));
+        maxFreq.setText(FORMAT_FREQ.format(chartContext.receivedFreq[maxCheck.getSampleNumber()]));
+        spanValue.setText(FORMAT_VALUE.format(maxCheck.getSampleValue() - minCheck.getSampleValue()));
     }
 
     public TitledPane getTitledPane() {

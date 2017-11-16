@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.mindpart.ui.FrequencyField?>
-<?import java.net.URL?>
+<?import com.mindpart.ui.DoubleField?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
-
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
 <GridPane hgap="5.0" vgap="5.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepSettingsController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" />
@@ -21,8 +17,8 @@
       <RowConstraints vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
-      <FrequencyField fx:id="startFrequencyField" alignment="CENTER_RIGHT" label="start frequency" prefColumnCount="8" promptText="from" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <FrequencyField fx:id="endFrequencyField" alignment="CENTER_RIGHT" label="end frequency" prefColumnCount="8" promptText="to" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+      <DoubleField fx:id="startFrequencyField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <DoubleField fx:id="endFrequencyField" GridPane.columnIndex="2" GridPane.rowIndex="1" />
       <Label text="%label.freqRange" GridPane.columnIndex="1" GridPane.columnSpan="2" />
       <Label text="%quality.label" GridPane.columnIndex="3" />
       <Label text="%label.presets" />

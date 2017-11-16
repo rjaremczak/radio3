@@ -15,7 +15,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Popup;
 
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -37,9 +37,9 @@ public class ChartMarker {
     private NumberAxis chartAxisX;
     private NumberAxis chartAxisY;
     private Bounds chartBounds;
+    private XYChart.Data<Number, Number> startData;
     private Function<Point2D,SelectionData> selectionHandler;
-    private Consumer<XYChart.Data<Number, Number>> rangeStartHandler = null;
-    private Consumer<XYChart.Data<Number, Number>> rangeEndHandler = null;
+    private BiConsumer<XYChart.Data<Number, Number>, XYChart.Data<Number, Number>> rangeHandler = null;
     private volatile boolean rangeStarted = false;
     private Supplier<Boolean> clickActive = () -> false;
     private Supplier<Boolean> rangeActive = () -> false;
@@ -125,14 +125,12 @@ public class ChartMarker {
         rangeEndRuler.setVisible(false);
     }
 
-    public void setupRangeSelection(Consumer<XYChart.Data<Number, Number>> startHandler,
-                                    Consumer<XYChart.Data<Number, Number>> endHandler) {
-        this.rangeStartHandler = startHandler;
-        this.rangeEndHandler = endHandler;
+    public void setRangeHandler(BiConsumer<XYChart.Data<Number, Number>, XYChart.Data<Number, Number>> rangeHandler) {
+        this.rangeHandler = rangeHandler;
     }
 
-    private boolean isRangeSelection() {
-        return rangeStartHandler!=null && rangeEndHandler!=null;
+    private boolean hasRangeHandler() {
+        return rangeHandler != null;
     }
 
     private void setupRuler(Line vLine) {
@@ -170,17 +168,14 @@ public class ChartMarker {
         rangeStarted = true;
         updateRuler(rangeStartRuler, refPos.getX(), true);
         rangeEndRuler.setVisible(false);
-
-        XYChart.Data<Number, Number> data = eventToValues(event);
-        rangeStartHandler.accept(data);
-        rangeEndHandler.accept(data);
+        startData = eventToValues(event);
     }
 
     private void onRangeEnded(Point2D refPos, MouseEvent event) {
         if(refPos.getX() > rangeStartRuler.getStartX()) {
             rangeStarted = false;
             updateRuler(rangeEndRuler, refPos.getX(), true);
-            rangeEndHandler.accept(eventToValues(event));
+            rangeHandler.accept(startData, eventToValues(event));
         } else {
             onRangeStarted(refPos, event);
         }
@@ -237,7 +232,7 @@ public class ChartMarker {
         if(!chartBounds.contains(refPos)) { return; }
 
         if(rangeActive.get() && event.getButton() == MouseButton.SECONDARY) {
-            if(isRangeSelection()) { handleRangeSelection(refPos, event); }
+            if(hasRangeHandler()) { handleRangeSelection(refPos, event); }
         }
     }
 

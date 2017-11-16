@@ -1,6 +1,5 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.ui.ValueField;
 import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;

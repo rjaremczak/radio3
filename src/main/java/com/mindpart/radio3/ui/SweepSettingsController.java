@@ -3,7 +3,11 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.SweepProfiles;
 import com.mindpart.type.Frequency;
-import com.mindpart.ui.FrequencyField;
+import com.mindpart.ui.DoubleField;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,12 +21,16 @@ import org.apache.log4j.Logger;
  */
 public class SweepSettingsController {
     private static Logger logger = Logger.getLogger(SweepSettingsController.class);
+    private static final Frequency FREQUENCY_MIN = Frequency.ofMHz(0.1);
+    private static final Frequency FREQUENCY_MAX = Frequency.ofMHz(70);
+    private static final Frequency FREQUENCY_STEP = Frequency.ofMHz(0.01);
+    private static final String FREQUENCY_FORMAT = "##0.000";
 
     @FXML
-    FrequencyField startFrequencyField;
+    DoubleField startFrequencyField;
 
     @FXML
-    FrequencyField endFrequencyField;
+    DoubleField endFrequencyField;
 
     @FXML
     ChoiceBox<SweepQuality> sweepQuality;
@@ -40,30 +48,45 @@ public class SweepSettingsController {
         this.presets.addAll(sweepProfiles.profiles);
     }
 
-    private void initSweepSteps() {
-        sweepQuality.setConverter(bundleData.getGenericStringConverter());
-        sweepQuality.getItems().addAll(SweepQuality.values());
-        sweepQuality.getSelectionModel().select(SweepQuality.FAST);
+    private void initFrequencyField(DoubleField doubleField, double initValue, double step) {
+        doubleField.setDecimalFormat(FREQUENCY_FORMAT);
+        doubleField.setPrefColumnCount(6);
+        doubleField.getDoubleValueFactory().setValue(initValue);
+        doubleField.getDoubleValueFactory().setAmountToStepBy(step);
     }
 
     public void initialize() {
-        initSweepSteps();
+        sweepQuality.setConverter(bundleData.getGenericStringConverter());
+        sweepQuality.getItems().addAll(SweepQuality.values());
+        sweepQuality.getSelectionModel().select(SweepQuality.FAST);
 
-        startFrequencyField.initFromBundle(bundleData);
-        startFrequencyField.setMinSupplier(() -> Frequency.ofMHz(0.1));
-        startFrequencyField.setMaxSupplier(() -> endFrequencyField.getFrequency());
-        startFrequencyField.setChangeListener(this::internalRangeChangeListener);
+        initFrequencyField(startFrequencyField, FREQUENCY_MIN.toMHz(), FREQUENCY_STEP.toMHz());
+        initFrequencyField(endFrequencyField, FREQUENCY_MAX.toMHz(), FREQUENCY_STEP.toMHz());
+        
+        startFrequencyField.getDoubleValueFactory().setMin(FREQUENCY_MIN.toMHz());
+        endFrequencyField.getDoubleValueFactory().setMax(FREQUENCY_MAX.toMHz());
 
-        endFrequencyField.initFromBundle(bundleData);
-        endFrequencyField.setMinSupplier(() -> startFrequencyField.getFrequency());
-        endFrequencyField.setMaxSupplier(() -> Frequency.ofMHz(150));
-        endFrequencyField.setChangeListener(this::internalRangeChangeListener);
+        startFrequencyField.getDoubleValueFactory().maxProperty().bind(
+                DoubleProperty.doubleProperty(endFrequencyField.getDoubleValueFactory().valueProperty()).subtract(FREQUENCY_STEP.toMHz()));
+
+        endFrequencyField.getDoubleValueFactory().minProperty().bind(
+                DoubleProperty.doubleProperty(startFrequencyField.getDoubleValueFactory().valueProperty()).add(FREQUENCY_STEP.toMHz()));
+
+        startFrequencyField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            clearPreset();
+            rangeChangeListener.run();
+        });
+
+        endFrequencyField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            clearPreset();
+            rangeChangeListener.run();
+        });
 
         presetsChoiceBox.setItems(presets);
         presetsChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newProfile) -> {
             if(newProfile!=null) {
-                startFrequencyField.setFrequency(Frequency.parse(newProfile.freqMin));
-                endFrequencyField.setFrequency(Frequency.parse(newProfile.freqMax));
+                startFrequencyField.getDoubleValueFactory().setValue(Frequency.parse(newProfile.freqMin).toMHz());
+                endFrequencyField.getDoubleValueFactory().setValue(Frequency.parse(newProfile.freqMax).toMHz());
                 rangeChangeListener.run();
             }
         });
@@ -79,27 +102,20 @@ public class SweepSettingsController {
         presetsChoiceBox.getSelectionModel().clearSelection();
     }
 
-    void internalRangeChangeListener() {
-        clearPreset();
-        rangeChangeListener.run();
-    }
-
     public Frequency getStartFrequency() {
-        return startFrequencyField.getFrequency();
-    }
-
-    public void setStartFrequency(Frequency frequency) {
-        clearPreset();
-        if(!startFrequencyField.isDisabled()) { startFrequencyField.setFrequency(frequency); }
+        return Frequency.ofMHz(startFrequencyField.getDoubleValueFactory().getValue());
     }
 
     public Frequency getEndFrequency() {
-        return endFrequencyField.getFrequency();
+        return Frequency.ofMHz(endFrequencyField.getDoubleValueFactory().getValue());
     }
 
-    public void setEndFrequency(Frequency frequency) {
-        clearPreset();
-        if(!endFrequencyField.isDisabled()) { endFrequencyField.setFrequency(frequency); }
+    public void setFrequencyRange(Frequency startFreq, Frequency endFreq) {
+        if(!startFrequencyField.isDisabled() && !endFrequencyField.isDisabled()) {
+            clearPreset();
+            startFrequencyField.getDoubleValueFactory().setValue(startFreq.toMHz());
+            endFrequencyField.getDoubleValueFactory().setValue(endFreq.toMHz());
+        }
     }
 
     public SweepQuality getQuality() {

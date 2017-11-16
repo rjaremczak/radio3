@@ -29,6 +29,7 @@ import javafx.scene.layout.VBox;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.mindpart.ui.FxChartUtils.autoRangeAxis;
@@ -115,9 +116,12 @@ public class VnaController {
             return new ChartMarker.SelectionData(selectionPos , "f = "+freq+"\nSWR = "+swr+"\nZ = "+RX_FORMAT.format(r)+" + j"+RX_FORMAT.format(x)+" Ω");
         }, () -> !btnContinuous.isSelected(), () -> true);
 
-        chartMarker.setupRangeSelection(
-                data -> sweepSettingsController.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
-                data -> sweepSettingsController.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
+        chartMarker.setRangeHandler((startData, endData) -> sweepSettingsController.setFrequencyRange(
+                Frequency.ofMHz(startData.getXValue().doubleValue()),
+                Frequency.ofMHz(endData.getXValue().doubleValue())));
+
+        sweepSettingsController.setRangeChangeListener(this::sweepSettingsChangeListener);
+        sweepSettingsController.setQualityChangeListener(this::sweepSettingsChangeListener);
 
         impedanceDataSeries = FXCollections.observableArrayList();
         impedanceChart.setData(impedanceDataSeries);
@@ -133,6 +137,11 @@ public class VnaController {
         controlBox.getChildren().add(0, sweepSettingsPane);
 
         btnContinuous.selectedProperty().addListener(this::onContinuousChanged);
+    }
+
+    private void sweepSettingsChangeListener() {
+        clear();
+        onSweepOnce();
     }
 
     private void disableUI() {

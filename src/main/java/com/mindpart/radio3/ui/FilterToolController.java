@@ -5,6 +5,7 @@ import com.mindpart.javafx.ChartSpanMarker;
 import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.QFactorCalc;
 import com.mindpart.ui.IntegerField;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;

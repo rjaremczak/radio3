@@ -61,6 +61,9 @@ public class SweepController {
     @FXML
     private ToggleButton btnContinuous;
 
+    @FXML
+    private ToggleButton btnTools;
+
     private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
     private SweepSettingsController sweepSettingsController;
@@ -69,12 +72,14 @@ public class SweepController {
     private RangeToolController rangeToolController;
     private FilterToolController filterToolController;
 
-    private Accordion chartToolParent;
+    private VBox chartTools;
+    private Accordion chartToolsAccordion;
     private SweepDataInfo receivedDataInfo;
     private ChartContext chartContext = new ChartContext();
     private EnhancedLineChart<Number, Number> signalChart;
     private NumberAxis signalAxisX;
     private NumberAxis signalAxisY;
+
 
     public SweepController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
@@ -139,9 +144,9 @@ public class SweepController {
             return new ChartMarker.SelectionData(selectionPos, "f = "+freq+"\n" + chartContext.valueProcessor.valueLabel()+" = "+ chartContext.valueProcessor.format(value));
         }, () -> !btnContinuous.isSelected(), () -> !btnNormalize.isSelected());
 
-        chartMarker.setupRangeSelection(
-                data -> sweepSettingsController.setStartFrequency(Frequency.ofMHz(data.getXValue().doubleValue())),
-                data -> sweepSettingsController.setEndFrequency(Frequency.ofMHz(data.getXValue().doubleValue())));
+        chartMarker.setRangeHandler((startData, endData) -> sweepSettingsController.setFrequencyRange(
+                Frequency.ofMHz(startData.getXValue().doubleValue()),
+                Frequency.ofMHz(endData.getXValue().doubleValue())));
 
         signalDataSeries = FXCollections.observableArrayList();
         signalChart.setData(signalDataSeries);
@@ -158,18 +163,26 @@ public class SweepController {
         initInputProbeList();
         initChartContext();
 
-        chartToolParent = new Accordion();
-        chartToolParent.setMinWidth(180);
+        chartToolsAccordion = new Accordion();
+        chartToolsAccordion.setMinWidth(180);
 
         rangeToolController = new RangeToolController(mainController.bundle, chartContext);
-        chartToolParent.getPanes().add(rangeToolController.getTitledPane());
-        chartToolParent.setExpandedPane(rangeToolController.getTitledPane());
+        chartToolsAccordion.getPanes().add(rangeToolController.getTitledPane());
+        chartToolsAccordion.setExpandedPane(rangeToolController.getTitledPane());
 
         filterToolController = new FilterToolController(mainController.bundle, signalChart, chartContext);
-        chartToolParent.getPanes().add(filterToolController.getTitledPane());
+        chartToolsAccordion.getPanes().add(filterToolController.getTitledPane());
 
-        chartBox.getChildren().add(new VBox(chartToolParent));
-        
+        chartTools = new VBox(chartToolsAccordion);
+
+        btnTools.selectedProperty().addListener((observable, oldValue, selected) -> {
+            if(selected && !chartBox.getChildren().contains(chartTools)) {
+                chartBox.getChildren().add(chartTools);
+            } else {
+                chartBox.getChildren().remove(chartTools);
+            }
+        });
+        btnTools.setSelected(true);
         updateNormButton();
     }
 
