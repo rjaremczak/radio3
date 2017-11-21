@@ -1,11 +1,11 @@
 package com.mindpart.type;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.Locale;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by Robert Jaremczak
@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 public class VoltageTest {
     double accuracy = 0.0000001;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Locale.setDefault(Locale.US);
     }

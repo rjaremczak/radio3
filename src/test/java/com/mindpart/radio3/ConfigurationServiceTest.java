@@ -1,7 +1,7 @@
 package com.mindpart.radio3;
 
 import com.mindpart.radio3.config.ConfigurationService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 

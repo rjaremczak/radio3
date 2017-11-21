@@ -11,14 +11,14 @@ import static com.mindpart.radio3.device.FrameCommand.VFO_GET_FREQ;
  * Created by Robert Jaremczak
  * Date: 2016.02.22
  */
-public class VfoParser implements FrameParser<Frequency> {
+public class VfoParser implements FrameParser<Integer> {
     @Override
     public boolean recognizes(Frame frame) {
         return frame.getCommand() == VFO_GET_FREQ && frame.getPayloadSize() == 4;
     }
 
     @Override
-    public Frequency parse(Frame frame) {
-        return Frequency.ofHz(Binary.toUInt32(frame.getPayload()));
+    public Integer parse(Frame frame) {
+        return Math.toIntExact(Binary.toUInt32(frame.getPayload()));
     }
 }

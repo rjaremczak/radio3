@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.mindpart.ui.DoubleField?>
+<?import com.mindpart.ui.DoubleSpinner?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -17,8 +17,8 @@
       <RowConstraints vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
-      <DoubleField fx:id="startFrequencyField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <DoubleField fx:id="endFrequencyField" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+      <DoubleSpinner fx:id="startFrequencyField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <DoubleSpinner fx:id="endFrequencyField" GridPane.columnIndex="2" GridPane.rowIndex="1" />
       <Label text="%label.freqRange" GridPane.columnIndex="1" GridPane.columnSpan="2" />
       <Label text="%quality.label" GridPane.columnIndex="3" />
       <Label text="%label.presets" />

@@ -4,8 +4,7 @@ import com.mindpart.javafx.ChartRuler;
 import com.mindpart.javafx.ChartSpanMarker;
 import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.QFactorCalc;
-import com.mindpart.ui.IntegerField;
-import javafx.beans.property.BooleanProperty;
+import com.mindpart.ui.IntegerSpinner;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
@@ -25,8 +24,8 @@ import java.util.Collection;
 
 import static com.mindpart.radio3.ui.FilterInfoType.BANDPASS;
 import static com.mindpart.radio3.ui.FilterInfoType.BANDSTOP;
-import static com.mindpart.type.MetricPrefix.NANO;
-import static com.mindpart.type.MetricPrefix.PICO;
+import static com.mindpart.type.UnitPrefix.NANO;
+import static com.mindpart.type.UnitPrefix.PICO;
 
 /**
  * Created by Robert Jaremczak
@@ -45,7 +44,7 @@ public class FilterToolController {
     private final Label bandPeakFreq;
     private final Label bandwidth;
     private final Label qFactor;
-    private final IntegerField capacitance;
+    private final IntegerSpinner capacitance;
     private final Label inductance;
     private final Label resistance;
 
@@ -60,17 +59,17 @@ public class FilterToolController {
 
     private QFactorCalc qFactorCalc;
 
-    public FilterToolController(BundleData bundle, EnhancedLineChart<Number, Number> signalChart, ChartContext chartContext) {
+    public FilterToolController(UserInterface ui, EnhancedLineChart<Number, Number> signalChart, ChartContext chartContext) {
         this.signalChart = signalChart;
         this.chartContext = chartContext;
         
         filterInfoTypeChoiceBox = new ChoiceBox<>(FXCollections.observableArrayList(BANDSTOP, BANDPASS));
-        filterInfoTypeChoiceBox.setConverter(bundle.getGenericStringConverter());
+        filterInfoTypeChoiceBox.setConverter(ui.getGenericStringConverter());
         filterInfoTypeChoiceBox.getSelectionModel().select(BANDSTOP);
         filterInfoTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener(this::onChangeFilterType);
 
         propertyGrid = new PropertyGrid();
-        propertyGrid.addProperty(bundle.resolve("info.bandfilter.type"), filterInfoTypeChoiceBox);
+        propertyGrid.addProperty(ui.text("info.bandfilter.type"), filterInfoTypeChoiceBox);
         propertyGrid.addRow();
         
         bandPeakFreq = propertyGrid.addProperty("f₀ [MHz]");
@@ -78,7 +77,7 @@ public class FilterToolController {
         qFactor = propertyGrid.addProperty("Q");
         propertyGrid.addRow();
 
-        capacitance = propertyGrid.addProperty("C [pF]", new IntegerField());
+        capacitance = propertyGrid.addProperty("C [pF]", new IntegerSpinner());
         capacitance.getEditor().setFont(Font.font("Courier", FontWeight.BOLD, 13));
         propertyGrid.addRow();
 
@@ -86,7 +85,7 @@ public class FilterToolController {
         resistance = propertyGrid.addProperty("R [Ω]");
         capacitance.valueProperty().addListener((observable, oldValue, newValue) -> updateLR());
 
-        titledPane = new TitledPane(bundle.resolve("info.bandfilter.title"), propertyGrid.getNode());
+        titledPane = new TitledPane(ui.text("info.bandfilter.title"), propertyGrid.getNode());
         titledPane.setAlignment(Pos.TOP_LEFT);
         titledPane.setAnimated(false);
         titledPane.expandedProperty().addListener(this::onExpandedListener);

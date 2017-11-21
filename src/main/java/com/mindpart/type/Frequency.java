@@ -15,8 +15,6 @@ public class Frequency implements Comparable<Frequency> {
     private static final NumberFormat FORMAT_KHZ = new DecimalFormat("0.000 kHz");
     private static final NumberFormat FORMAT_HZ = new DecimalFormat("# Hz");
 
-    public static final Frequency ZERO = Frequency.ofHz(0);
-
     private long valueHz;
 
     private Frequency(long valueHz) {

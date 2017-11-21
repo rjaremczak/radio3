@@ -2,7 +2,6 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
-import com.mindpart.type.Frequency;
 import javafx.event.ActionEvent;
 
 /**
@@ -11,25 +10,25 @@ import javafx.event.ActionEvent;
  */
 public class FreqMeterController extends ComponentController {
     private final Radio3 radio3;
-    private final BundleData bundle;
+    private final UserInterface ui;
 
-    public FreqMeterController(Radio3 radio3, BundleData bundle) {
+    public FreqMeterController(Radio3 radio3, UserInterface ui) {
         this.radio3 = radio3;
-        this.bundle = bundle;
+        this.ui = ui;
     }
 
     @Override
     public void initialize() {
-        setUp(bundle.resolve("label.freqMeter"), bundle.resolve("label.frequency"), false, bundle.buttonGet);
+        setUp(ui.text("label.freqMeter"), ui.text("label.frequency"), false, ui.text("button.get"));
     }
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        Response<Frequency> response = radio3.readFMeter();
+        Response<Integer> response = radio3.readFMeter();
         if(response.isOK()) update(response.getData());
     }
 
-    public void update(Frequency frequency) {
-        setValue(frequency.format());
+    public void update(int frequency) {
+        setValue(ui.frequency.format(frequency));
     }
 }

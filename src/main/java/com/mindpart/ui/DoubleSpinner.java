@@ -16,15 +16,15 @@ import java.util.regex.Pattern;
  * Created by Robert Jaremczak
  * Date: 2017.10.28
  */
-public class DoubleField extends Spinner<Double> {
-    private static final Logger logger = Logger.getLogger(DoubleField.class);
+public class DoubleSpinner extends Spinner<Double> {
+    private static final Logger logger = Logger.getLogger(DoubleSpinner.class);
     private static final Pattern NON_NEGATIVE = Pattern.compile("\\d+(?:\\.\\d+)?");
 
     private final TextFormatter<Double> textFormatter;
 
     private NumberFormat valueFormatter = new DecimalFormat();
 
-    public DoubleField() {
+    public DoubleSpinner() {
         super(0, Double.MAX_VALUE, 0, 1);
         textFormatter = new TextFormatter<>(
                 new StringConverter<Double>() {
@@ -53,10 +53,6 @@ public class DoubleField extends Spinner<Double> {
 
     public void setDecimalFormat(String format) {
         valueFormatter = new DecimalFormat(format);
-    }
-
-    public void setPrefColumnCount(int count) {
-        getEditor().setPrefColumnCount(count);
     }
 
     public SpinnerValueFactory.DoubleSpinnerValueFactory getDoubleValueFactory() {

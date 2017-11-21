@@ -29,9 +29,9 @@ public enum DeviceStatus {
         return mainIndicatorColor;
     }
 
-    public String format(BundleData bundleData) {
-        String name = bundleData.resolve("device.status."+name().toLowerCase());
-        String lastResponse = bundleData.resolve("device.status.lastActivity");
+    public String format(UserInterface ui) {
+        String name = ui.text("device.status."+name().toLowerCase());
+        String lastResponse = ui.text("device.status.lastActivity");
         return name + (this == DISCONNECTED ? "" : " ("+lastResponse+": " + timeFormatter.format(LocalDateTime.now()) +")");
     }
 }

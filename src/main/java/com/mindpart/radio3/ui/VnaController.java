@@ -29,7 +29,6 @@ import javafx.scene.layout.VBox;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.mindpart.ui.FxChartUtils.autoRangeAxis;
@@ -88,7 +87,7 @@ public class VnaController {
     public VnaController(Radio3 radio3, MainController mainController) {
         this.radio3 = radio3;
         this.mainController = mainController;
-        this.sweepSettingsController = new SweepSettingsController(mainController.bundle, radio3.getSweepProfiles());
+        this.sweepSettingsController = new SweepSettingsController(mainController.ui, radio3.getSweepProfiles());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -117,8 +116,9 @@ public class VnaController {
         }, () -> !btnContinuous.isSelected(), () -> true);
 
         chartMarker.setRangeHandler((startData, endData) -> sweepSettingsController.setFrequencyRange(
-                Frequency.ofMHz(startData.getXValue().doubleValue()),
-                Frequency.ofMHz(endData.getXValue().doubleValue())));
+                startData.getXValue().doubleValue(),
+                endData.getXValue().doubleValue()
+        ));
 
         sweepSettingsController.setRangeChangeListener(this::sweepSettingsChangeListener);
         sweepSettingsController.setQualityChangeListener(this::sweepSettingsChangeListener);
@@ -174,10 +174,10 @@ public class VnaController {
         if(continuous) {
             disableUI();
             runSweepOnce(this::displayDataAndSweepAgain);
-            btnContinuous.setText(mainController.bundle.buttonStop);
+            btnContinuous.setText(mainController.ui.text("button.stop"));
         } else {
             enableUI();
-            btnContinuous.setText(mainController.bundle.buttonContinuous);
+            btnContinuous.setText(mainController.ui.text("button.continuous"));
         }
     }
 

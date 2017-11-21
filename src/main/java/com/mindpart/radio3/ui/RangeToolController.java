@@ -2,7 +2,6 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.numeric.MaxCheck;
 import com.mindpart.numeric.MinCheck;
-import com.mindpart.type.Frequency;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
@@ -27,7 +26,7 @@ public class RangeToolController {
     private final Label spanValue;
     private final ChartContext chartContext;
 
-    public RangeToolController(BundleData bundle, ChartContext chartContext) {
+    public RangeToolController(UserInterface bundle, ChartContext chartContext) {
         this.chartContext = chartContext;
 
         propertyGrid = new PropertyGrid();
@@ -39,7 +38,7 @@ public class RangeToolController {
         propertyGrid.addRow();
         spanValue = propertyGrid.addProperty("Δf [MHz]");
 
-        titledPane = new TitledPane(bundle.resolve("info.ranges.title"), propertyGrid.getNode());
+        titledPane = new TitledPane(bundle.text("info.ranges.title"), propertyGrid.getNode());
         titledPane.setAlignment(Pos.TOP_LEFT);
         titledPane.setAnimated(false);
     }

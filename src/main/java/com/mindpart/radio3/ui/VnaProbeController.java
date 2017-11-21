@@ -17,11 +17,11 @@ public class VnaProbeController extends ComponentController {
     private static final NumberFormat FORMAT_RX = new DecimalFormat("0.0");
 
     private final Radio3 radio3;
-    private final BundleData bundle;
+    private final UserInterface ui;
 
-    public VnaProbeController(Radio3 radio3, BundleData bundle) {
+    public VnaProbeController(Radio3 radio3, UserInterface ui) {
         this.radio3 = radio3;
-        this.bundle = bundle;
+        this.ui = ui;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class VnaProbeController extends ComponentController {
 
     @Override
     public void initialize() {
-        setUp(bundle.resolve("label.vnaProbe"), bundle.resolve("label.impedance"), false, bundle.buttonGet);
+        setUp(ui.text("label.vnaProbe"), ui.text("label.impedance"), false, ui.text("button.get"));
     }
 
     public void update(VnaResult vnaResult) {

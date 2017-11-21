@@ -3,11 +3,8 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.SweepProfiles;
 import com.mindpart.type.Frequency;
-import com.mindpart.ui.DoubleField;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
+import com.mindpart.ui.DoubleSpinner;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,16 +18,16 @@ import org.apache.log4j.Logger;
  */
 public class SweepSettingsController {
     private static Logger logger = Logger.getLogger(SweepSettingsController.class);
-    private static final Frequency FREQUENCY_MIN = Frequency.ofMHz(0.1);
-    private static final Frequency FREQUENCY_MAX = Frequency.ofMHz(70);
-    private static final Frequency FREQUENCY_STEP = Frequency.ofMHz(0.01);
-    private static final String FREQUENCY_FORMAT = "##0.000";
+    private static final double FREQUENCY_MIN_MHZ = 0.1;
+    private static final double FREQUENCY_MAX_MHZ = 70;
+    private static final double FREQUENCY_STEP_MHZ = 0.01;
+    private static final String FREQUENCY_FORMAT_MHZ = "##0.000";
 
     @FXML
-    DoubleField startFrequencyField;
+    DoubleSpinner startFrequencyField;
 
     @FXML
-    DoubleField endFrequencyField;
+    DoubleSpinner endFrequencyField;
 
     @FXML
     ChoiceBox<SweepQuality> sweepQuality;
@@ -38,39 +35,39 @@ public class SweepSettingsController {
     @FXML
     ChoiceBox<SweepProfile> presetsChoiceBox;
 
-    private BundleData bundleData;
+    private UserInterface ui;
     private ObservableList<SweepProfile> presets = FXCollections.observableArrayList();
     private Runnable rangeChangeListener = () -> {};
     private Runnable qualityChangeListener = () -> {};
 
-    public SweepSettingsController(BundleData bundleData, SweepProfiles sweepProfiles) {
-        this.bundleData = bundleData;
+    public SweepSettingsController(UserInterface ui, SweepProfiles sweepProfiles) {
+        this.ui = ui;
         this.presets.addAll(sweepProfiles.profiles);
     }
 
-    private void initFrequencyField(DoubleField doubleField, double initValue, double step) {
-        doubleField.setDecimalFormat(FREQUENCY_FORMAT);
-        doubleField.setPrefColumnCount(6);
-        doubleField.getDoubleValueFactory().setValue(initValue);
-        doubleField.getDoubleValueFactory().setAmountToStepBy(step);
+    private void initFrequencyField(DoubleSpinner doubleSpinner, double initValue, double step) {
+        doubleSpinner.setDecimalFormat(FREQUENCY_FORMAT_MHZ);
+        doubleSpinner.getEditor().setPrefColumnCount(6);
+        doubleSpinner.getDoubleValueFactory().setValue(initValue);
+        doubleSpinner.getDoubleValueFactory().setAmountToStepBy(step);
     }
 
     public void initialize() {
-        sweepQuality.setConverter(bundleData.getGenericStringConverter());
+        sweepQuality.setConverter(ui.getGenericStringConverter());
         sweepQuality.getItems().addAll(SweepQuality.values());
         sweepQuality.getSelectionModel().select(SweepQuality.FAST);
 
-        initFrequencyField(startFrequencyField, FREQUENCY_MIN.toMHz(), FREQUENCY_STEP.toMHz());
-        initFrequencyField(endFrequencyField, FREQUENCY_MAX.toMHz(), FREQUENCY_STEP.toMHz());
+        initFrequencyField(startFrequencyField, FREQUENCY_MIN_MHZ, FREQUENCY_STEP_MHZ);
+        initFrequencyField(endFrequencyField, FREQUENCY_MAX_MHZ, FREQUENCY_STEP_MHZ);
         
-        startFrequencyField.getDoubleValueFactory().setMin(FREQUENCY_MIN.toMHz());
-        endFrequencyField.getDoubleValueFactory().setMax(FREQUENCY_MAX.toMHz());
+        startFrequencyField.getDoubleValueFactory().setMin(FREQUENCY_MIN_MHZ);
+        endFrequencyField.getDoubleValueFactory().setMax(FREQUENCY_MAX_MHZ);
 
         startFrequencyField.getDoubleValueFactory().maxProperty().bind(
-                DoubleProperty.doubleProperty(endFrequencyField.getDoubleValueFactory().valueProperty()).subtract(FREQUENCY_STEP.toMHz()));
+                DoubleProperty.doubleProperty(endFrequencyField.getDoubleValueFactory().valueProperty()).subtract(FREQUENCY_STEP_MHZ));
 
         endFrequencyField.getDoubleValueFactory().minProperty().bind(
-                DoubleProperty.doubleProperty(startFrequencyField.getDoubleValueFactory().valueProperty()).add(FREQUENCY_STEP.toMHz()));
+                DoubleProperty.doubleProperty(startFrequencyField.getDoubleValueFactory().valueProperty()).add(FREQUENCY_STEP_MHZ));
 
         startFrequencyField.valueProperty().addListener((observable, oldValue, newValue) -> {
             clearPreset();
@@ -85,8 +82,8 @@ public class SweepSettingsController {
         presetsChoiceBox.setItems(presets);
         presetsChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newProfile) -> {
             if(newProfile!=null) {
-                startFrequencyField.getDoubleValueFactory().setValue(Frequency.parse(newProfile.freqMin).toMHz());
-                endFrequencyField.getDoubleValueFactory().setValue(Frequency.parse(newProfile.freqMax).toMHz());
+                startFrequencyField.getDoubleValueFactory().setValue(newProfile.freqMin);
+                endFrequencyField.getDoubleValueFactory().setValue(newProfile.freqMax);
                 rangeChangeListener.run();
             }
         });
@@ -110,11 +107,11 @@ public class SweepSettingsController {
         return Frequency.ofMHz(endFrequencyField.getDoubleValueFactory().getValue());
     }
 
-    public void setFrequencyRange(Frequency startFreq, Frequency endFreq) {
+    public void setFrequencyRange(double startFreqMHz, double endFreqMHz) {
         if(!startFrequencyField.isDisabled() && !endFrequencyField.isDisabled()) {
             clearPreset();
-            startFrequencyField.getDoubleValueFactory().setValue(startFreq.toMHz());
-            endFrequencyField.getDoubleValueFactory().setValue(endFreq.toMHz());
+            startFrequencyField.getDoubleValueFactory().setValue(startFreqMHz);
+            endFrequencyField.getDoubleValueFactory().setValue(endFreqMHz);
         }
     }
 

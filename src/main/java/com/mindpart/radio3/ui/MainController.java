@@ -1,9 +1,9 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.device.*;
-import com.mindpart.type.Frequency;
 import com.mindpart.ui.FxUtils;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -69,22 +69,13 @@ public class MainController {
     HBox deviceControlPane;
 
     @FXML
-    Tab componentsTab;
-
-    @FXML
     Tab sweepTab;
 
     @FXML
     Tab vnaTab;
 
     @FXML
-    VBox componentsBox;
-
-    @FXML
-    ToggleButton continuousSamplingOfAllProbesBtn;
-
-    @FXML
-    Button sampleAllProbesBtn;
+    Tab dashboardTab;
 
     @FXML
     ChoiceBox<VfoType> vfoType;
@@ -120,33 +111,26 @@ public class MainController {
     ToggleGroup vfoOut;
 
     @FXML
-    ToggleButton outVfo;
+    ToggleButton vfoOutDirect;
 
     @FXML
-    ToggleButton outVna;
+    ToggleButton vfoOutVna;
 
     private Radio3 radio3;
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
     private Map<String, String> devicePropertiesMap = new LinkedHashMap<>();
     private ObservableList<Property> deviceProperties = FXCollections.observableArrayList();
-    private ScheduledExecutorService continuousSampling = Executors.newSingleThreadScheduledExecutor();
     private List<Object> nonModalNodes;
 
     private VnaController vnaController;
     private SweepController sweepController;
-    private VfoController vfoController;
-    private FreqMeterController freqMeterController;
-    private LogarithmicProbeController logarithmicProbeController;
-    private LinearProbeController linearProbeController;
-    private VnaProbeController vnaProbeController;
+    private DashboardController dashboardController;
 
-    private volatile boolean continuousSamplingEnabled = false;
-
-    public final BundleData bundle;
+    public final UserInterface ui;
 
     public MainController(Radio3 radio3) {
         this.radio3 = radio3;
-        bundle = new BundleData(radio3.getConfiguration().getLocale());
+        ui = new UserInterface(radio3.getConfiguration().getLocale());
     }
 
     public void updateAvailablePorts() {
@@ -161,23 +145,17 @@ public class MainController {
         }
     }
 
-    private <T extends ComponentController> void addFeatureBox(T controller) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("featureBox.fxml"));
-        loader.setControllerFactory(clazz -> controller);
-        componentsBox.getChildren().add(loader.load());
-    }
-
     private void updateOnConnect() {
-        btnConnect.setText(bundle.buttonDisconnect);
-        FxUtils.enableItems(toolBar, btnConnect, componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
+        btnConnect.setText(ui.text("button.disconnect"));
+        FxUtils.enableItems(toolBar, btnConnect, dashboardTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         FxUtils.disableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         updateDeviceStatus(DeviceStatus.READY);
     }
 
     private void updateOnDisconnect(DeviceStatus deviceStatus) {
-        btnConnect.setText(bundle.buttonConnect);
+        btnConnect.setText(ui.text("button.connect"));
         FxUtils.enableItems(btnConnect, serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
-        FxUtils.disableItems(toolBar, componentsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
+        FxUtils.disableItems(toolBar, dashboardTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         deviceProperties.clear();
         devicePropertiesMap.clear();
         updateDeviceStatus(deviceStatus);
@@ -220,11 +198,11 @@ public class MainController {
 
 
     public Parent loadFXml(Object controller, String fxml) {
-        return FxUtils.loadFXml(controller, fxml, bundle.getResourceBundle());
+        return FxUtils.loadFXml(controller, fxml, ui.getResourceBundle());
     }
 
     public void initialize() throws IOException {
-        nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, componentsTab);
+        nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, dashboardTab);
 
         devicePropertiesTable.setItems(deviceProperties);
         devicePropertiesRefresh.setOnAction(this::onRefresh);
@@ -234,20 +212,11 @@ public class MainController {
 
         vnaController = new VnaController(radio3, this);
         sweepController = new SweepController(radio3, this);
+        dashboardController = new DashboardController(radio3, ui);
+
         sweepTab.setContent(loadFXml(sweepController, "sweepPane.fxml"));
         vnaTab.setContent(loadFXml(vnaController, "vnaPane.fxml"));
-
-        vfoController = new VfoController(radio3, bundle);
-        freqMeterController = new FreqMeterController(radio3, bundle);
-        logarithmicProbeController = new LogarithmicProbeController(radio3, bundle);
-        linearProbeController = new LinearProbeController(radio3, bundle);
-        vnaProbeController = new VnaProbeController(radio3, bundle);
-
-        addFeatureBox(vfoController);
-        addFeatureBox(freqMeterController);
-        addFeatureBox(logarithmicProbeController);
-        addFeatureBox(linearProbeController);
-        addFeatureBox(vnaProbeController);
+        dashboardTab.setContent(loadFXml(dashboardController, "dashboard.fxml"));
 
         initVfoOut();
         initHardwareRevision();
@@ -258,17 +227,21 @@ public class MainController {
         updateOnDisconnect(DeviceStatus.DISCONNECTED);
         updateAvailablePorts();
 
-        continuousSampling.scheduleWithFixedDelay(() -> {
-            if(continuousSamplingEnabled) { Platform.runLater(this::sampleAllProbes); }
-        }, 200, 200, TimeUnit.MILLISECONDS);
-
-        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> tabPaneListener(newValue));
+        tabPane.getSelectionModel().selectedItemProperty().addListener(this::tabSelectionListener);
     }
 
-    private void tabPaneListener(Tab selectedPane) {
-        if(selectedPane == componentsTab) {
+    private void tabSelectionListener(ObservableValue<? extends Tab> observable, Tab deselectedPane, Tab selectedPane) {
+        if(deselectedPane == selectedPane) return;
+
+        if(deselectedPane == dashboardTab) {
+            dashboardController.deactivate();
+            FxUtils.enableItems(btnConnect);
+        }
+
+        if(selectedPane == dashboardTab) {
+            FxUtils.disableItems(btnConnect);
             disableVfoOut(false);
-            requestVfoFrequency();
+            dashboardController.activate();
         } else if(selectedPane == sweepTab) {
             disableVfoOut(true);
         } else if(selectedPane == vnaTab) {
@@ -328,11 +301,11 @@ public class MainController {
     private void updateVfoOut(VfoOut mode) {
         switch (mode) {
             case VFO: {
-                vfoOut.selectToggle(outVfo);
+                vfoOut.selectToggle(vfoOutDirect);
                 break;
             }
             case VNA: {
-                vfoOut.selectToggle(outVna);
+                vfoOut.selectToggle(vfoOutVna);
                 break;
             }
             default: {
@@ -370,7 +343,7 @@ public class MainController {
     }
 
     void shutdown() {
-        continuousSampling.shutdown();
+        dashboardController.shutdown();
     }
 
     void requestDeviceState() {
@@ -382,11 +355,6 @@ public class MainController {
             updateVfoAmp(ds.vfoAmp);
             updateVfoAtt(ds.vfoAtt0, ds.vfoAtt1, ds.vfoAtt2);
         }
-    }
-
-    private void requestVfoFrequency() {
-        Response<Frequency> response = radio3.readVfoFrequency();
-        if(response.isOK()) vfoController.update(response.getData());
     }
 
     private void requestDeviceInfo() {
@@ -403,61 +371,28 @@ public class MainController {
         devicePropertiesRefresh.setDisable(false);
     }
 
-    public void sampleAllProbes() {
-        Response<ProbesValues> response = radio3.readAllProbes();
-        if(response.isOK()) updateAllProbes(response.getData());
-    }
-
-    private void updateAllProbes(ProbesValues probesValues) {
-        logarithmicProbeController.update(probesValues.getLogarithmic());
-        linearProbeController.update(probesValues.getLinear());
-        vnaProbeController.update(probesValues.getVnaResult());
-        freqMeterController.update(probesValues.getFMeter());
-    }
-
-    private void disableGetOnAllProbes(boolean disable) {
-        logarithmicProbeController.disableMainButton(disable);
-        linearProbeController.disableMainButton(disable);
-        vnaProbeController.disableMainButton(disable);
-        freqMeterController.disableMainButton(disable);
-    }
-
-    public void doContinuousSamplingOfAllProbes() {
-        if (continuousSamplingOfAllProbesBtn.isSelected()) {
-            FxUtils.disableItems(sampleAllProbesBtn, btnConnect, deviceTab, sweepTab, vnaTab);
-            disableGetOnAllProbes(true);
-            continuousSamplingEnabled = true;
-            continuousSamplingOfAllProbesBtn.setText(bundle.buttonStop);
-        } else {
-            FxUtils.enableItems(sampleAllProbesBtn, btnConnect, deviceTab, sweepTab, vnaTab);
-            disableGetOnAllProbes(false);
-            continuousSamplingEnabled = false;
-            continuousSamplingOfAllProbesBtn.setText(bundle.buttonContinuous);
-        }
-    }
-
     private void updateDeviceProperties() {
         deviceProperties.setAll(devicePropertiesMap.entrySet().stream().map(e -> new Property(e.getKey(), e.getValue())).collect(Collectors.toList()));
     }
 
     private void updateDeviceProperties(DeviceInfo di) {
-        devicePropertiesMap.put(bundle.resolve("device.prop.hardware"), di.name+" ("+di.hardwareRevision+")");
-        devicePropertiesMap.put(bundle.resolve("device.prop.firmware"), di.buildId);
-        devicePropertiesMap.put(bundle.resolve("device.prop.vfoType"), di.vfoType.toString());
+        devicePropertiesMap.put(ui.text("device.prop.hardware"), di.name+" ("+di.hardwareRevision+")");
+        devicePropertiesMap.put(ui.text("device.prop.firmware"), di.buildId);
+        devicePropertiesMap.put(ui.text("device.prop.vfoType"), di.vfoType.toString());
         updateDeviceProperties();
     }
 
     private String formatOnOff(boolean on) {
-        return on ? bundle.textOn : bundle.textOff;
+        return ui.text(on ? "text.on" : "text.off");
     }
 
     private void updateDeviceProperties(DeviceState ds) {
-        devicePropertiesMap.put(bundle.resolve("device.prop.uptime"), ds.timeMs + " ms");
-        devicePropertiesMap.put(bundle.resolve("device.prop.vfoOut"), ds.vfoOut.toString());
-        devicePropertiesMap.put(bundle.resolve("device.prop.amplifier"), formatOnOff(ds.vfoAmp == VfoAmp.ON));
-        devicePropertiesMap.put(bundle.resolve("device.prop.attStage0"), formatOnOff(ds.vfoAtt0));
-        devicePropertiesMap.put(bundle.resolve("device.prop.attStage1"), formatOnOff(ds.vfoAtt1));
-        devicePropertiesMap.put(bundle.resolve("device.prop.attStage2"), formatOnOff(ds.vfoAtt2));
+        devicePropertiesMap.put(ui.text("device.prop.uptime"), ds.timeMs + " ms");
+        devicePropertiesMap.put(ui.text("device.prop.vfoOut"), ds.vfoOut.toString());
+        devicePropertiesMap.put(ui.text("device.prop.amplifier"), formatOnOff(ds.vfoAmp == VfoAmp.ON));
+        devicePropertiesMap.put(ui.text("device.prop.attStage0"), formatOnOff(ds.vfoAtt0));
+        devicePropertiesMap.put(ui.text("device.prop.attStage1"), formatOnOff(ds.vfoAtt1));
+        devicePropertiesMap.put(ui.text("device.prop.attStage2"), formatOnOff(ds.vfoAtt2));
         updateDeviceProperties();
     }
 
@@ -472,7 +407,7 @@ public class MainController {
     }
 
     void disableVfoOut(boolean flag) {
-        FxUtils.setDisabled(flag, outVfo, outVna);
+        FxUtils.setDisabled(flag, vfoOutDirect, vfoOutVna);
     }
 
     private void updateMainIndicator(Color color) {
@@ -483,11 +418,9 @@ public class MainController {
                 new Stop(1.0, color)));
     }
 
-    
-
     void updateDeviceStatus(DeviceStatus deviceStatus) {
         updateMainIndicator(deviceStatus.getMainIndicatorColor());
         String portName = radio3.isConnected() ? "("+ radio3.getPortName()+") " : "";
-        this.deviceStatus.setText(portName + deviceStatus.format(bundle));
+        this.deviceStatus.setText(portName + deviceStatus.format(ui));
     }
 }

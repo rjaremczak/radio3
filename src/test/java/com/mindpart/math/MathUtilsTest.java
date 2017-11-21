@@ -1,9 +1,9 @@
 package com.mindpart.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.mindpart.math.MathUtils.tickUnit;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by Robert Jaremczak

@@ -4,7 +4,7 @@ package com.mindpart.type;
  * Created by Robert Jaremczak
  * Date: 2017.10.30
  */
-public enum MetricPrefix {
+public enum UnitPrefix {
     TERA(1E12, "T"),
     GIGA(1E9, "G"),
     MEGA(1E6, "M"),
@@ -18,7 +18,7 @@ public enum MetricPrefix {
     private final double factor;
     private final String symbol;
 
-    MetricPrefix(double factor, String symbol) {
+    UnitPrefix(double factor, String symbol) {
         this.factor = factor;
         this.symbol = symbol;
     }
@@ -31,14 +31,19 @@ public enum MetricPrefix {
         return v * factor;
     }
 
+    public double from(double value, UnitPrefix unitPrefix) {
+        return value * unitPrefix.factor / factor;
+    }
+
     public String getSymbol() {
         return symbol;
     }
 
-    public static MetricPrefix autoRange(double value) {
-        for(MetricPrefix prefix : MetricPrefix.values()) {
+    public static UnitPrefix autoRange(double value) {
+        for(UnitPrefix prefix : UnitPrefix.values()) {
             if(prefix.factor <= value) return prefix;
         }
         return BASE;
     }
+
 }

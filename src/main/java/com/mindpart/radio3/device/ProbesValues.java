@@ -11,9 +11,9 @@ public class ProbesValues {
     private double logarithmic;
     private double linear;
     private VnaResult vnaResult;
-    private Frequency fMeter;
+    private int fMeter;
 
-    public ProbesValues(double logarithmic, double linear, VnaResult vnaResult, Frequency fMeter) {
+    public ProbesValues(double logarithmic, double linear, VnaResult vnaResult, int fMeter) {
         this.logarithmic = logarithmic;
         this.linear = linear;
         this.vnaResult = vnaResult;
@@ -32,7 +32,7 @@ public class ProbesValues {
         return vnaResult;
     }
 
-    public Frequency getFMeter() {
+    public int getFMeter() {
         return fMeter;
     }
 }

@@ -18,7 +18,7 @@ public abstract class Quantity implements Comparable<Quantity> {
             return symbol;
         }
 
-        public String getSymbol(MetricPrefix prefix) {
+        public String getSymbol(UnitPrefix prefix) {
             return prefix.getSymbol()+symbol;
         }
     }

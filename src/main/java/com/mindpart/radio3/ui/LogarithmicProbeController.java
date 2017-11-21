@@ -15,11 +15,11 @@ public class LogarithmicProbeController extends ComponentController {
     private static final NumberFormat fmtPower = new DecimalFormat("0.000");
 
     private final Radio3 radio3;
-    private final BundleData bundle;
+    private final UserInterface ui;
 
-    public LogarithmicProbeController(Radio3 radio3, BundleData bundle) {
+    public LogarithmicProbeController(Radio3 radio3, UserInterface ui) {
         this.radio3 = radio3;
-        this.bundle = bundle;
+        this.ui = ui;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class LogarithmicProbeController extends ComponentController {
 
     @Override
     public void initialize() {
-        setUp(bundle.resolve("label.logProbe"), bundle.resolve("label.power"), false, bundle.buttonGet);
+        setUp(ui.text("label.logProbe"), ui.text("label.power"), false, ui.text("button.get"));
     }
 
     public void update(double power) {

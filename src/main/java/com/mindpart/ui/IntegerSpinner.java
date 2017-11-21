@@ -12,11 +12,11 @@ import java.util.regex.Pattern;
  * Created by Robert Jaremczak
  * Date: 2017.10.28
  */
-public class IntegerField extends Spinner<Integer> {
+public class IntegerSpinner extends Spinner<Integer> {
     private static final Pattern NON_NEGATIVE = Pattern.compile("[0-9]*");
     private final TextFormatter<Integer> textFormatter;
 
-    public IntegerField() {
+    public IntegerSpinner() {
         super(1, Integer.MAX_VALUE, 10, 1);
         textFormatter = new TextFormatter<>(
                 new IntegerStringConverter(),

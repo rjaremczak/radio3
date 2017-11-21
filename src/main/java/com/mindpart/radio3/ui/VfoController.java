@@ -3,6 +3,9 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.device.Radio3;
 import com.mindpart.type.Frequency;
 import javafx.event.ActionEvent;
+import org.apache.commons.lang3.math.NumberUtils;
+
+import static com.mindpart.type.UnitPrefix.MEGA;
 
 /**
  * Created by Robert Jaremczak
@@ -10,29 +13,30 @@ import javafx.event.ActionEvent;
  */
 public class VfoController extends ComponentController {
     private final Radio3 radio3;
-    private final BundleData bundle;
+    private final UserInterface ui;
 
-    public VfoController(Radio3 radio3, BundleData bundle) {
+    public VfoController(Radio3 radio3, UserInterface ui) {
         this.radio3 = radio3;
-        this.bundle = bundle;
+        this.ui = ui;
     }
 
     @Override
     public void initialize() {
-        setUp(bundle.resolve("label.vfo"), bundle.resolve("label.frequency"), true, bundle.buttonSet);
+        setUp(ui.text("label.vfo"), ui.text("label.frequency"), true, ui.text("button.set"));
     }
 
 
     @Override
     public void onMainButton(ActionEvent actionEvent) {
-        Frequency frequency = Frequency.parse(valueField.getText());
-        if(frequency != null) {
-            radio3.writeVfoFrequency((int) frequency.toHz());
-            update(frequency);
+        double freqMHz = NumberUtils.toDouble(valueField.getText());
+        if(freqMHz>0) {
+            int freqHz = (int) MEGA.toBase(freqMHz);
+            radio3.writeVfoFrequency(freqHz);
+            update(freqHz);
         }
     }
 
-    public void update(Frequency frequency) {
-        setValue(frequency.format());
+    public void update(Integer frequency) {
+        setValue(ui.frequency.format(MEGA.fromBase(frequency)));
     }
 }

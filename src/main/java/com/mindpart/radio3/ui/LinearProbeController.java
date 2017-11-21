@@ -15,11 +15,11 @@ public class LinearProbeController extends ComponentController {
     private static final NumberFormat fmtPower = new DecimalFormat("0.000");
 
     private final Radio3 radio3;
-    private final BundleData bundle;
+    private final UserInterface ui;
 
-    public LinearProbeController(Radio3 radio3, BundleData bundle) {
+    public LinearProbeController(Radio3 radio3, UserInterface ui) {
         this.radio3 = radio3;
-        this.bundle = bundle;
+        this.ui = ui;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class LinearProbeController extends ComponentController {
 
     @Override
     public void initialize() {
-        setUp(bundle.resolve("label.linProbe"), bundle.resolve("label.voltage"), false, bundle.buttonGet);
+        setUp(ui.text("label.linProbe"), ui.text("label.voltage"), false, ui.text("button.get"));
     }
 
     public void update(double power) {

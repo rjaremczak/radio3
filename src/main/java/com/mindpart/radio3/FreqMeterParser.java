@@ -12,7 +12,7 @@ import static com.mindpart.radio3.device.FrameCommand.FMETER_DATA;
  * Created by Robert Jaremczak
  * Date: 2016.02.22
  */
-public class FreqMeterParser implements FrameParser<Frequency> {
+public class FreqMeterParser implements FrameParser<Integer> {
     private FreqMeterConfig config;
 
     public FreqMeterParser(FreqMeterConfig config) {
@@ -25,11 +25,11 @@ public class FreqMeterParser implements FrameParser<Frequency> {
     }
 
     @Override
-    public Frequency parse(Frame frame) {
+    public Integer parse(Frame frame) {
         return parse(Binary.toUInt32(frame.getPayload()));
     }
 
-    Frequency parse(long count) {
-        return Frequency.ofHz((count * config.multiplier) + config.base);
+    Integer parse(long count) {
+        return Math.toIntExact((count * config.multiplier) + config.base);
     }
 }

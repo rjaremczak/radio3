@@ -201,7 +201,7 @@ public class Radio3 {
         return performRequest(new Frame(DEVICE_GET_STATE), deviceStateParser);
     }
 
-    public Response<Frequency> readVfoFrequency() {
+    public Response<Integer> readVfoFrequency() {
         return performRequest(new Frame(VFO_GET_FREQ), vfoParser);
     }
 
@@ -221,7 +221,7 @@ public class Radio3 {
         return performRequest(new Frame(VNAPROBE_DATA), vnaParser);
     }
 
-    public Response<Frequency> readFMeter() {
+    public Response<Integer> readFMeter() {
         return performRequest(new Frame(FMETER_DATA), freqMeterParser);
     }
 

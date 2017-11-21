@@ -1,10 +1,8 @@
 package com.mindpart.numeric;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static java.lang.Double.MIN_VALUE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by Robert Jaremczak
@@ -18,9 +16,9 @@ public class QFactorCalcTest {
     @Test
     public void testLowPeak() {
         assertTrue(qFactorCalc.findBandStop(3));
-        assertEquals(1.4, qFactorCalc.getBandStart(), MIN_VALUE);
-        assertEquals(1.5, qFactorCalc.getBandPeak(), MIN_VALUE);
-        assertEquals(1.8, qFactorCalc.getBandEnd(), MIN_VALUE);
+        assertEquals(1.4, qFactorCalc.getBandStart());
+        assertEquals(1.5, qFactorCalc.getBandPeak());
+        assertEquals(1.8, qFactorCalc.getBandEnd());
         assertEquals(0.4, qFactorCalc.getBandwidth(), 1E-6);
         assertEquals(1.5 / 0.4, qFactorCalc.getQFactor(), 0.01);
     }
@@ -28,9 +26,9 @@ public class QFactorCalcTest {
     @Test
     public void testHighPeak() {
         assertTrue(qFactorCalc.findBandPass(3));
-        assertEquals(2.5, qFactorCalc.getBandStart(), MIN_VALUE);
-        assertEquals(2.9, qFactorCalc.getBandPeak(), MIN_VALUE);
-        assertEquals(3.1, qFactorCalc.getBandEnd(), MIN_VALUE);
+        assertEquals(2.5, qFactorCalc.getBandStart());
+        assertEquals(2.9, qFactorCalc.getBandPeak());
+        assertEquals(3.1, qFactorCalc.getBandEnd());
         assertEquals(0.6, qFactorCalc.getBandwidth(), 1E-6);
         assertEquals(2.9 / 0.6, qFactorCalc.getQFactor(), 0.01);
     }
