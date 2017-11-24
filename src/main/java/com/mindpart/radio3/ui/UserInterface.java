@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.ui.DoubleSpinner;
 import com.mindpart.util.ResourceBundleUtils;
 import javafx.util.StringConverter;
 
@@ -11,10 +12,16 @@ import java.util.ResourceBundle;
  * Date: 2017.07.05
  */
 public class UserInterface {
+    private static final String FREQUENCY_FORMAT_MHZ = "##0.000";
+    private static final double FREQUENCY_MIN_MHZ = 0.1;
+    private static final double FREQUENCY_MAX_MHZ = 70;
+    private static final double FREQUENCY_STEP_MHZ = 0.01;
+
     private final ResourceBundle resourceBundle;
     private final StringConverter genericStringConverter;
 
     public final FrequencyFormat frequency = new FrequencyFormat();
+    public final ImpedanceFormat impedance = new ImpedanceFormat();
 
     public UserInterface(Locale locale) {
         resourceBundle = ResourceBundleUtils.getBundle("bundle", locale, "UTF-8");
@@ -43,5 +50,16 @@ public class UserInterface {
         return genericStringConverter;
     }
 
+    public void initFrequencyField(DoubleSpinner doubleSpinner) {
+        doubleSpinner.setDecimalFormat(FREQUENCY_FORMAT_MHZ);
+        doubleSpinner.getEditor().setPrefColumnCount(6);
+        doubleSpinner.getDoubleValueFactory().setValue(FREQUENCY_MIN_MHZ);
+        doubleSpinner.getDoubleValueFactory().setAmountToStepBy(FREQUENCY_STEP_MHZ);
+    }
 
+    public void initFrequencyFieldWithRanges(DoubleSpinner doubleSpinner) {
+        initFrequencyField(doubleSpinner);
+        doubleSpinner.getDoubleValueFactory().setMin(FREQUENCY_MIN_MHZ);
+        doubleSpinner.getDoubleValueFactory().setMax(FREQUENCY_MAX_MHZ);
+    }
 }

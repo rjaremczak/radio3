@@ -5,7 +5,6 @@ import com.mindpart.radio3.config.Configuration;
 import com.mindpart.radio3.config.ConfigurationService;
 import com.mindpart.radio3.config.SweepProfilesService;
 import com.mindpart.radio3.ui.DeviceStatus;
-import com.mindpart.type.Frequency;
 import com.mindpart.bin.Binary;
 import com.mindpart.bin.BinaryBuilder;
 import org.apache.log4j.Logger;
@@ -225,7 +224,7 @@ public class Radio3 {
         return performRequest(new Frame(FMETER_DATA), freqMeterParser);
     }
 
-    public Response<ProbesValues> readAllProbes() {
+    public Response<Probes> readAllProbes() {
         return performRequest(new Frame(PROBES_DATA), multipleProbesParser);
     }
 

@@ -1,24 +1,31 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.radio3.device.ProbesValues;
+import com.mindpart.radio3.device.Probes;
 import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
 import com.mindpart.ui.DoubleSpinner;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import org.apache.log4j.Logger;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.mindpart.type.UnitPrefix.MEGA;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2017.11.20
  */
 public class DashboardController {
+    private static final Logger logger = Logger.getLogger(DashboardController.class);
+
     private final Radio3 radio3;
     private final UserInterface ui;
 
@@ -32,9 +39,6 @@ public class DashboardController {
 
     @FXML
     protected DoubleSpinner vfoFreq;
-
-    @FXML
-    protected Button vfoFreqSet;
 
     @FXML
     protected Label fMeterFreq;
@@ -53,26 +57,33 @@ public class DashboardController {
             if(continuousSamplingEnabled.get()) { Platform.runLater(this::sampleAllProbes); }
         }, 200, 200, TimeUnit.MILLISECONDS);
 
-
+        ui.initFrequencyFieldWithRanges(vfoFreq);
+        vfoFreq.getDoubleValueFactory().valueProperty().addListener((observable, oldValue, newFreq) -> radio3.writeVfoFrequency((int) MEGA.toBase(newFreq)));
     }
 
-    public void sampleAllProbes() {
-        Response<ProbesValues> response = radio3.readAllProbes();
+    private void sampleAllProbes() {
+        Response<Probes> response = radio3.readAllProbes();
         if(response.isOK()) {
-            //updateAllProbes(response.getData());
+            Probes probes = response.getData();
+            fMeterFreq.setText(ui.frequency.format(probes.getFMeter()));
+            logProbeValue.setText(ui.frequency.format(probes.getLogarithmic()));
+            linProbeValue.setText(ui.frequency.format(probes.getLinear()));
+            vnaProbeValue.setText(ui.impedance.format(probes.getVnaResult().getImpedance()));
         }
     }
 
-    public void activate() {
+    void activate() {
+        logger.debug("activate");
         requestVfoFrequency();
         continuousSamplingEnabled.set(true);
     }
 
-    public void deactivate() {
+    void deactivate() {
+        logger.debug("deactivate");
         continuousSamplingEnabled.set(false);
     }
 
-    public void shutdown() {
+    void shutdown() {
         deactivate();
         continuousSampling.shutdownNow();
     }
@@ -80,7 +91,7 @@ public class DashboardController {
     private void requestVfoFrequency() {
         Response<Integer> response = radio3.readVfoFrequency();
         if(response.isOK()) {
-            //vfoController.update(response.getData());
+            vfoFreq.getDoubleValueFactory().setValue(MEGA.fromBase(response.getData()));
         }
     }
 }

@@ -20,4 +20,8 @@ public class FrequencyFormat {
     public String format(double mhz) {
         return FORMATTER_FREQ_EXACT.get().format(mhz);
     }
+
+    public String format(int hz) {
+        return format(UnitPrefix.MEGA.fromBase(hz));
+    }
 }

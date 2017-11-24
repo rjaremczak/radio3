@@ -7,13 +7,13 @@ import com.mindpart.type.Frequency;
  * Created by Robert Jaremczak
  * Date: 2016.04.09
  */
-public class ProbesValues {
+public class Probes {
     private double logarithmic;
     private double linear;
     private VnaResult vnaResult;
     private int fMeter;
 
-    public ProbesValues(double logarithmic, double linear, VnaResult vnaResult, int fMeter) {
+    public Probes(double logarithmic, double linear, VnaResult vnaResult, int fMeter) {
         this.logarithmic = logarithmic;
         this.linear = linear;
         this.vnaResult = vnaResult;

@@ -27,6 +27,10 @@ public enum UnitPrefix {
         return base / factor;
     }
 
+    public double fromBase(int base) {
+        return base / factor;
+    }
+
     public double toBase(double v) {
         return v * factor;
     }

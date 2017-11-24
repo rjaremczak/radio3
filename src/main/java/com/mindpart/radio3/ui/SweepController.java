@@ -128,7 +128,6 @@ public class SweepController {
         HBox.setHgrow(signalChart, Priority.ALWAYS);
     }
 
-    @FXML
     public void initialize() throws IOException {
         initSignalChart();
 
@@ -283,10 +282,10 @@ public class SweepController {
         if(continuous) {
             disableUI();
             runSweepOnce(this::displayDataAndSweepAgain);
-            btnContinuous.setText(mainController.ui.text("buttonStop"));
+            btnContinuous.setText(mainController.ui.text("button.stop"));
         } else {
             enableUI();
-            btnContinuous.setText(mainController.ui.text("buttonContinuous"));
+            btnContinuous.setText(mainController.ui.text("button.continuous"));
         }
     }
 

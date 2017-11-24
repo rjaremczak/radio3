@@ -18,10 +18,6 @@ import org.apache.log4j.Logger;
  */
 public class SweepSettingsController {
     private static Logger logger = Logger.getLogger(SweepSettingsController.class);
-    private static final double FREQUENCY_MIN_MHZ = 0.1;
-    private static final double FREQUENCY_MAX_MHZ = 70;
-    private static final double FREQUENCY_STEP_MHZ = 0.01;
-    private static final String FREQUENCY_FORMAT_MHZ = "##0.000";
 
     @FXML
     DoubleSpinner startFrequencyField;
@@ -45,29 +41,21 @@ public class SweepSettingsController {
         this.presets.addAll(sweepProfiles.profiles);
     }
 
-    private void initFrequencyField(DoubleSpinner doubleSpinner, double initValue, double step) {
-        doubleSpinner.setDecimalFormat(FREQUENCY_FORMAT_MHZ);
-        doubleSpinner.getEditor().setPrefColumnCount(6);
-        doubleSpinner.getDoubleValueFactory().setValue(initValue);
-        doubleSpinner.getDoubleValueFactory().setAmountToStepBy(step);
-    }
-
     public void initialize() {
         sweepQuality.setConverter(ui.getGenericStringConverter());
         sweepQuality.getItems().addAll(SweepQuality.values());
         sweepQuality.getSelectionModel().select(SweepQuality.FAST);
 
-        initFrequencyField(startFrequencyField, FREQUENCY_MIN_MHZ, FREQUENCY_STEP_MHZ);
-        initFrequencyField(endFrequencyField, FREQUENCY_MAX_MHZ, FREQUENCY_STEP_MHZ);
-        
-        startFrequencyField.getDoubleValueFactory().setMin(FREQUENCY_MIN_MHZ);
-        endFrequencyField.getDoubleValueFactory().setMax(FREQUENCY_MAX_MHZ);
+        ui.initFrequencyField(startFrequencyField);
+        ui.initFrequencyField(endFrequencyField);
 
         startFrequencyField.getDoubleValueFactory().maxProperty().bind(
-                DoubleProperty.doubleProperty(endFrequencyField.getDoubleValueFactory().valueProperty()).subtract(FREQUENCY_STEP_MHZ));
+                DoubleProperty.doubleProperty(endFrequencyField.getDoubleValueFactory().valueProperty())
+                        .subtract(startFrequencyField.getDoubleValueFactory().getAmountToStepBy()));
 
         endFrequencyField.getDoubleValueFactory().minProperty().bind(
-                DoubleProperty.doubleProperty(startFrequencyField.getDoubleValueFactory().valueProperty()).add(FREQUENCY_STEP_MHZ));
+                DoubleProperty.doubleProperty(startFrequencyField.getDoubleValueFactory().valueProperty())
+                        .add(startFrequencyField.getDoubleValueFactory().getAmountToStepBy()));
 
         startFrequencyField.valueProperty().addListener((observable, oldValue, newValue) -> {
             clearPreset();
