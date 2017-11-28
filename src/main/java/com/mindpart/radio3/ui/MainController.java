@@ -197,10 +197,6 @@ public class MainController {
     }
 
 
-    public Parent loadFXml(Object controller, String fxml) {
-        return FxUtils.loadFXml(controller, fxml, ui.getResourceBundle());
-    }
-
     public void initialize() throws IOException {
         nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, dashboardTab);
 
@@ -214,9 +210,9 @@ public class MainController {
         sweepController = new SweepController(radio3, this);
         dashboardController = new DashboardController(radio3, ui);
 
-        sweepTab.setContent(loadFXml(sweepController, "sweepPane.fxml"));
-        vnaTab.setContent(loadFXml(vnaController, "vnaPane.fxml"));
-        dashboardTab.setContent(loadFXml(dashboardController, "dashboard.fxml"));
+        sweepTab.setContent(ui.loadFXml(sweepController, "sweepPane.fxml"));
+        vnaTab.setContent(ui.loadFXml(vnaController, "vnaPane.fxml"));
+        dashboardTab.setContent(ui.loadFXml(dashboardController, "dashboard.fxml"));
 
         initVfoOut();
         initHardwareRevision();
@@ -224,8 +220,8 @@ public class MainController {
         initVfoAmp();
         initVfoAtt();
 
-        updateOnDisconnect(DeviceStatus.DISCONNECTED);
         updateAvailablePorts();
+        updateOnDisconnect(DeviceStatus.DISCONNECTED);
 
         tabPane.getSelectionModel().selectedItemProperty().addListener(this::tabSelectionListener);
     }
@@ -347,6 +343,8 @@ public class MainController {
     }
 
     void requestDeviceState() {
+        if(!radio3.isConnected()) return;
+        
         Response<DeviceState> deviceStateResponse = radio3.readDeviceState();
         if(deviceStateResponse.isOK()) {
             DeviceState ds = deviceStateResponse.getData();

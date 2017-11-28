@@ -11,8 +11,6 @@ import com.mindpart.ui.ChartMarker;
 import com.mindpart.ui.FxChartUtils;
 import com.mindpart.ui.FxUtils;
 import com.mindpart.numeric.Range;
-import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -22,14 +20,11 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.function.Consumer;
 
 import static com.mindpart.ui.FxChartUtils.autoRangeAxis;
 import static com.mindpart.ui.FxUtils.valueFromSeries;
@@ -38,26 +33,17 @@ import static com.mindpart.ui.FxUtils.valueFromSeries;
  * Created by Robert Jaremczak
  * Date: 2016.04.15
  */
-public class VnaController {
+public class VnaController extends AbstractSweepController {
     private static final NumberFormat RX_FORMAT = new DecimalFormat("0.0");
 
     @FXML
     AnchorPane anchorPane;
 
     @FXML
-    VBox vBox;
-
-    @FXML
     HBox controlBox;
 
     @FXML
     HBox chartBox;
-
-    @FXML
-    Button btnStart;
-
-    @FXML
-    ToggleButton btnContinuous;
 
     @FXML
     LineChart<Number, Number> swrChart;
@@ -77,17 +63,14 @@ public class VnaController {
     @FXML
     NumberAxis impedanceAxisY;
 
-    private Radio3 radio3;
     private ObservableList<XYChart.Series<Number, Number>> swrDataSeries;
     private ObservableList<XYChart.Series<Number, Number>> impedanceDataSeries;
-    private SweepSettingsController sweepSettingsController;
     private ChartMarker chartMarker = new ChartMarker();
     private MainController mainController;
 
     public VnaController(Radio3 radio3, MainController mainController) {
-        this.radio3 = radio3;
+        super(radio3, mainController.ui);
         this.mainController = mainController;
-        this.sweepSettingsController = new SweepSettingsController(mainController.ui, radio3.getSweepProfiles());
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -100,6 +83,8 @@ public class VnaController {
     }
 
     public void initialize() {
+        super.initialize();
+        
         swrDataSeries = FXCollections.observableArrayList();
         swrChart.setData(swrDataSeries);
         swrChart.setCreateSymbols(false);
@@ -120,9 +105,6 @@ public class VnaController {
                 endData.getXValue().doubleValue()
         ));
 
-        sweepSettingsController.setRangeChangeListener(this::sweepSettingsChangeListener);
-        sweepSettingsController.setQualityChangeListener(this::sweepSettingsChangeListener);
-
         impedanceDataSeries = FXCollections.observableArrayList();
         impedanceChart.setData(impedanceDataSeries);
         impedanceChart.setCreateSymbols(false);
@@ -133,70 +115,40 @@ public class VnaController {
         FxChartUtils.autoRangeAxis(impedanceAxisX, 1, 55, 2.5);
         FxChartUtils.autoRangeAxis(impedanceAxisY, 0, 1000, 50);
 
-        Parent sweepSettingsPane = mainController.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml");
+        Parent sweepSettingsPane = ui.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml");
         controlBox.getChildren().add(0, sweepSettingsPane);
-
-        btnContinuous.selectedProperty().addListener(this::onContinuousChanged);
     }
 
-    private void sweepSettingsChangeListener() {
+    protected void sweepSettingsChangeListener() {
         clear();
         onSweepOnce();
     }
 
-    private void disableUI() {
-        FxUtils.disableItems(btnStart);
+    protected void disableUI() {
+        FxUtils.disableItems(btnOnce);
         sweepSettingsController.disableControls(true);
         mainController.disableAllExcept(true, mainController.vnaTab);
         if(!btnContinuous.isSelected()) btnContinuous.setDisable(true);
     }
 
-    private void enableUI() {
+    protected void enableUI() {
         if(!btnContinuous.isSelected()) btnContinuous.setDisable(false);
-        FxUtils.enableItems(btnStart);
+        FxUtils.enableItems(btnOnce);
         sweepSettingsController.disableControls(false);
         mainController.disableAllExcept(false, mainController.vnaTab);
         mainController.requestDeviceState();
     }
 
-    private void runSweepOnce(Consumer<SweepResponse> analyserDataConsumer) {
-        radio3.executeInBackground(() -> {
-            Response<SweepResponse> response = sweepOnce();
-            if(response.isOK() && radio3.isConnected()) {
-                Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
-            } else {
-                enableUI();
-            }
-        });
-    }
-
-    private void onContinuousChanged(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean continuous) {
-        if(continuous) {
-            disableUI();
-            runSweepOnce(this::displayDataAndSweepAgain);
-            btnContinuous.setText(mainController.ui.text("button.stop"));
-        } else {
-            enableUI();
-            btnContinuous.setText(mainController.ui.text("button.continuous"));
-        }
-    }
-
-    private void displayDataAndSweepAgain(SweepResponse analyserResponse) {
-        if(btnContinuous.isSelected()) {
-            updateAnalyserData(analyserResponse);
-            runSweepOnce(this::displayDataAndSweepAgain);
-        }
-    }
-
     public void onSweepOnce() {
         disableUI();
+        mainController.updateDeviceStatus(DeviceStatus.PROCESSING);
         runSweepOnce(analyserResponse -> {
             updateAnalyserData(analyserResponse);
             enableUI();
         });
     }
 
-    private Response<SweepResponse> sweepOnce() {
+    protected Response<SweepResponse> sweepOnce() {
         SweepQuality quality = sweepSettingsController.getQuality();
         long fStart = sweepSettingsController.getStartFrequency().toHz();
         long fEnd = sweepSettingsController.getEndFrequency ().toHz();

@@ -17,8 +17,8 @@ public class MinFinderTest {
     }
 
     private void assertMinimum(int expectedNumber, double expectedValue) {
-        assertEquals(expectedNumber, minFinder.getSampleNumber(), Double.MIN_VALUE);
-        assertEquals(expectedValue, minFinder.getSampleValue(), Double.MIN_VALUE);
+        assertEquals(expectedNumber, minFinder.getSampleNumber());
+        assertEquals(expectedValue, minFinder.getSampleValue());
     }
 
     @Test

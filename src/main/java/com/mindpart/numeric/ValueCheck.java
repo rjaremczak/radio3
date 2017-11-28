@@ -22,7 +22,7 @@ abstract class ValueCheck {
 
     public abstract void sample(int number, double value);
 
-    public Double getSampleValue() {
+    public double getSampleValue() {
         return sampleValue;
     }
 

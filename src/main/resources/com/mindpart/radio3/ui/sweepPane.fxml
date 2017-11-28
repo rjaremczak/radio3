@@ -38,7 +38,7 @@
                       <RowConstraints vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="%button.start" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" text="%button.start" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                         <Label text="%label.in" />
                         <ChoiceBox fx:id="sourceProbe" focusTraversable="false" GridPane.rowIndex="1" />
                         <ToggleButton fx:id="btnNormalize" mnemonicParsing="false" text="Norm" textOverrun="CLIP" GridPane.columnIndex="1" GridPane.rowIndex="1" />

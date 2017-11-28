@@ -36,12 +36,9 @@ import static com.mindpart.ui.FxUtils.valueFromSeries;
  * Created by Robert Jaremczak
  * Date: 2016.04.15
  */
-public class SweepController {
+public class SweepController extends AbstractSweepController {
     @FXML
     private AnchorPane anchorPane;
-
-    @FXML
-    private VBox vBox;
 
     @FXML
     private HBox controlBox;
@@ -56,34 +53,28 @@ public class SweepController {
     private ToggleButton btnNormalize;
 
     @FXML
-    private Button btnOnce;
-
-    @FXML
-    private ToggleButton btnContinuous;
-
-    @FXML
     private ToggleButton btnTools;
 
-    private Radio3 radio3;
-    private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
-    private SweepSettingsController sweepSettingsController;
-    private ChartMarker chartMarker = new ChartMarker();
-    private MainController mainController;
-    private RangeToolController rangeToolController;
-    private FilterToolController filterToolController;
+    private final ChartMarker chartMarker = new ChartMarker();
+    private final MainController mainController;
+    private final RangeToolController rangeToolController;
+    private final ChartContext chartContext = new ChartContext();
 
+    private ObservableList<XYChart.Series<Number, Number>> signalDataSeries;
+
+    private FilterToolController filterToolController;
     private VBox chartTools;
     private Accordion chartToolsAccordion;
     private SweepDataInfo receivedDataInfo;
-    private ChartContext chartContext = new ChartContext();
     private EnhancedLineChart<Number, Number> signalChart;
     private NumberAxis signalAxisX;
     private NumberAxis signalAxisY;
 
     public SweepController(Radio3 radio3, MainController mainController) {
-        this.radio3 = radio3;
+        super(radio3, mainController.ui);
         this.mainController = mainController;
-        this.sweepSettingsController = new SweepSettingsController(mainController.ui, radio3.getSweepProfiles());
+
+        rangeToolController = new RangeToolController(ui, chartContext);
     }
 
     private void initChartContext() {
@@ -92,15 +83,15 @@ public class SweepController {
 
         if(signalSource == LOG_PROBE) {
             if(normalized) {
-                chartContext.valueProcessor = new LogProbeNormProcessor(radio3.getLogarithmicParser()::parse, chartContext.receivedData, mainController.ui.text("axis.relativePower"));
+                chartContext.valueProcessor = new LogProbeNormProcessor(radio3.getLogarithmicParser()::parse, chartContext.receivedData, ui.text("axis.relativePower"));
             } else {
-                chartContext.valueProcessor = new LogProbeProcessor(radio3.getLogarithmicParser()::parse, mainController.ui.text("axis.power"));
+                chartContext.valueProcessor = new LogProbeProcessor(radio3.getLogarithmicParser()::parse, ui.text("axis.power"));
             }
         } else if(signalSource == LIN_PROBE) {
             if(normalized) {
-                chartContext.valueProcessor = new LinProbeNormProcessor(radio3.getLinearParser()::parse, chartContext.receivedData, mainController.ui.text("axisRelativeVoltage"));
+                chartContext.valueProcessor = new LinProbeNormProcessor(radio3.getLinearParser()::parse, chartContext.receivedData, ui.text("axisRelativeVoltage"));
             } else {
-                chartContext.valueProcessor = new LinProbeProcessor(radio3.getLinearParser()::parse, mainController.ui.text("axis.voltage"));
+                chartContext.valueProcessor = new LinProbeProcessor(radio3.getLinearParser()::parse, ui.text("axis.voltage"));
             }
         } else {
             throw new IllegalStateException("source probe: "+sourceProbe.getValue());
@@ -119,8 +110,8 @@ public class SweepController {
     }
 
     private void initSignalChart() {
-        signalAxisX = new NumberAxis(mainController.ui.text("axis.freq"), 0, 52, 5);
-        signalAxisY = new NumberAxis(mainController.ui.text("axis.power"), -40, 10, 5);
+        signalAxisX = new NumberAxis(ui.text("axis.freq"), 0, 52, 5);
+        signalAxisY = new NumberAxis(ui.text("axis.power"), -40, 10, 5);
         signalChart = new EnhancedLineChart<>(signalAxisX, signalAxisY);
         signalChart.legendVisibleProperty().setValue(false);
         signalChart.setAnimated(false);
@@ -128,9 +119,12 @@ public class SweepController {
         HBox.setHgrow(signalChart, Priority.ALWAYS);
     }
 
-    public void initialize() throws IOException {
+    public void initialize() {
+        super.initialize();
+        
         initSignalChart();
 
+        filterToolController = new FilterToolController(ui, signalChart, chartContext);
         anchorPane.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> anchorPane.requestLayout());
 
         chartMarker.initialize(anchorPane, signalChart, scenePos -> {
@@ -151,13 +145,9 @@ public class SweepController {
         signalChart.setData(signalDataSeries);
         signalChart.setCreateSymbols(false);
 
-        controlBox.getChildren().add(0, mainController.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml"));
+        controlBox.getChildren().add(0, ui.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml"));
 
         btnNormalize.selectedProperty().addListener(this::normalizeChangeListener);
-        btnContinuous.selectedProperty().addListener(this::continuousChangeListener);
-
-        sweepSettingsController.setRangeChangeListener(this::sweepSettingsChangeListener);
-        sweepSettingsController.setQualityChangeListener(this::sweepSettingsChangeListener);
 
         initInputProbeList();
         initChartContext();
@@ -165,11 +155,8 @@ public class SweepController {
         chartToolsAccordion = new Accordion();
         chartToolsAccordion.setMinWidth(180);
 
-        rangeToolController = new RangeToolController(mainController.ui, chartContext);
         chartToolsAccordion.getPanes().add(rangeToolController.getTitledPane());
         chartToolsAccordion.setExpandedPane(rangeToolController.getTitledPane());
-
-        filterToolController = new FilterToolController(mainController.ui, signalChart, chartContext);
         chartToolsAccordion.getPanes().add(filterToolController.getTitledPane());
 
         chartTools = new VBox(chartToolsAccordion);
@@ -185,7 +172,7 @@ public class SweepController {
         updateNormButton();
     }
 
-    private void sweepSettingsChangeListener() {
+    protected void sweepSettingsChangeListener() {
         clear();
         updateNormButton();
         onSweepOnce();
@@ -219,14 +206,14 @@ public class SweepController {
         sourceProbe.getSelectionModel().selectedItemProperty().addListener(this::inputSourceChangeListener);
     }
 
-    private void disableUI() {
+    protected void disableUI() {
         FxUtils.disableItems(btnOnce, btnNormalize, sourceProbe);
         sweepSettingsController.disableControls(true);
         mainController.disableAllExcept(true, mainController.sweepTab);
         if(!btnContinuous.isSelected()) btnContinuous.setDisable(true);
     }
 
-    private void enableUI() {
+    protected void enableUI() {
         if(!btnContinuous.isSelected()) btnContinuous.setDisable(false);
         if(btnNormalize.isSelected()) {
             FxUtils.enableItems(btnOnce, btnNormalize);
@@ -247,13 +234,6 @@ public class SweepController {
         });
     }
 
-    private void displayDataAndSweepAgain(SweepResponse analyserResponse) {
-        if(btnContinuous.isSelected()) {
-            updateAnalyserData(analyserResponse);
-            runSweepOnce(this::displayDataAndSweepAgain);
-        }
-    }
-
     public void updateAnalyserData(SweepResponse ad) {
         receivedDataInfo = ad.toInfo();
         int samples[] = ad.getData()[0];
@@ -267,29 +247,7 @@ public class SweepController {
         updateChart();
     }
     
-    private void runSweepOnce(Consumer<SweepResponse> analyserDataConsumer) {
-        radio3.executeInBackground(() -> {
-            Response<SweepResponse> response = sweepOnce();
-            if(response.isOK() && radio3.isConnected()) {
-                Platform.runLater(() -> analyserDataConsumer.accept(response.getData()));
-            } else {
-                enableUI();
-            }
-        });
-    }
-
-    private void continuousChangeListener(ObservableValue<? extends Boolean> ob, Boolean ov, Boolean continuous) {
-        if(continuous) {
-            disableUI();
-            runSweepOnce(this::displayDataAndSweepAgain);
-            btnContinuous.setText(mainController.ui.text("button.stop"));
-        } else {
-            enableUI();
-            btnContinuous.setText(mainController.ui.text("button.continuous"));
-        }
-    }
-
-    private Response<SweepResponse> sweepOnce() {
+    protected Response<SweepResponse> sweepOnce() {
         SweepQuality quality = sweepSettingsController.getQuality();
         long fStart = sweepSettingsController.getStartFrequency().toHz();
         long fEnd = sweepSettingsController.getEndFrequency().toHz();

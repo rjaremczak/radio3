@@ -21,7 +21,7 @@ public class RangeTest {
         double v = -8.050183150183159;
         range.sample(v);
         assertTrue(range.isValid());
-        assertEquals(v, range.min(), Double.MIN_VALUE);
-        assertEquals(v, range.max(), Double.MIN_VALUE);
+        assertEquals(v, range.min());
+        assertEquals(v, range.max());
     }
 }

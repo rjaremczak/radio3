@@ -18,7 +18,7 @@
 
 <AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.VnaController">
    <children>
-      <VBox fx:id="vBox" layoutX="211.0" layoutY="50.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox layoutX="211.0" layoutY="50.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox fx:id="controlBox" spacing="5.0">
                <children>
@@ -38,7 +38,7 @@
                       <RowConstraints vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button fx:id="btnStart" defaultButton="true" mnemonicParsing="false" onAction="#onSweepOnce" text="%button.start" GridPane.rowIndex="2" />
+                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" text="%button.start" GridPane.rowIndex="2" />
                         <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="%button.continuous" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text=" " GridPane.rowIndex="1" />
                         <Label GridPane.rowIndex="1" />

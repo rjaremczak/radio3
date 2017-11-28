@@ -1,7 +1,9 @@
 package com.mindpart.radio3.ui;
 
 import com.mindpart.ui.DoubleSpinner;
+import com.mindpart.ui.FxUtils;
 import com.mindpart.util.ResourceBundleUtils;
+import javafx.scene.Parent;
 import javafx.util.StringConverter;
 
 import java.util.Locale;
@@ -42,10 +44,6 @@ public class UserInterface {
         return resourceBundle.getString(key.toString());
     }
 
-    public ResourceBundle getResourceBundle() {
-        return resourceBundle;
-    }
-
     public StringConverter getGenericStringConverter() {
         return genericStringConverter;
     }
@@ -61,5 +59,9 @@ public class UserInterface {
         initFrequencyField(doubleSpinner);
         doubleSpinner.getDoubleValueFactory().setMin(FREQUENCY_MIN_MHZ);
         doubleSpinner.getDoubleValueFactory().setMax(FREQUENCY_MAX_MHZ);
+    }
+
+    public Parent loadFXml(Object controller, String fxml) {
+        return FxUtils.loadFXml(controller, fxml, resourceBundle);
     }
 }
