@@ -1,17 +1,19 @@
 package com.mindpart.radio3.device;
 
+import com.mindpart.science.Frequency;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.11.18
  */
 public class SweepDataInfo {
     private SweepState state;
-    private long freqStart;
-    private long freqStep;
+    private Frequency freqStart;
+    private Frequency freqStep;
     private int numSteps;
     private SweepSignalSource source;
 
-    public SweepDataInfo(SweepState state, long freqStart, long freqStep, int numSteps, SweepSignalSource source) {
+    public SweepDataInfo(SweepState state, Frequency freqStart, Frequency freqStep, int numSteps, SweepSignalSource source) {
         this.state = state;
         this.freqStart = freqStart;
         this.freqStep = freqStep;
@@ -23,15 +25,15 @@ public class SweepDataInfo {
         return state;
     }
 
-    public long getFreqStart() {
+    public Frequency getFreqStart() {
         return freqStart;
     }
 
-    public long getFreqEnd() {
-        return freqStart + numSteps * freqStep;
+    public Frequency getFreqEnd() {
+        return new Frequency(freqStart.value + numSteps * freqStep.value);
     }
 
-    public long getFreqStep() {
+    public Frequency getFreqStep() {
         return freqStep;
     }
 

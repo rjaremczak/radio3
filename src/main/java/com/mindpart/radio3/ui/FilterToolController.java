@@ -24,8 +24,8 @@ import java.util.Collection;
 
 import static com.mindpart.radio3.ui.FilterInfoType.BANDPASS;
 import static com.mindpart.radio3.ui.FilterInfoType.BANDSTOP;
-import static com.mindpart.type.UnitPrefix.NANO;
-import static com.mindpart.type.UnitPrefix.PICO;
+import static com.mindpart.science.UnitPrefix.NANO;
+import static com.mindpart.science.UnitPrefix.PICO;
 
 /**
  * Created by Robert Jaremczak

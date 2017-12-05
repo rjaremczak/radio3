@@ -7,6 +7,7 @@ import com.mindpart.radio3.config.SweepProfilesService;
 import com.mindpart.radio3.ui.DeviceStatus;
 import com.mindpart.bin.Binary;
 import com.mindpart.bin.BinaryBuilder;
+import com.mindpart.science.Frequency;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -137,10 +138,10 @@ public class Radio3 {
         return ((avgPasses - 1) & 0x0f) << 4 | ((avgSamples - 1) & 0x0f);
     }
 
-    public Response<SweepResponse> startAnalyser(long freqStart, long freqStep, int numSteps, int avgPasses, int avgSamples, SweepSignalSource source) {
+    public Response<SweepResponse> startAnalyser(Frequency freqStart, Frequency freqStep, int numSteps, int avgPasses, int avgSamples, SweepSignalSource source) {
         BinaryBuilder builder = new BinaryBuilder(14);
-        builder.addUInt32(freqStart);
-        builder.addUInt32(freqStep);
+        builder.addUInt32(freqStart.value);
+        builder.addUInt32(freqStep.value);
         builder.addUInt16(numSteps);
         builder.addUInt8(source.ordinal());
         builder.addUInt8(buildAvgMode(avgPasses, avgSamples));

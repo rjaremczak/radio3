@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.type.Power;
+import com.mindpart.science.Power;
 
 import java.util.function.Function;
 

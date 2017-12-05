@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.type.UnitPrefix;
+import com.mindpart.science.UnitPrefix;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

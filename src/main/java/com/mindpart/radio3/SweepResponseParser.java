@@ -2,6 +2,7 @@ package com.mindpart.radio3;
 
 import com.mindpart.radio3.device.*;
 import com.mindpart.bin.BinaryIterator;
+import com.mindpart.science.Frequency;
 
 /**
  * Created by Robert Jaremczak
@@ -19,8 +20,8 @@ public class SweepResponseParser implements FrameParser<SweepResponse> {
         BinaryIterator bi = frame.binaryIterator();
         SweepResponse response = new SweepResponse(
                 SweepState.values()[bi.nextUInt8()],
-                bi.nextUInt32(),
-                bi.nextUInt32(),
+                new Frequency((int) bi.nextUInt32()),
+                new Frequency((int) bi.nextUInt32()),
                 bi.nextUInt16(),
                 SweepSignalSource.values()[bi.nextUInt8()]);
 

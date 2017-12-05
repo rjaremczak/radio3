@@ -1,11 +1,13 @@
 package com.mindpart.radio3.device;
 
+import com.mindpart.science.Frequency;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2016.04.16
  */
 public class SweepResponse extends SweepDataInfo {
-    public SweepResponse(SweepState state, long freqStart, long freqStep, int numSteps, SweepSignalSource source) {
+    public SweepResponse(SweepState state, Frequency freqStart, Frequency freqStep, int numSteps, SweepSignalSource source) {
         super(state, freqStart, freqStep, numSteps, source);
         this.data = new int[source.getNumSeries()][numSteps+1];
     }

@@ -1,7 +1,10 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.type.Frequency;
+import com.mindpart.science.Frequency;
+import com.mindpart.science.UnitPrefix;
 import javafx.scene.chart.NumberAxis;
+
+import static com.mindpart.science.UnitPrefix.MEGA;
 
 /**
  * Created by Robert Jaremczak
@@ -19,9 +22,9 @@ public final class FrequencyAxisUtils {
         return 1.0;
     }
 
-    public static void setupFrequencyAxis(NumberAxis axis, long freqStart, long freqEnd) {
-        double f0 = Frequency.toMHz(freqStart);
-        double f1 = Frequency.toMHz(freqEnd);
+    public static void setupFrequencyAxis(NumberAxis axis, Frequency freqStart, Frequency freqEnd) {
+        double f0 = freqStart.to(MEGA);
+        double f1 = freqEnd.to(MEGA);
         axis.setAutoRanging(false);
         axis.setLowerBound(f0);
         axis.setUpperBound(f1);

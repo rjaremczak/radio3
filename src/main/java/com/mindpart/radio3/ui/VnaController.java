@@ -5,8 +5,9 @@ import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
 import com.mindpart.radio3.device.SweepResponse;
 import com.mindpart.radio3.device.SweepSignalSource;
-import com.mindpart.type.Frequency;
-import com.mindpart.type.SWR;
+import com.mindpart.science.Frequency;
+import com.mindpart.science.SWR;
+import com.mindpart.science.UnitPrefix;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.ui.FxChartUtils;
 import com.mindpart.ui.FxUtils;
@@ -19,13 +20,13 @@ import javafx.scene.Parent;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import static com.mindpart.science.UnitPrefix.MEGA;
 import static com.mindpart.ui.FxChartUtils.autoRangeAxis;
 import static com.mindpart.ui.FxUtils.valueFromSeries;
 
@@ -75,7 +76,7 @@ public class VnaController extends AbstractSweepController {
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
         double axisX = swrAxisX.sceneToLocal(scenePos).getX();
-        return Frequency.ofMHz(swrAxisX.getValueForDisplay(axisX).doubleValue());
+        return new Frequency(swrAxisX.getValueForDisplay(axisX).doubleValue(), MEGA);
     }
 
     private Point2D swrToLocalPos(SWR swr) {
@@ -93,9 +94,9 @@ public class VnaController extends AbstractSweepController {
             if(swrDataSeries.isEmpty()) return null;
             
             Frequency freq = scenePosToFrequency(scenePos);
-            SWR swr = new SWR(valueFromSeries(swrDataSeries.get(0), freq.toMHz()));
-            double r = valueFromSeries(impedanceDataSeries.get(0), freq.toMHz());
-            double x = valueFromSeries(impedanceDataSeries.get(1), freq.toMHz());
+            SWR swr = new SWR(valueFromSeries(swrDataSeries.get(0), freq.to(MEGA)));
+            double r = valueFromSeries(impedanceDataSeries.get(0), freq.to(MEGA));
+            double x = valueFromSeries(impedanceDataSeries.get(1), freq.to(MEGA));
             Point2D selectionPos = new Point2D(scenePos.getX(), swrToLocalPos(swr).getY());
             return new ChartMarker.SelectionData(selectionPos , "f = "+freq+"\nSWR = "+swr+"\nZ = "+RX_FORMAT.format(r)+" + j"+RX_FORMAT.format(x)+" Ω");
         }, () -> !btnContinuous.isSelected(), () -> true);
@@ -150,9 +151,9 @@ public class VnaController extends AbstractSweepController {
 
     protected Response<SweepResponse> sweepOnce() {
         SweepQuality quality = sweepSettingsController.getQuality();
-        long fStart = sweepSettingsController.getStartFrequency().toHz();
-        long fEnd = sweepSettingsController.getEndFrequency ().toHz();
-        int fStep = (int) ((fEnd - fStart) / quality.getSteps());
+        Frequency fStart = sweepSettingsController.getStartFrequency();
+        Frequency fEnd = sweepSettingsController.getEndFrequency ();
+        Frequency fStep = new Frequency(((fEnd.value - fStart.value) / quality.getSteps()));
         return radio3.startAnalyser(fStart, fStep,
                 quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(),
                 SweepSignalSource.VNA);
@@ -160,7 +161,7 @@ public class VnaController extends AbstractSweepController {
 
     public void updateAnalyserData(SweepResponse ad) {
         chartMarker.clear();
-        long freqEnd = ad.getFreqStart() + (ad.getNumSteps() * ad.getFreqStep());
+        Frequency freqEnd = new Frequency(ad.getFreqStart().value + (ad.getNumSteps() * ad.getFreqStep().value));
         int samples[][] = ad.getData();
 
         FrequencyAxisUtils.setupFrequencyAxis(swrAxisX, ad.getFreqStart(), freqEnd);
@@ -175,7 +176,7 @@ public class VnaController extends AbstractSweepController {
         return series;
     }
 
-    private void updateCharts(long freqStart, long freqStep, int numSteps, int samples[][]) {
+    private void updateCharts(Frequency freqStart, Frequency freqStep, int numSteps, int samples[][]) {
         clear();
 
         XYChart.Series<Number, Number> swrSeries = createSeries("SWR");
@@ -188,14 +189,14 @@ public class VnaController extends AbstractSweepController {
 
         Range swrRange = new Range();
         Range impedanceRange = new Range();
-        long freq = freqStart;
+        long freq = freqStart.value;
         for (int num = 0; num <= numSteps; num++) {
             VnaResult vnaResult = radio3.getVnaParser().calculateVnaResult(samples[0][num], samples[1][num]);
-            double fMHz = Frequency.toMHz(freq);
+            double fMHz = MEGA.fromBase(freq);
             swrData.add(new XYChart.Data<>(fMHz, swrRange.sample(vnaResult.getSwr())));
             rData.add(new XYChart.Data<>(fMHz, impedanceRange.sample(vnaResult.getR())));
             xData.add(new XYChart.Data<>(fMHz, impedanceRange.sample(vnaResult.getX())));
-            freq += freqStep;
+            freq += freqStep.value;
         }
 
         swrChart.getData().add(swrSeries);

@@ -3,7 +3,6 @@ package com.mindpart.radio3;
 import com.mindpart.radio3.config.FreqMeterConfig;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
-import com.mindpart.type.Frequency;
 import com.mindpart.bin.Binary;
 
 import static com.mindpart.radio3.device.FrameCommand.FMETER_DATA;

@@ -2,7 +2,8 @@ package com.mindpart.radio3.ui;
 
 import com.mindpart.radio3.SweepProfile;
 import com.mindpart.radio3.SweepProfiles;
-import com.mindpart.type.Frequency;
+import com.mindpart.science.Frequency;
+import com.mindpart.science.UnitPrefix;
 import com.mindpart.ui.DoubleSpinner;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ObservableValue;
@@ -11,6 +12,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import org.apache.log4j.Logger;
+
+import static com.mindpart.science.UnitPrefix.MEGA;
 
 /**
  * Created by Robert Jaremczak
@@ -88,11 +91,11 @@ public class SweepSettingsController {
     }
 
     public Frequency getStartFrequency() {
-        return Frequency.ofMHz(startFrequencyField.getDoubleValueFactory().getValue());
+        return new Frequency(startFrequencyField.getDoubleValueFactory().getValue(), MEGA);
     }
 
     public Frequency getEndFrequency() {
-        return Frequency.ofMHz(endFrequencyField.getDoubleValueFactory().getValue());
+        return new Frequency(endFrequencyField.getDoubleValueFactory().getValue(), MEGA);
     }
 
     public void setFrequencyRange(double startFreqMHz, double endFreqMHz) {

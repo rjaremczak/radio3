@@ -1,9 +1,12 @@
 package com.mindpart.radio3;
 
-import com.mindpart.type.Frequency;
+import com.mindpart.science.Frequency;
+import com.mindpart.science.UnitPrefix;
 import javafx.scene.chart.XYChart;
 
 import java.util.List;
+
+import static com.mindpart.science.UnitPrefix.MEGA;
 
 /**
  * Created by Robert Jaremczak
@@ -37,11 +40,11 @@ public class VnaStatistics {
     }
 
     public Frequency getMinFrequency() {
-        return Frequency.ofMHz(minFrequency);
+        return new Frequency(minFrequency, MEGA);
     }
 
     public Frequency getMaxFrequency() {
-        return Frequency.ofMHz(maxFrequency);
+        return new Frequency(maxFrequency, MEGA);
     }
 
     public double getMinSwr() {

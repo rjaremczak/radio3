@@ -3,11 +3,11 @@ package com.mindpart.radio3.ui;
 import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.Range;
 import com.mindpart.radio3.device.*;
-import com.mindpart.type.Frequency;
+import com.mindpart.science.Frequency;
+import com.mindpart.science.UnitPrefix;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.ui.FxChartUtils;
 import com.mindpart.ui.FxUtils;
-import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +17,6 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Accordion;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
@@ -25,11 +24,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import java.io.IOException;
-import java.util.function.Consumer;
-
 import static com.mindpart.radio3.device.SweepSignalSource.LIN_PROBE;
 import static com.mindpart.radio3.device.SweepSignalSource.LOG_PROBE;
+import static com.mindpart.science.UnitPrefix.MEGA;
 import static com.mindpart.ui.FxUtils.valueFromSeries;
 
 /**
@@ -102,7 +99,7 @@ public class SweepController extends AbstractSweepController {
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
         double axisX = signalAxisX.sceneToLocal(scenePos).getX();
-        return Frequency.ofMHz(signalAxisX.getValueForDisplay(axisX).doubleValue());
+        return new Frequency(signalAxisX.getValueForDisplay(axisX).doubleValue(), MEGA);
     }
 
     private Point2D valueToRefPos(double value) {
@@ -131,7 +128,7 @@ public class SweepController extends AbstractSweepController {
             if(signalDataSeries.isEmpty()) return null;
             
             Frequency freq = scenePosToFrequency(scenePos);
-            double value = valueFromSeries(signalDataSeries.get(0), freq.toMHz());
+            double value = valueFromSeries(signalDataSeries.get(0), freq.to(MEGA));
             Point2D selectionPos = new Point2D(scenePos.getX(), valueToRefPos(value).getY());
             return new ChartMarker.SelectionData(selectionPos, "f = "+freq+"\n" + chartContext.valueProcessor.valueLabel()+" = "+ chartContext.valueProcessor.format(value));
         }, () -> !btnContinuous.isSelected(), () -> !btnNormalize.isSelected());
@@ -237,11 +234,12 @@ public class SweepController extends AbstractSweepController {
     public void updateAnalyserData(SweepResponse ad) {
         receivedDataInfo = ad.toInfo();
         int samples[] = ad.getData()[0];
-        long freq = ad.getFreqStart();
+        int freq = ad.getFreqStart().value;
+        int freqStep = ad.getFreqStep().value;
         chartContext.init(samples.length);
         for (int step = 0; step <= ad.getNumSteps(); step++) {
-            chartContext.setReceivedData(step, samples[step], Frequency.toMHz(freq));
-            freq += ad.getFreqStep();
+            chartContext.setReceivedData(step, samples[step],  MEGA.fromBase(freq));
+            freq += freqStep;
         }
 
         updateChart();
@@ -249,9 +247,9 @@ public class SweepController extends AbstractSweepController {
     
     protected Response<SweepResponse> sweepOnce() {
         SweepQuality quality = sweepSettingsController.getQuality();
-        long fStart = sweepSettingsController.getStartFrequency().toHz();
-        long fEnd = sweepSettingsController.getEndFrequency().toHz();
-        int fStep = (int) ((fEnd - fStart) / quality.getSteps());
+        Frequency fStart = sweepSettingsController.getStartFrequency();
+        Frequency fEnd = sweepSettingsController.getEndFrequency();
+        Frequency fStep = new Frequency((fEnd.value - fStart.value) / quality.getSteps());
         return radio3.startAnalyser(fStart, fStep,
                 quality.getSteps(), quality.getAvgPasses(), quality.getAvgSamples(), sourceProbe.getValue());
     }

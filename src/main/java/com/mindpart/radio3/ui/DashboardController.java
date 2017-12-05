@@ -5,10 +5,7 @@ import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
 import com.mindpart.ui.DoubleSpinner;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import org.apache.log4j.Logger;
 
@@ -17,7 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.mindpart.type.UnitPrefix.MEGA;
+import static com.mindpart.science.UnitPrefix.MEGA;
 
 /**
  * Created by Robert Jaremczak

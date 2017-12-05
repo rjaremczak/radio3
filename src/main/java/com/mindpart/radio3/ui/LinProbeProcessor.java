@@ -1,6 +1,6 @@
 package com.mindpart.radio3.ui;
 
-import com.mindpart.type.Voltage;
+import com.mindpart.science.Voltage;
 
 import java.util.function.Function;
 

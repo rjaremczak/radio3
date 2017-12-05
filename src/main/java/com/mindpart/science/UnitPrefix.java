@@ -1,4 +1,4 @@
-package com.mindpart.type;
+package com.mindpart.science;
 
 /**
  * Created by Robert Jaremczak
