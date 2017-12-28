@@ -4,7 +4,6 @@ import com.mindpart.javafx.EnhancedLineChart;
 import com.mindpart.numeric.Range;
 import com.mindpart.radio3.device.*;
 import com.mindpart.science.Frequency;
-import com.mindpart.science.UnitPrefix;
 import com.mindpart.ui.ChartMarker;
 import com.mindpart.ui.FxChartUtils;
 import com.mindpart.ui.FxUtils;
@@ -93,8 +92,8 @@ public class SweepController extends AbstractSweepController {
         } else {
             throw new IllegalStateException("source probe: "+sourceProbe.getValue());
         }
-        
-        signalAxisY.setLabel(chartContext.valueProcessor.axisLabel());
+
+        signalAxisX.setLabel(chartContext.valueProcessor.axisLabel()+ " / "+ ui.text("axis.freq"));
     }
 
     private Frequency scenePosToFrequency(Point2D scenePos) {
@@ -107,8 +106,8 @@ public class SweepController extends AbstractSweepController {
     }
 
     private void initSignalChart() {
-        signalAxisX = new NumberAxis(ui.text("axis.freq"), 0, 52, 5);
-        signalAxisY = new NumberAxis(ui.text("axis.power"), -40, 10, 5);
+        signalAxisX = new NumberAxis(0, 52, 5);
+        signalAxisY = new NumberAxis(-40, 10, 5);
         signalChart = new EnhancedLineChart<>(signalAxisX, signalAxisY);
         signalChart.legendVisibleProperty().setValue(false);
         signalChart.setAnimated(false);

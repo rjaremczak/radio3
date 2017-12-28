@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  */
 public class DoubleSpinner extends Spinner<Double> {
     private static final Logger logger = Logger.getLogger(DoubleSpinner.class);
-    private static final Pattern NON_NEGATIVE = Pattern.compile("\\d+(?:\\.\\d+)?");
+    private static final Pattern NON_NEGATIVE = Pattern.compile("\\d*(?:\\.\\d+)?");
 
     private final TextFormatter<Double> textFormatter;
 
