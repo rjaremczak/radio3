@@ -16,6 +16,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
@@ -50,6 +51,21 @@ public class SweepController extends AbstractSweepController {
 
     @FXML
     private ToggleButton btnTools;
+
+    @FXML
+    private Button btnZoomIn;
+
+    @FXML
+    private Button btnZoomOut;
+
+    @FXML
+    private Button btnPanUp;
+
+    @FXML
+    private Button btnPanDown;
+
+    @FXML
+    private ToggleButton btnAutoRange;
 
     private final ChartMarker chartMarker = new ChartMarker();
     private final MainController mainController;
@@ -147,7 +163,26 @@ public class SweepController extends AbstractSweepController {
 
         initInputProbeList();
         initChartContext();
+        initChartTools();
+        initAutoRange();
+        
+        updateNormButton();
+    }
 
+    private void initAutoRange() {
+        btnAutoRange.selectedProperty().addListener((observable, oldValue, selected) -> {
+            disableManualRangeControls(selected);
+            updateChart();
+        });
+        btnAutoRange.setSelected(true);
+
+        btnPanUp.setOnAction(event -> FxChartUtils.panAxis(signalAxisY, -signalAxisY.getTickUnit()));
+        btnPanDown.setOnAction(event -> FxChartUtils.panAxis(signalAxisY, signalAxisY.getTickUnit()));
+        btnZoomIn.setOnAction(event -> FxChartUtils.scaleAxis(signalAxisY, 0.5));
+        btnZoomOut.setOnAction(event -> FxChartUtils.scaleAxis(signalAxisY, 2));
+    }
+
+    private void initChartTools() {
         chartToolsAccordion = new Accordion();
         chartToolsAccordion.setMinWidth(180);
 
@@ -165,7 +200,13 @@ public class SweepController extends AbstractSweepController {
             }
         });
         btnTools.setSelected(true);
-        updateNormButton();
+    }
+
+    private void disableManualRangeControls(boolean disable) {
+        btnZoomIn.setDisable(disable);
+        btnZoomOut.setDisable(disable);
+        btnPanUp.setDisable(disable);
+        btnPanDown.setDisable(disable);
     }
 
     protected void sweepSettingsChangeListener() {
@@ -276,17 +317,24 @@ public class SweepController extends AbstractSweepController {
             range.sample(processed);
             data.add(new Data<>(chartContext.receivedFreq[step], processed));
         }
+        
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, receivedDataInfo.getFreqStart(), receivedDataInfo.getFreqEnd());
-        switch (sourceProbe.getValue()) {
-            case LIN_PROBE:
-                FxChartUtils.autoRangeAxis(signalAxisY, range, 0.02, 0.01);
-                break;
-            default:
-                FxChartUtils.autoRangeAxis(signalAxisY, range, 6, 1);
-        }
+        updateValueAxisRange(range);
 
         rangeToolController.update();
         filterToolController.update();
+    }
+    
+    private void updateValueAxisRange(Range range) {
+        if(btnAutoRange.isSelected()) {
+            switch (sourceProbe.getValue()) {
+                case LIN_PROBE:
+                    FxChartUtils.autoRangeAxis(signalAxisY, range, 0.02, 0.01);
+                    break;
+                default:
+                    FxChartUtils.autoRangeAxis(signalAxisY, range, 6, 1);
+            }
+        }
     }
 
     void clear() {

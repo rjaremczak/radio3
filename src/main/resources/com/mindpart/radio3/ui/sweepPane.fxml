@@ -56,20 +56,32 @@
                <children>
                   <VBox fx:id="boxRangeControl" alignment="CENTER" spacing="5.0">
                      <children>
-                        <Button fx:id="btnWidenRange" mnemonicParsing="false" text="↑">
+                        <Button fx:id="btnZoomIn" mnemonicParsing="false" text="⊕">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Button>
-                        <ToggleButton fx:id="btnAutoRange" mnemonicParsing="false" prefWidth="30.0" text="A" />
-                        <Button fx:id="btnNarrowRange" mnemonicParsing="false" text="↓">
+                        <Button fx:id="btnZoomOut" mnemonicParsing="false" text="⊖">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Button>
-                        <ToggleButton fx:id="btnZeroInRange" mnemonicParsing="false" prefWidth="30.0" text="0">
+                        <Button fx:id="btnPanUp" mnemonicParsing="false" text="↑">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
                            <VBox.margin>
-                              <Insets top="10.0" />
+                              <Insets top="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="btnPanDown" mnemonicParsing="false" text="↓">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </Button>
+                        <ToggleButton fx:id="btnAutoRange" mnemonicParsing="false" prefWidth="30.0" text="A">
+                           <VBox.margin>
+                              <Insets top="5.0" />
                            </VBox.margin></ToggleButton>
                      </children>
                      <padding>

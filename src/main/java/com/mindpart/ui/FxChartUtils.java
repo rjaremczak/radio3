@@ -43,4 +43,20 @@ public final class FxChartUtils {
     public static void autoRangeAxis(NumberAxis axis, Range range, double minSpan, double minGrid) {
         autoRangeAxis(axis, range, minSpan, -Double.MAX_VALUE, Double.MAX_VALUE, minGrid);
     }
+
+    public static void panAxis(NumberAxis axis, double step) {
+        axis.setLowerBound(axis.getLowerBound() + step);
+        axis.setUpperBound(axis.getUpperBound() + step);
+    }
+
+    public static void scaleAxis(NumberAxis axis, double factor) {
+        double range = axis.getUpperBound() - axis.getLowerBound();
+        double center = axis.getLowerBound() + range/2;
+
+        double newRange = range * factor;
+
+        axis.setLowerBound(center - newRange/2);
+        axis.setUpperBound(center + newRange/2);
+        axis.setTickUnit(tickUnit(newRange, NUM_TICKS));
+    }
 }
