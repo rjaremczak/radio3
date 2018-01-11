@@ -65,7 +65,7 @@ public class SweepController extends AbstractSweepController {
     private Button btnPanDown;
 
     @FXML
-    private ToggleButton btnAutoRange;
+    private Button btnAutoRange;
 
     private final ChartMarker chartMarker = new ChartMarker();
     private final MainController mainController;
@@ -123,7 +123,7 @@ public class SweepController extends AbstractSweepController {
 
     private void initSignalChart() {
         signalAxisX = new NumberAxis(0, 52, 5);
-        signalAxisY = new NumberAxis(-40, 10, 5);
+        signalAxisY = new NumberAxis(-60, 10, 5);
         signalChart = new EnhancedLineChart<>(signalAxisX, signalAxisY);
         signalChart.legendVisibleProperty().setValue(false);
         signalChart.setAnimated(false);
@@ -164,18 +164,13 @@ public class SweepController extends AbstractSweepController {
         initInputProbeList();
         initChartContext();
         initChartTools();
-        initAutoRange();
+        initRangeControls();
         
         updateNormButton();
     }
 
-    private void initAutoRange() {
-        btnAutoRange.selectedProperty().addListener((observable, oldValue, selected) -> {
-            disableManualRangeControls(selected);
-            updateChart();
-        });
-        btnAutoRange.setSelected(true);
-
+    private void initRangeControls() {
+        btnAutoRange.setOnAction(event -> autoRangeValueAxis());
         btnPanUp.setOnAction(event -> FxChartUtils.panAxis(signalAxisY, -signalAxisY.getTickUnit()));
         btnPanDown.setOnAction(event -> FxChartUtils.panAxis(signalAxisY, signalAxisY.getTickUnit()));
         btnZoomIn.setOnAction(event -> FxChartUtils.scaleAxis(signalAxisY, 0.5));
@@ -200,13 +195,6 @@ public class SweepController extends AbstractSweepController {
             }
         });
         btnTools.setSelected(true);
-    }
-
-    private void disableManualRangeControls(boolean disable) {
-        btnZoomIn.setDisable(disable);
-        btnZoomOut.setDisable(disable);
-        btnPanUp.setDisable(disable);
-        btnPanDown.setDisable(disable);
     }
 
     protected void sweepSettingsChangeListener() {
@@ -311,29 +299,28 @@ public class SweepController extends AbstractSweepController {
         ObservableList<Data<Number, Number>> data = chartSeries.getData();
         signalDataSeries.add(chartSeries);
 
-        Range range = new Range();
         for (int step = 0; step < chartContext.getDataSize(); step++) {
-            double processed = chartContext.setAndGetProcessedData(step);
-            range.sample(processed);
-            data.add(new Data<>(chartContext.receivedFreq[step], processed));
+            double processedValue = chartContext.setAndGetProcessedData(step);
+            data.add(new Data<>(chartContext.receivedFreq[step], processedValue));
         }
         
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, receivedDataInfo.getFreqStart(), receivedDataInfo.getFreqEnd());
-        updateValueAxisRange(range);
-
         rangeToolController.update();
         filterToolController.update();
     }
     
-    private void updateValueAxisRange(Range range) {
-        if(btnAutoRange.isSelected()) {
-            switch (sourceProbe.getValue()) {
-                case LIN_PROBE:
-                    FxChartUtils.autoRangeAxis(signalAxisY, range, 0.02, 0.01);
-                    break;
-                default:
-                    FxChartUtils.autoRangeAxis(signalAxisY, range, 6, 1);
-            }
+    private void autoRangeValueAxis() {
+        Range range = new Range();
+        for(int i=0; i<chartContext.processedData.length; i++) {
+            range.sample(chartContext.processedData[i]);
+        }
+
+        switch (sourceProbe.getValue()) {
+            case LIN_PROBE:
+                FxChartUtils.autoRangeAxis(signalAxisY, range, 0.02, 0.01);
+                break;
+            default:
+                FxChartUtils.autoRangeAxis(signalAxisY, range, 6, 1);
         }
     }
 

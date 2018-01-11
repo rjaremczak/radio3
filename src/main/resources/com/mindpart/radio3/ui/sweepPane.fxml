@@ -79,10 +79,10 @@
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Button>
-                        <ToggleButton fx:id="btnAutoRange" mnemonicParsing="false" prefWidth="30.0" text="A">
+                        <Button fx:id="btnAutoRange" mnemonicParsing="false" prefWidth="30.0" text="A">
                            <VBox.margin>
                               <Insets top="5.0" />
-                           </VBox.margin></ToggleButton>
+                           </VBox.margin></Button>
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

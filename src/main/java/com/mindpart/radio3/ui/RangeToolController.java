@@ -30,13 +30,13 @@ public class RangeToolController {
         this.chartContext = chartContext;
 
         propertyGrid = new PropertyGrid();
-        minValue = propertyGrid.addProperty("min [dBm]");
-        minFreq = propertyGrid.addProperty("f min [MHz]");
+        minValue = propertyGrid.addProperty("min", "dBm");
+        minFreq = propertyGrid.addProperty("f min", "MHz");
         propertyGrid.addRow();
-        maxValue = propertyGrid.addProperty("max [dBm]");
-        maxFreq = propertyGrid.addProperty("f max [MHz]");
+        maxValue = propertyGrid.addProperty("max", "dBm");
+        maxFreq = propertyGrid.addProperty("f max", "MHz");
         propertyGrid.addRow();
-        spanValue = propertyGrid.addProperty("Δf [MHz]");
+        spanValue = propertyGrid.addProperty("Δf", "MHz");
 
         titledPane = new TitledPane(bundle.text("info.ranges.title"), propertyGrid.getNode());
         titledPane.setAlignment(Pos.TOP_LEFT);

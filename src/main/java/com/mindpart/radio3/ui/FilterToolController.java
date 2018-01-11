@@ -69,20 +69,20 @@ public class FilterToolController {
         filterInfoTypeChoiceBox.getSelectionModel().selectedItemProperty().addListener(this::onChangeFilterType);
 
         propertyGrid = new PropertyGrid();
-        propertyGrid.addProperty(ui.text("info.bandfilter.type"), filterInfoTypeChoiceBox);
+        propertyGrid.addProperty(ui.text("info.bandfilter.type"), filterInfoTypeChoiceBox, "");
         propertyGrid.addRow();
         
-        bandPeakFreq = propertyGrid.addProperty("f₀ [MHz]");
-        bandwidth = propertyGrid.addProperty("B [MHz]");
-        qFactor = propertyGrid.addProperty("Q");
+        bandPeakFreq = propertyGrid.addProperty("f₀", "MHz");
+        bandwidth = propertyGrid.addProperty("B", "MHz");
+        qFactor = propertyGrid.addProperty("Q", "");
         propertyGrid.addRow();
 
-        capacitance = propertyGrid.addProperty("C [pF]", new IntegerSpinner());
+        capacitance = propertyGrid.addProperty("C", new IntegerSpinner(), "pF");
         capacitance.getEditor().setFont(Font.font("Courier", FontWeight.BOLD, 13));
         propertyGrid.addRow();
 
-        inductance = propertyGrid.addProperty("L [nH]");
-        resistance = propertyGrid.addProperty("R [Ω]");
+        inductance = propertyGrid.addProperty("L", "nH");
+        resistance = propertyGrid.addProperty("R", "Ω");
         capacitance.valueProperty().addListener((observable, oldValue, newValue) -> updateLR());
 
         titledPane = new TitledPane(ui.text("info.bandfilter.title"), propertyGrid.getNode());
