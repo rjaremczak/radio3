@@ -154,8 +154,9 @@ public class MainController {
 
     private void updateOnDisconnect(DeviceStatus deviceStatus) {
         btnConnect.setText(ui.text("button.connect"));
-        FxUtils.enableItems(btnConnect, serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
+        FxUtils.enableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         FxUtils.disableItems(toolBar, dashboardTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
+        btnConnect.setDisable(availablePortNames.isEmpty());
         deviceProperties.clear();
         devicePropertiesMap.clear();
         updateDeviceStatus(deviceStatus);
@@ -197,7 +198,7 @@ public class MainController {
     }
 
 
-    public void initialize() throws IOException {
+    public void initialize() {
         nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, dashboardTab);
 
         devicePropertiesTable.setItems(deviceProperties);
@@ -231,11 +232,11 @@ public class MainController {
 
         if(deselectedPane == dashboardTab) {
             dashboardController.deactivate();
-            FxUtils.enableItems(btnConnect);
+            btnConnect.setDisable(true);
         }
 
         if(selectedPane == dashboardTab) {
-            FxUtils.disableItems(btnConnect);
+            btnConnect.setDisable(availablePortNames.isEmpty());
             disableVfoOut(false);
             dashboardController.activate();
         } else if(selectedPane == sweepTab) {
