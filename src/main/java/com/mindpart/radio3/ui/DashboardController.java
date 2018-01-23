@@ -3,6 +3,9 @@ package com.mindpart.radio3.ui;
 import com.mindpart.radio3.device.Probes;
 import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
+import com.mindpart.science.Power;
+import com.mindpart.science.UnitPrefix;
+import com.mindpart.science.Voltage;
 import com.mindpart.ui.DoubleSpinner;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -44,10 +47,17 @@ public class DashboardController {
     protected Label logProbeValue;
 
     @FXML
+    protected Label logProbeAux;
+
+    @FXML
     protected Label linProbeValue;
 
     @FXML
+    protected Label linProbeAux;
+
+    @FXML
     protected Label vnaProbeValue;
+
 
     public void initialize() {
         continuousSampling.scheduleWithFixedDelay(() -> {
@@ -62,10 +72,19 @@ public class DashboardController {
         Response<Probes> response = radio3.readAllProbes();
         if(response.isOK()) {
             Probes probes = response.getData();
-            fMeterFreq.setText(ui.frequency.format(probes.getFMeter()));
-            logProbeValue.setText(ui.frequency.format(probes.getLogarithmic()));
-            linProbeValue.setText(ui.frequency.format(probes.getLinear()));
+            Power logPower = Power.ofDBm(probes.getLogarithmic());
+            Voltage linVrms = Voltage.ofVolt(probes.getLinear());
+
+            fMeterFreq.setText(ui.decimal.formatHighPrecision(MEGA.fromBase(probes.getFMeter())));
+            logProbeValue.setText(ui.decimal.format(logPower.toDBm()));
+            linProbeValue.setText(ui.decimal.format(linVrms.toMilliVolt()));
             vnaProbeValue.setText(ui.impedance.format(probes.getVnaResult().getImpedance()));
+
+            Power linDerivedPower = Power.ofWatt(linVrms.toVolt() * linVrms.toVolt() / 50.0);
+            linProbeAux.setText("P = " + ui.decimal.format(linDerivedPower.toMilliWatt()) + " mW ( " + ui.decimal.format(linDerivedPower.toDBm()) + " dBm )");
+
+            Voltage logDerivedVoltage = Voltage.ofVolt(Math.sqrt(logPower.toWatt() * 50.0));
+            logProbeAux.setText("P = " + ui.decimal.format(logPower.toMilliWatt()) + " mW, Vrms = " + ui.decimal.format(logDerivedVoltage.toMilliVolt()) + " mV");
         }
     }
 

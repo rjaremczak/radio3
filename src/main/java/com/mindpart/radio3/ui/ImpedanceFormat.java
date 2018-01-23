@@ -14,6 +14,6 @@ public class ImpedanceFormat {
 
     public String format(Complex impedance) {
         NumberFormat formatter = FORMATTER.get();
-        return formatter.format(impedance.getReal())+" j"+formatter.format(impedance.getImaginary());
+        return formatter.format(impedance.getReal())+" + j"+formatter.format(impedance.getImaginary());
     }
 }

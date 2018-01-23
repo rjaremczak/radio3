@@ -22,7 +22,7 @@ public class UserInterface {
     private final ResourceBundle resourceBundle;
     private final StringConverter genericStringConverter;
 
-    public final FrequencyFormat frequency = new FrequencyFormat();
+    public final DecimalFormat decimal = new DecimalFormat();
     public final ImpedanceFormat impedance = new ImpedanceFormat();
 
     public UserInterface(Locale locale) {

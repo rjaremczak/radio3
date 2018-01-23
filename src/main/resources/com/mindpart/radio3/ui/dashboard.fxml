@@ -18,7 +18,8 @@
           <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="30.0" />
             <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="250.0" />
             <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
-            <ColumnConstraints hgrow="ALWAYS" />
+            <ColumnConstraints fillWidth="false" hgrow="NEVER" minWidth="10.0" />
+            <ColumnConstraints hgrow="ALWAYS" maxWidth="259.0" minWidth="93.0" prefWidth="259.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints vgrow="NEVER" />
@@ -66,6 +67,8 @@
                </font>
             </Label>
             <Label text="Ω" textFill="GREY" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+            <Label fx:id="logProbeAux" text="Label" GridPane.columnIndex="5" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+            <Label fx:id="linProbeAux" text="Label" GridPane.columnIndex="5" GridPane.rowIndex="4" />
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

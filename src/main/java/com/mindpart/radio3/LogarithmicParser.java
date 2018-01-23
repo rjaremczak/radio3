@@ -12,7 +12,7 @@ import static com.mindpart.radio3.device.FrameCommand.LOGPROBE_DATA;
  * Date: 2016.09.23
  */
 public class LogarithmicParser implements FrameParser<Double> {
-    private static final double REF_DBM = -82.5;
+    private static final double REF_DBM = -87;
     private static final double V_TO_DBM_RATIO = 0.025;
 
     private Adc adc = Adc.getDefault();
