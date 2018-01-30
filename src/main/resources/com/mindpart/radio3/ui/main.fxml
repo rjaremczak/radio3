@@ -101,7 +101,7 @@
                         </Tab>
                         <Tab fx:id="sweepTab" text="%tab.sweep" />
                         <Tab fx:id="vnaTab" text="%tab.vna" />
-                        <Tab fx:id="dashboardTab" text="%tab.measurements" />
+                        <Tab fx:id="measurementsTab" text="%tab.measurements" />
                     </tabs>
                 </TabPane>
             </children>

@@ -6,8 +6,9 @@ package com.mindpart.radio3.device;
  */
 public enum HardwareRevision {
     AUTODETECT(0, "Auto"),
-    VERSION_1(1, "Ver. 1"),
-    VERSION_2(2, "Ver. 2");
+    VERSION_1(1),
+    VERSION_2(2),
+    VERSION_3(3);
 
     private int code;
     private String name;
@@ -15,6 +16,10 @@ public enum HardwareRevision {
     HardwareRevision(int code, String name) {
         this.code = code;
         this.name = name;
+    }
+
+    HardwareRevision(int code) {
+        this(code, "Ver. " + code);
     }
 
     @Override

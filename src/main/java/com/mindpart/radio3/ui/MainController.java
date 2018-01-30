@@ -8,8 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -21,14 +19,10 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -75,7 +69,7 @@ public class MainController {
     Tab vnaTab;
 
     @FXML
-    Tab dashboardTab;
+    Tab measurementsTab;
 
     @FXML
     ChoiceBox<VfoType> vfoType;
@@ -124,7 +118,7 @@ public class MainController {
 
     private VnaController vnaController;
     private SweepController sweepController;
-    private DashboardController dashboardController;
+    private DashboardController measurementsController;
 
     public final UserInterface ui;
 
@@ -147,7 +141,7 @@ public class MainController {
 
     private void updateOnConnect() {
         btnConnect.setText(ui.text("button.disconnect"));
-        FxUtils.enableItems(toolBar, btnConnect, dashboardTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
+        FxUtils.enableItems(toolBar, btnConnect, measurementsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         FxUtils.disableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
         updateDeviceStatus(DeviceStatus.READY);
     }
@@ -155,7 +149,7 @@ public class MainController {
     private void updateOnDisconnect(DeviceStatus deviceStatus) {
         btnConnect.setText(ui.text("button.connect"));
         FxUtils.enableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
-        FxUtils.disableItems(toolBar, dashboardTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
+        FxUtils.disableItems(toolBar, measurementsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         btnConnect.setDisable(availablePortNames.isEmpty());
         deviceProperties.clear();
         devicePropertiesMap.clear();
@@ -199,7 +193,7 @@ public class MainController {
 
 
     public void initialize() {
-        nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, dashboardTab);
+        nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, measurementsTab);
 
         devicePropertiesTable.setItems(deviceProperties);
         devicePropertiesRefresh.setOnAction(this::onRefresh);
@@ -209,11 +203,11 @@ public class MainController {
 
         vnaController = new VnaController(radio3, this);
         sweepController = new SweepController(radio3, this);
-        dashboardController = new DashboardController(radio3, ui);
+        measurementsController = new DashboardController(radio3, ui);
 
         sweepTab.setContent(ui.loadFXml(sweepController, "sweepPane.fxml"));
         vnaTab.setContent(ui.loadFXml(vnaController, "vnaPane.fxml"));
-        dashboardTab.setContent(ui.loadFXml(dashboardController, "dashboard.fxml"));
+        measurementsTab.setContent(ui.loadFXml(measurementsController, "measurements.fxml"));
 
         initVfoOut();
         initHardwareRevision();
@@ -230,15 +224,14 @@ public class MainController {
     private void tabSelectionListener(ObservableValue<? extends Tab> observable, Tab deselectedPane, Tab selectedPane) {
         if(deselectedPane == selectedPane) return;
 
-        if(deselectedPane == dashboardTab) {
-            dashboardController.deactivate();
-            btnConnect.setDisable(true);
+        if(deselectedPane == measurementsTab) {
+            measurementsController.deactivate();
         }
 
-        if(selectedPane == dashboardTab) {
+        if(selectedPane == measurementsTab) {
             btnConnect.setDisable(availablePortNames.isEmpty());
             disableVfoOut(false);
-            dashboardController.activate();
+            measurementsController.activate();
         } else if(selectedPane == sweepTab) {
             disableVfoOut(true);
         } else if(selectedPane == vnaTab) {
@@ -340,7 +333,7 @@ public class MainController {
     }
 
     void shutdown() {
-        dashboardController.shutdown();
+        measurementsController.shutdown();
     }
 
     void requestDeviceState() {
