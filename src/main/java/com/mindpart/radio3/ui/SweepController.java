@@ -123,7 +123,7 @@ public class SweepController extends AbstractSweepController {
 
     private void initSignalChart() {
         signalAxisX = new NumberAxis(0, 52, 5);
-        signalAxisY = new NumberAxis(-60, 10, 5);
+        signalAxisY = new NumberAxis(-70, 10, 5);
         signalChart = new EnhancedLineChart<>(signalAxisX, signalAxisY);
         signalChart.legendVisibleProperty().setValue(false);
         signalChart.setAnimated(false);
@@ -299,9 +299,15 @@ public class SweepController extends AbstractSweepController {
         ObservableList<Data<Number, Number>> data = chartSeries.getData();
         signalDataSeries.add(chartSeries);
 
+        Range range = new Range();
         for (int step = 0; step < chartContext.getDataSize(); step++) {
             double processedValue = chartContext.setAndGetProcessedData(step);
+            range.sample(processedValue);
             data.add(new Data<>(chartContext.receivedFreq[step], processedValue));
+        }
+
+        if(range.min() > signalAxisY.getUpperBound() || range.max() < signalAxisY.getLowerBound()) {
+            autoRangeValueAxis();
         }
         
         FrequencyAxisUtils.setupFrequencyAxis(signalAxisX, receivedDataInfo.getFreqStart(), receivedDataInfo.getFreqEnd());

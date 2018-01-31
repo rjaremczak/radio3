@@ -278,7 +278,7 @@ public class MainController {
         vfoAtt0.setSelected(false);
         vfoAtt1.setSelected(false);
         vfoAtt2.setSelected(false);
-        FxUtils.setDisabled(hardwareRevision != HardwareRevision.VERSION_2, vfoAtt0, vfoAtt1, vfoAtt2);
+        FxUtils.setDisabled(hardwareRevision.isAttenuator(), vfoAtt0, vfoAtt1, vfoAtt2);
     }
 
     private void initHardwareRevision() {
@@ -329,7 +329,7 @@ public class MainController {
 
     void setUpVfoAmp(HardwareRevision hardwareRevision) {
         vfoAmp.setSelected(false);
-        vfoAmp.setDisable(hardwareRevision != HardwareRevision.VERSION_2);
+        vfoAmp.setDisable(!hardwareRevision.isAmplifier());
     }
 
     void shutdown() {
