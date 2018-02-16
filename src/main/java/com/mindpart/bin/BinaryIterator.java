@@ -17,7 +17,7 @@ public class BinaryIterator {
         return Binary.toUInt8(buffer, index++);
     }
 
-    public boolean nextBool() {
+    public boolean nextBoolean() {
         return nextUInt8() != 0;
     }
 

@@ -9,7 +9,6 @@ import com.mindpart.bin.Binary;
 import com.mindpart.bin.BinaryBuilder;
 import com.mindpart.science.Frequency;
 import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static com.mindpart.radio3.device.FrameCommand.*;
+import static com.mindpart.radio3.device.FrameCmd.*;
 
 /**
  * Created by Robert Jaremczak
@@ -40,12 +39,8 @@ public class Radio3 {
     private PingParser pingParser;
     private DeviceStateParser deviceStateParser;
     private VfoParser vfoParser;
-    private DeviceInfoParser deviceInfoParser;
-    private LogarithmicParser logarithmicParser;
-    private LinearParser linearParser;
-    private VnaParser vnaParser;
-    private FreqMeterParser freqMeterParser;
-    private MultipleProbesParser multipleProbesParser;
+    private DeviceConfigurationParser deviceConfigurationParser;
+    private ProbesParser probesParser;
     private SweepResponseParser sweepResponseParser;
 
     private Consumer<Frame> requestHandler;
@@ -67,12 +62,8 @@ public class Radio3 {
         pingParser = new PingParser();
         deviceStateParser = new DeviceStateParser();
         vfoParser = new VfoParser();
-        deviceInfoParser = new DeviceInfoParser();
-        logarithmicParser = new LogarithmicParser();
-        linearParser = new LinearParser();
-        vnaParser = new VnaParser();
-        freqMeterParser = new FreqMeterParser(configuration.getFreqMeter());
-        multipleProbesParser = new MultipleProbesParser(logarithmicParser, linearParser, vnaParser, freqMeterParser);
+        deviceConfigurationParser = new DeviceConfigurationParser();
+        probesParser = new ProbesParser(configuration.getFreqMeter());
         sweepResponseParser = new SweepResponseParser();
 
         initKeepAlive();
@@ -97,12 +88,10 @@ public class Radio3 {
         sweepProfiles = sweepProfilesService.load();
     }
 
-    public Response<DeviceInfo> connect(String portName, HardwareRevision hardwareRevision, VfoType vfoType) {
-        getDeviceInfoParser().resetDeviceInfo();
+    public Response<DeviceConfiguration> connect(String portName, VfoType vfoType) {
         try {
             logger.debug("connecting...");
             dataLink.connect(portName);
-            writeHardwareRevision(hardwareRevision);
             writeVfoType(vfoType);
             return readDeviceInfo();
         } catch (Exception e) {
@@ -117,7 +106,6 @@ public class Radio3 {
             logger.debug("disconnect");
             dataLink.disconnect();
         }
-        deviceInfoParser.resetDeviceInfo();
     }
 
     public boolean isConnected() {
@@ -146,36 +134,28 @@ public class Radio3 {
         builder.addUInt8(source.ordinal());
         builder.addUInt8(buildAvgMode(avgPasses, avgSamples));
 
-        return performRequest(new Frame(FrameCommand.SWEEP_REQUEST, builder.getBytes()), sweepResponseParser);
+        return performRequest(new Frame(FrameCmd.SWEEP_REQUEST, builder.getBytes()), sweepResponseParser);
     }
 
     public Response<Class<Void>> writeVfoFrequency(int frequency) {
-        return performRequest(new Frame(FrameCommand.VFO_SET_FREQ, Binary.fromUInt32(frequency)), pingParser);
-    }
-
-    public Response<Class<Void>> writeHardwareRevision(HardwareRevision hardwareRevision) {
-        return performRequest(new Frame(FrameCommand.DEVICE_HARDWARE_REVISION, Binary.fromUInt8(hardwareRevision.getCode())), pingParser);
+        return performRequest(new Frame(FrameCmd.SET_VFO_FREQ, Binary.fromUInt32(frequency)), pingParser);
     }
 
     public Response<Class<Void>> writeVfoType(VfoType vfoType) {
-        return performRequest(new Frame(FrameCommand.VFO_TYPE, Binary.fromUInt8(vfoType.getCode())), pingParser);
+        return performRequest(new Frame(FrameCmd.SET_VFO_TYPE, Binary.fromUInt8(vfoType.getCode())), pingParser);
     }
 
     public Response<Class<Void>> writeVfoAttenuator(boolean att0, boolean att1, boolean att2) {
         int val = (att0 ? 1 : 0) + (att1 ? 2 : 0) + (att2 ? 4 : 0);
-        return performRequest(new Frame(FrameCommand.VFO_ATTENUATOR, Binary.fromUInt8(val)), pingParser);
+        return performRequest(new Frame(FrameCmd.SET_ATTENUATOR, Binary.fromUInt8(val)), pingParser);
     }
 
     public Response<Class<Void>> writeVfoOutput(VfoOut vfoOut) {
-        return performRequest(new Frame(vfoOut.getFrameCommand()), pingParser);
+        return performRequest(new Frame(vfoOut.getFrameCmd()), pingParser);
     }
 
-    public Response<Class<Void>> writeVnaMode(VnaMode vnaMode) {
-        return performRequest(new Frame(FrameCommand.VNA_MODE, Binary.fromUInt8(vnaMode.getCode())), pingParser);
-    }
-
-    public Response<Class<Void>> writeVfoAmp(VfoAmp vfoAmp) {
-        return performRequest(new Frame(FrameCommand.VFO_AMPLIFIER, Binary.fromUInt8(vfoAmp.getCode())), pingParser);
+    public Response<Class<Void>> writeAmplifierEnabled(boolean enabled) {
+        return performRequest(new Frame(FrameCmd.SET_AMPLIFIER, Binary.fromUInt8(enabled ? 1 : 0)), pingParser);
     }
 
     public List<String> availablePorts() {
@@ -198,35 +178,19 @@ public class Radio3 {
     }
 
     public Response<DeviceState> readDeviceState() {
-        return performRequest(new Frame(DEVICE_GET_STATE), deviceStateParser);
+        return performRequest(new Frame(GET_DEVICE_STATE), deviceStateParser);
     }
 
     public Response<Integer> readVfoFrequency() {
-        return performRequest(new Frame(VFO_GET_FREQ), vfoParser);
+        return performRequest(new Frame(GET_VFO_FREQ), vfoParser);
     }
 
-    public Response<DeviceInfo> readDeviceInfo() {
-        return performRequest(new Frame(DEVICE_GET_INFO), deviceInfoParser);
-    }
-
-    public Response<Double> readLogProbe() {
-        return performRequest(new Frame(LOGPROBE_DATA), logarithmicParser);
-    }
-
-    public Response<Double> readLinProbe() {
-        return performRequest(new Frame(LINPROBE_DATA), linearParser);
-    }
-
-    public Response<VnaResult> readVnaProbe() {
-        return performRequest(new Frame(VNAPROBE_DATA), vnaParser);
-    }
-
-    public Response<Integer> readFMeter() {
-        return performRequest(new Frame(FMETER_DATA), freqMeterParser);
+    public Response<DeviceConfiguration> readDeviceInfo() {
+        return performRequest(new Frame(GET_DEVICE_CONFIGURATION), deviceConfigurationParser);
     }
 
     public Response<Probes> readAllProbes() {
-        return performRequest(new Frame(PROBES_DATA), multipleProbesParser);
+        return performRequest(new Frame(GET_ALL_PROBES), probesParser);
     }
 
     public Response<Class<Void>> sendPing() {
@@ -235,22 +199,6 @@ public class Radio3 {
 
     public String getPortName() {
         return dataLink.getPortName();
-    }
-
-    public LogarithmicParser getLogarithmicParser() {
-        return logarithmicParser;
-    }
-
-    public LinearParser getLinearParser() {
-        return linearParser;
-    }
-
-    public VnaParser getVnaParser() {
-        return vnaParser;
-    }
-
-    public DeviceInfoParser getDeviceInfoParser() {
-        return deviceInfoParser;
     }
 
     public DeviceStatus getDeviceStatus() {
@@ -289,5 +237,9 @@ public class Radio3 {
             configuration.setHardwareRevision(hardwareRevision);
             configurationService.save(configuration);
         }
+    }
+
+    public ProbesParser getProbesParser() {
+        return probesParser;
     }
 }

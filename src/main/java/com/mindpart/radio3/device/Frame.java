@@ -13,19 +13,19 @@ import java.util.Arrays;
  * Date: 2016.02.16
  */
 public class Frame {
-    private FrameCommand command;
+    private FrameCmd command;
     private byte[] payload;
 
-    public Frame(FrameCommand command) {
+    public Frame(FrameCmd command) {
         this(command, null);
     }
 
-    public Frame(FrameCommand command, byte[] payload) {
+    public Frame(FrameCmd command, byte[] payload) {
         this.command = command;
         this.payload = payload;
     }
 
-    public FrameCommand getCommand() {
+    public FrameCmd getCommand() {
         return command;
     }
 
@@ -39,7 +39,18 @@ public class Frame {
 
     @Override
     public String toString() {
-        return command + ":"+getPayloadSize();
+        StringBuilder sb = new StringBuilder(command.toString());
+
+        int payloadSize = getPayloadSize();
+        if(payloadSize > 0 && payloadSize <= 4) {
+            sb.append(":");
+            sb.append(Arrays.toString(payload));
+        } else if(payloadSize > 4) {
+            sb.append(": ");
+            sb.append(Integer.toString(payloadSize));
+            sb.append(" B");
+        }
+        return sb.toString();
     }
 
     public BinaryIterator binaryIterator() {

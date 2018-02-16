@@ -95,15 +95,15 @@ public class SweepController extends AbstractSweepController {
 
         if(signalSource == LOG_PROBE) {
             if(normalized) {
-                chartContext.valueProcessor = new LogProbeNormProcessor(radio3.getLogarithmicParser()::parse, chartContext.receivedData, ui.text("axis.relativePower"));
+                chartContext.valueProcessor = new LogProbeNormProcessor(radio3.getProbesParser()::convertLogValue, chartContext.receivedData, ui.text("axis.relativePower"));
             } else {
-                chartContext.valueProcessor = new LogProbeProcessor(radio3.getLogarithmicParser()::parse, ui.text("axis.power"));
+                chartContext.valueProcessor = new LogProbeProcessor(radio3.getProbesParser()::convertLogValue, ui.text("axis.power"));
             }
         } else if(signalSource == LIN_PROBE) {
             if(normalized) {
-                chartContext.valueProcessor = new LinProbeNormProcessor(radio3.getLinearParser()::parse, chartContext.receivedData, ui.text("axisRelativeVoltage"));
+                chartContext.valueProcessor = new LinProbeNormProcessor(radio3.getProbesParser()::convertLinValue, chartContext.receivedData, ui.text("axisRelativeVoltage"));
             } else {
-                chartContext.valueProcessor = new LinProbeProcessor(radio3.getLinearParser()::parse, ui.text("axis.voltage"));
+                chartContext.valueProcessor = new LinProbeProcessor(radio3.getProbesParser()::convertLinValue, ui.text("axis.voltage"));
             }
         } else {
             throw new IllegalStateException("source probe: "+sourceProbe.getValue());
@@ -145,7 +145,7 @@ public class SweepController extends AbstractSweepController {
             Frequency freq = scenePosToFrequency(scenePos);
             double value = valueFromSeries(signalDataSeries.get(0), freq.to(MEGA));
             Point2D selectionPos = new Point2D(scenePos.getX(), valueToRefPos(value).getY());
-            return new ChartMarker.SelectionData(selectionPos, "f = "+freq+"\n" + chartContext.valueProcessor.valueLabel()+" = "+ chartContext.valueProcessor.format(value));
+            return new ChartMarker.SelectionData(selectionPos, "f = "+ui.decimal.formatHighPrecision(freq.to(MEGA))+" MHz\n" + chartContext.valueProcessor.valueLabel()+" = "+ chartContext.valueProcessor.format(value));
         }, () -> !btnContinuous.isSelected(), () -> !btnNormalize.isSelected());
 
         chartMarker.setRangeHandler((startData, endData) -> sweepSettingsController.setFrequencyRange(

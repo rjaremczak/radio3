@@ -21,24 +21,24 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.shape.Circle?>
 
-<VBox prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.MainController">
+<VBox prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.MainController">
     <children>
         <ToolBar fx:id="toolBar">
             <items>
-                <ToggleButton fx:id="vfoAmp" mnemonicParsing="false" text="%button.amp" textOverrun="CLIP" />
+                <ToggleButton fx:id="amplifier" mnemonicParsing="false" text="%button.amp" textOverrun="CLIP" />
                 <Separator orientation="VERTICAL" />
                 <Label text="%label.att" textOverrun="CLIP" />
-                <ToggleButton fx:id="vfoAtt0" mnemonicParsing="false" text="6dB" textOverrun="CLIP" />
-                <ToggleButton fx:id="vfoAtt1" mnemonicParsing="false" text="10dB" textOverrun="CLIP" />
-                <ToggleButton fx:id="vfoAtt2" mnemonicParsing="false" text="20dB" textOverrun="CLIP" />
+                <ToggleButton fx:id="att6dB" mnemonicParsing="false" text="6dB" textOverrun="CLIP" />
+                <ToggleButton fx:id="att10dB" mnemonicParsing="false" text="10dB" textOverrun="CLIP" />
+                <ToggleButton fx:id="att20dB" mnemonicParsing="false" text="20dB" textOverrun="CLIP" />
                 <Separator orientation="VERTICAL" />
                 <Label text="%label.out" />
-                <ToggleButton fx:id="vfoOutDirect" mnemonicParsing="false" text="VFO" textOverrun="CLIP">
+                <ToggleButton fx:id="vfoToSocket" mnemonicParsing="false" text="VFO" textOverrun="CLIP">
                     <toggleGroup>
                         <ToggleGroup fx:id="vfoOut" />
                     </toggleGroup>
                 </ToggleButton>
-                <ToggleButton fx:id="vfoOutVna" mnemonicParsing="false" text="VNA" textOverrun="CLIP" toggleGroup="$vfoOut" />
+                <ToggleButton fx:id="vfoToVna" mnemonicParsing="false" text="VNA" textOverrun="CLIP" toggleGroup="$vfoOut" />
             </items>
         </ToolBar>
         <AnchorPane fx:id="mainPane" VBox.vgrow="ALWAYS">
@@ -53,9 +53,6 @@
                                             <children>
                                                 <ToolBar>
                                                     <items>
-                                                        <Label text="%label.hardware" />
-                                                        <ChoiceBox fx:id="hardwareRevisions" />
-                                                        <Separator orientation="VERTICAL" />
                                                         <Label text="VFO" />
                                                         <ChoiceBox fx:id="vfoType" />
                                                         <Separator orientation="VERTICAL" />

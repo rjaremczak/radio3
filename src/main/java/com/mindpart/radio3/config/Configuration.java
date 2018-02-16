@@ -23,7 +23,7 @@ public class Configuration {
     private String uiLocale;
     private boolean keepAlive = false;
     private HardwareRevision hardwareRevision = HardwareRevision.AUTODETECT;
-    private VfoType vfoType = VfoType.NONE;
+    private VfoType vfoType = VfoType.DDS_AD9851;
     private FreqMeterConfig freqMeter;
 
     public Locale getLocale() {

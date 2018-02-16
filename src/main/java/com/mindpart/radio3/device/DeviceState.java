@@ -2,13 +2,13 @@ package com.mindpart.radio3.device;
 
 /**
  * Created by Robert Jaremczak
- * Date: 2016.04.10
+ * Date: 2018.02.16
  */
 public class DeviceState {
     public long timeMs;
-    public VfoOut vfoOut;
-    public VfoAmp vfoAmp;
-    public boolean vfoAtt0;
-    public boolean vfoAtt1;
-    public boolean vfoAtt2;
+    public boolean vfoToVna;
+    public boolean amplifier;
+    public boolean att6dB;
+    public boolean att10dB;
+    public boolean att20dB;
 }

@@ -16,7 +16,7 @@ public class FrameHeaderTest {
         assertTrue(header.isFormatA());
         assertFalse(header.isFormatB());
         assertFalse(header.isFormatC());
-        assertEquals(FrameCommand.PING, header.getCommand());
+        assertEquals(FrameCmd.PING, header.getCommand());
         assertEquals(6, header.getPayloadSize());
     }
 
@@ -27,13 +27,13 @@ public class FrameHeaderTest {
         assertFalse(header.isFormatA());
         assertTrue(header.isFormatB());
         assertFalse(header.isFormatC());
-        assertEquals(FrameCommand.LINPROBE_DATA, header.getCommand());
+        assertEquals(FrameCmd.GET_ALL_PROBES, header.getCommand());
         assertEquals(214, header.getPayloadSize());
 
 
         header = FrameHeader.fromCode(0xE020);
         header.setSizeBytes(new byte[]{(byte)0});
-        assertEquals(FrameCommand.VNAPROBE_DATA, header.getCommand());
+        assertEquals(FrameCmd.GET_ALL_PROBES, header.getCommand());
         assertEquals(14, header.getPayloadSize());
     }
 
@@ -44,12 +44,12 @@ public class FrameHeaderTest {
         assertFalse(header.isFormatA());
         assertFalse(header.isFormatB());
         assertTrue(header.isFormatC());
-        assertEquals(FrameCommand.LINPROBE_DATA, header.getCommand());
+        assertEquals(FrameCmd.GET_VFO_FREQ, header.getCommand());
         assertEquals(1494, header.getPayloadSize());
 
         header = FrameHeader.fromCode(0xF020);
         header.setSizeBytes(new byte[]{(byte)0, (byte)0});
-        assertEquals(FrameCommand.VNAPROBE_DATA, header.getCommand());
+        assertEquals(FrameCmd.GET_VFO_FREQ, header.getCommand());
         assertEquals(270, header.getPayloadSize());
     }
 }

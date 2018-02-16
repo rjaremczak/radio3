@@ -12,7 +12,7 @@ public class SweepResponseParser implements FrameParser<SweepResponse> {
 
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getCommand() == FrameCommand.SWEEP_RESPONSE && frame.getPayloadSize() >= 12;
+        return frame.getCommand() == FrameCmd.SWEEP_RESPONSE && frame.getPayloadSize() >= 12;
     }
 
     @Override

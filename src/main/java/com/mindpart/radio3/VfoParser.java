@@ -4,7 +4,7 @@ import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
 import com.mindpart.bin.Binary;
 
-import static com.mindpart.radio3.device.FrameCommand.VFO_GET_FREQ;
+import static com.mindpart.radio3.device.FrameCmd.GET_VFO_FREQ;
 
 /**
  * Created by Robert Jaremczak
@@ -13,7 +13,7 @@ import static com.mindpart.radio3.device.FrameCommand.VFO_GET_FREQ;
 public class VfoParser implements FrameParser<Integer> {
     @Override
     public boolean recognizes(Frame frame) {
-        return frame.getCommand() == VFO_GET_FREQ && frame.getPayloadSize() == 4;
+        return frame.getCommand() == GET_VFO_FREQ && frame.getPayloadSize() == 4;
     }
 
     @Override

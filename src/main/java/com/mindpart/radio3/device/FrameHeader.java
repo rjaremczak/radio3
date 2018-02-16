@@ -34,10 +34,10 @@ import com.mindpart.bin.Binary;
 
 class FrameHeader {
     private int format;
-    private FrameCommand command;
+    private FrameCmd command;
     private int size;
 
-    FrameHeader(int format, FrameCommand command) {
+    FrameHeader(int format, FrameCmd command) {
         this.format = format;
         this.command = command;
 
@@ -48,7 +48,7 @@ class FrameHeader {
 
     static FrameHeader fromCode(int header) {
         int format = (header >> 12) & 0x0f;
-        FrameCommand command = FrameCommand.fromCode(header & 0x7ff);
+        FrameCmd command = FrameCmd.fromCode(header & 0x7ff);
         return new FrameHeader(format, command);
     }
 
@@ -137,7 +137,7 @@ class FrameHeader {
         }
     }
 
-    public FrameCommand getCommand() {
+    public FrameCmd getCommand() {
         return command;
     }
 

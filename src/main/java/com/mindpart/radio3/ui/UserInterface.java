@@ -6,6 +6,7 @@ import com.mindpart.util.ResourceBundleUtils;
 import javafx.scene.Parent;
 import javafx.util.StringConverter;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -24,6 +25,7 @@ public class UserInterface {
 
     public final DecimalFormat decimal = new DecimalFormat();
     public final ImpedanceFormat impedance = new ImpedanceFormat();
+    public final DateTimeFormatter timestamp = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     public UserInterface(Locale locale) {
         resourceBundle = ResourceBundleUtils.getBundle("bundle", locale, "UTF-8");

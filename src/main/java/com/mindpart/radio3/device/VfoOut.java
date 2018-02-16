@@ -5,17 +5,17 @@ package com.mindpart.radio3.device;
  * Date: 2016.12.03
  */
 public enum VfoOut {
-    VFO(FrameCommand.VFO_OUT_DIRECT),
-    VNA(FrameCommand.VFO_OUT_VNA);
+    VFO(FrameCmd.SET_VFO_TO_SOCKET),
+    VNA(FrameCmd.SET_VFO_TO_VNA);
 
-    private FrameCommand frameCommand;
+    private FrameCmd frameCmd;
 
-    VfoOut(FrameCommand frameCommand) {
-        this.frameCommand = frameCommand;
+    VfoOut(FrameCmd frameCmd) {
+        this.frameCmd = frameCmd;
     }
 
-    public FrameCommand getFrameCommand() {
-        return frameCommand;
+    public FrameCmd getFrameCmd() {
+        return frameCmd;
     }
 
     public String toString() {

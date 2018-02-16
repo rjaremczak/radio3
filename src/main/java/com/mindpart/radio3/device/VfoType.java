@@ -5,9 +5,8 @@ package com.mindpart.radio3.device;
  * Date: 2017.01.30
  */
 public enum VfoType {
-    NONE(0, "Not installed"),
-    DDS_AD9850(1, "DDS AD9850"),
-    DDS_AD9851(2, "DDS AD9851");
+    DDS_AD9850(0, "DDS AD9850"),
+    DDS_AD9851(1, "DDS AD9851");
 
     private int code;
     private String name;

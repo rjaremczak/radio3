@@ -3,7 +3,7 @@ package com.mindpart.radio3;
 import com.mindpart.radio3.device.Frame;
 import com.mindpart.radio3.device.FrameParser;
 
-import static com.mindpart.radio3.device.FrameCommand.PING;
+import static com.mindpart.radio3.device.FrameCmd.PING;
 
 /**
  * Created by Robert Jaremczak

@@ -19,6 +19,9 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import org.apache.log4j.Logger;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -78,9 +81,6 @@ public class MainController {
     TableView<Property> devicePropertiesTable;
 
     @FXML
-    ChoiceBox<HardwareRevision> hardwareRevisions;
-
-    @FXML
     Circle mainIndicator;
 
     @FXML
@@ -90,25 +90,25 @@ public class MainController {
     Label deviceStatus;
 
     @FXML
-    ToggleButton vfoAmp;
+    ToggleButton amplifier;
 
     @FXML
-    ToggleButton vfoAtt0;
+    ToggleButton att6dB;
 
     @FXML
-    ToggleButton vfoAtt1;
+    ToggleButton att10dB;
 
     @FXML
-    ToggleButton vfoAtt2;
+    ToggleButton att20dB;
 
     @FXML
     ToggleGroup vfoOut;
 
     @FXML
-    ToggleButton vfoOutDirect;
+    ToggleButton vfoToSocket;
 
     @FXML
-    ToggleButton vfoOutVna;
+    ToggleButton vfoToVna;
 
     private Radio3 radio3;
     private ObservableList<String> availablePortNames = FXCollections.observableArrayList();
@@ -142,13 +142,13 @@ public class MainController {
     private void updateOnConnect() {
         btnConnect.setText(ui.text("button.disconnect"));
         FxUtils.enableItems(toolBar, btnConnect, measurementsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
-        FxUtils.disableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
+        FxUtils.disableItems(serialPorts, serialPortsRefresh, vfoType);
         updateDeviceStatus(DeviceStatus.READY);
     }
 
     private void updateOnDisconnect(DeviceStatus deviceStatus) {
         btnConnect.setText(ui.text("button.connect"));
-        FxUtils.enableItems(serialPorts, serialPortsRefresh, hardwareRevisions, vfoType);
+        FxUtils.enableItems(serialPorts, serialPortsRefresh, vfoType);
         FxUtils.disableItems(toolBar, measurementsTab, sweepTab, vnaTab, deviceRuntimePane, deviceControlPane, configurationBox);
         btnConnect.setDisable(availablePortNames.isEmpty());
         deviceProperties.clear();
@@ -160,13 +160,13 @@ public class MainController {
         updateDeviceStatus(DeviceStatus.CONNECTING);
         FxUtils.disableItems(serialPortsRefresh, serialPorts);
         Platform.runLater(() -> {
-            Response<DeviceInfo> deviceInfoResponse = radio3.connect(serialPorts.getValue(), hardwareRevisions.getValue(), vfoType.getValue());
-            if (deviceInfoResponse.isOK()) {
+            Response<DeviceConfiguration> response = radio3.connect(serialPorts.getValue(), vfoType.getValue());
+            if (response.isOK()) {
                 updateOnConnect();
-                DeviceInfo deviceInfo = deviceInfoResponse.getData();
-                updateDeviceProperties(deviceInfo);
-                setUpVfoAtt(deviceInfo.hardwareRevision);
-                setUpVfoAmp(deviceInfo.hardwareRevision);
+                DeviceConfiguration dc = response.getData();
+                updateDeviceProperties(dc);
+                setUpVfoAtt(dc.hardwareRevision);
+                setUpVfoAmp(dc.hardwareRevision);
                 requestDeviceState();
             } else {
                 radio3.disconnect();
@@ -191,7 +191,6 @@ public class MainController {
         }
     }
 
-
     public void initialize() {
         nonModalNodes = Arrays.asList(deviceTab, sweepTab, vnaTab, measurementsTab);
 
@@ -210,7 +209,6 @@ public class MainController {
         measurementsTab.setContent(ui.loadFXml(measurementsController, "measurements.fxml"));
 
         initVfoOut();
-        initHardwareRevision();
         initVfoType();
         initVfoAmp();
         initVfoAtt();
@@ -247,7 +245,7 @@ public class MainController {
     }
 
     private void initVfoOut() {
-        updateVfoOut(VfoOut.VFO);
+        updateVfoOut(false);
         vfoOut.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue!=null) {
                 VfoOut vfoOut = VfoOut.valueOf(((ToggleButton) newValue).getText());
@@ -264,72 +262,33 @@ public class MainController {
     }
 
     private void initVfoAtt() {
-        vfoAtt0.setOnAction(e -> vfoAttListener());
-        vfoAtt1.setOnAction(e -> vfoAttListener());
-        vfoAtt2.setOnAction(e -> vfoAttListener());
+        att6dB.setOnAction(e -> vfoAttListener());
+        att10dB.setOnAction(e -> vfoAttListener());
+        att20dB.setOnAction(e -> vfoAttListener());
     }
 
     private void vfoAttListener() {
-        radio3.writeVfoAttenuator(vfoAtt0.isSelected(), vfoAtt1.isSelected(), vfoAtt2.isSelected());
+        radio3.writeVfoAttenuator(att6dB.isSelected(), att10dB.isSelected(), att20dB.isSelected());
         if(isDeviceTabSelected()) requestDeviceState();
     }
 
     void setUpVfoAtt(HardwareRevision hardwareRevision) {
-        vfoAtt0.setSelected(false);
-        vfoAtt1.setSelected(false);
-        vfoAtt2.setSelected(false);
-        FxUtils.setDisabled(hardwareRevision.isAttenuator(), vfoAtt0, vfoAtt1, vfoAtt2);
-    }
-
-    private void initHardwareRevision() {
-        hardwareRevisions.getItems().addAll(HardwareRevision.values());
-        hardwareRevisions.getSelectionModel().select(radio3.getHardwareRevision());
-        hardwareRevisions.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldValue, newValue) -> radio3.setHardwareRevision(newValue));
-    }
-
-    private void updateVfoOut(VfoOut mode) {
-        switch (mode) {
-            case VFO: {
-                vfoOut.selectToggle(vfoOutDirect);
-                break;
-            }
-            case VNA: {
-                vfoOut.selectToggle(vfoOutVna);
-                break;
-            }
-            default: {
-                throw new IllegalArgumentException("not supported: "+mode);
-            }
-        }
-    }
-
-    private void updateVfoAmp(VfoAmp amp) {
-        switch (amp) {
-            case OFF: {
-                vfoAmp.setSelected(false);
-                break;
-            }
-            case ON: {
-                vfoAmp.setSelected(true);
-                break;
-            }
-            default: {
-                throw new IllegalArgumentException("not supported: "+amp);
-            }
-        }
+        att6dB.setSelected(false);
+        att10dB.setSelected(false);
+        att20dB.setSelected(false);
+        FxUtils.setDisabled(!hardwareRevision.isAttenuator(), att6dB, att10dB, att20dB);
     }
 
     private void initVfoAmp() {
-        vfoAmp.setOnAction(e -> {
-            radio3.writeVfoAmp(vfoAmp.isSelected() ? VfoAmp.ON : VfoAmp.OFF);
+        amplifier.setOnAction(e -> {
+            radio3.writeAmplifierEnabled(amplifier.isSelected());
             if(isDeviceTabSelected()) requestDeviceState();
         });
     }
 
     void setUpVfoAmp(HardwareRevision hardwareRevision) {
-        vfoAmp.setSelected(false);
-        vfoAmp.setDisable(!hardwareRevision.isAmplifier());
+        amplifier.setSelected(false);
+        amplifier.setDisable(!hardwareRevision.isAmplifier());
     }
 
     void shutdown() {
@@ -339,20 +298,24 @@ public class MainController {
     void requestDeviceState() {
         if(!radio3.isConnected()) return;
         
-        Response<DeviceState> deviceStateResponse = radio3.readDeviceState();
-        if(deviceStateResponse.isOK()) {
-            DeviceState ds = deviceStateResponse.getData();
+        Response<DeviceState> response = radio3.readDeviceState();
+        if(response.isOK()) {
+            DeviceState ds = response.getData();
             updateDeviceProperties(ds);
-            updateVfoOut(ds.vfoOut);
-            updateVfoAmp(ds.vfoAmp);
-            updateVfoAtt(ds.vfoAtt0, ds.vfoAtt1, ds.vfoAtt2);
+            updateVfoOut(ds.vfoToVna);
+            amplifier.setSelected(ds.amplifier);
+            updateVfoAtt(ds.att6dB, ds.att10dB, ds.att20dB);
         }
     }
 
+    private void updateVfoOut(boolean vfoToVna) {
+        vfoOut.selectToggle(vfoToVna ? this.vfoToVna : this.vfoToSocket);
+    }
+
     private void requestDeviceInfo() {
-        Response<DeviceInfo> deviceInfoResponse = radio3.readDeviceInfo();
-        if(deviceInfoResponse.isOK()) {
-            updateDeviceProperties(deviceInfoResponse.getData());
+        Response<DeviceConfiguration> response = radio3.readDeviceInfo();
+        if(response.isOK()) {
+            updateDeviceProperties(response.getData());
         }
     }
 
@@ -367,10 +330,13 @@ public class MainController {
         deviceProperties.setAll(devicePropertiesMap.entrySet().stream().map(e -> new Property(e.getKey(), e.getValue())).collect(Collectors.toList()));
     }
 
-    private void updateDeviceProperties(DeviceInfo di) {
-        devicePropertiesMap.put(ui.text("device.prop.hardware"), di.name+" ("+di.hardwareRevision+")");
-        devicePropertiesMap.put(ui.text("device.prop.firmware"), di.buildId);
-        devicePropertiesMap.put(ui.text("device.prop.vfoType"), di.vfoType.toString());
+    private void updateDeviceProperties(DeviceConfiguration dc) {
+        devicePropertiesMap.put(ui.text("device.prop.hardware"), String.format("%s-%08X-%08X-%08X",
+                dc.hardwareRevision, dc.coreUniqueId0, dc.coreUniqueId1, dc.coreUniqueId2));
+        devicePropertiesMap.put(ui.text("device.prop.firmware"), String.format("%02d.%02d-%s",
+                dc.firmwareVersionMajor, dc.firmwareVersionMinor,
+                ui.timestamp.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(dc.firmwareBuildTimestamp), ZoneId.systemDefault()))));
+        devicePropertiesMap.put(ui.text("device.prop.vfoType"), dc.vfoType.toString());
         updateDeviceProperties();
     }
 
@@ -378,20 +344,22 @@ public class MainController {
         return ui.text(on ? "text.on" : "text.off");
     }
 
+    private String formatAttenuation(boolean att6dB, boolean att10dB, boolean att20dB) {
+        return Integer.toString((att6dB ? -6 : 0) + (att10dB ? -10 : 0) + (att20dB ? -20 : 0));
+    }
+
     private void updateDeviceProperties(DeviceState ds) {
         devicePropertiesMap.put(ui.text("device.prop.uptime"), ds.timeMs + " ms");
-        devicePropertiesMap.put(ui.text("device.prop.vfoOut"), ds.vfoOut.toString());
-        devicePropertiesMap.put(ui.text("device.prop.amplifier"), formatOnOff(ds.vfoAmp == VfoAmp.ON));
-        devicePropertiesMap.put(ui.text("device.prop.attStage0"), formatOnOff(ds.vfoAtt0));
-        devicePropertiesMap.put(ui.text("device.prop.attStage1"), formatOnOff(ds.vfoAtt1));
-        devicePropertiesMap.put(ui.text("device.prop.attStage2"), formatOnOff(ds.vfoAtt2));
+        devicePropertiesMap.put(ui.text("device.prop.vfoOut"), ds.vfoToVna ? "VNA" : "VFO");
+        devicePropertiesMap.put(ui.text("device.prop.amplifier"), formatOnOff(ds.amplifier));
+        devicePropertiesMap.put(ui.text("device.prop.attenuator"), formatAttenuation(ds.att6dB, ds.att10dB, ds.att20dB));
         updateDeviceProperties();
     }
 
-    private void updateVfoAtt(boolean att0, boolean att1, boolean att2) {
-        vfoAtt0.setSelected(att0);
-        vfoAtt1.setSelected(att1);
-        vfoAtt2.setSelected(att2);
+    private void updateVfoAtt(boolean att6dB, boolean att10dB, boolean att20dB) {
+        this.att6dB.setSelected(att6dB);
+        this.att10dB.setSelected(att10dB);
+        this.att20dB.setSelected(att20dB);
     }
 
     void disableAllExcept(boolean flag, Object element) {
@@ -399,7 +367,7 @@ public class MainController {
     }
 
     void disableVfoOut(boolean flag) {
-        FxUtils.setDisabled(flag, vfoOutDirect, vfoOutVna);
+        FxUtils.setDisabled(flag, vfoToSocket, vfoToVna);
     }
 
     private void updateMainIndicator(Color color) {

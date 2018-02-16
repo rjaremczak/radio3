@@ -191,7 +191,7 @@ public class VnaController extends AbstractSweepController {
         Range impedanceRange = new Range();
         long freq = freqStart.value;
         for (int num = 0; num <= numSteps; num++) {
-            VnaResult vnaResult = radio3.getVnaParser().calculateVnaResult(samples[0][num], samples[1][num]);
+            VnaResult vnaResult = radio3.getProbesParser().convertVnaValue(samples[0][num], samples[1][num]);
             double fMHz = MEGA.fromBase(freq);
             swrData.add(new XYChart.Data<>(fMHz, swrRange.sample(vnaResult.getSwr())));
             rData.add(new XYChart.Data<>(fMHz, impedanceRange.sample(vnaResult.getR())));
