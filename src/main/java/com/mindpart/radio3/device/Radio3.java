@@ -38,8 +38,9 @@ public class Radio3 {
     private DataLink dataLink;
     private PingParser pingParser;
     private DeviceStateParser deviceStateParser;
-    private VfoParser vfoParser;
     private DeviceConfigurationParser deviceConfigurationParser;
+    private LicenseDataParser licenseDataParser;
+    private VfoParser vfoParser;
     private ProbesParser probesParser;
     private SweepResponseParser sweepResponseParser;
 
@@ -60,9 +61,10 @@ public class Radio3 {
         this.responseHandler = responseHandler;
 
         pingParser = new PingParser();
-        deviceStateParser = new DeviceStateParser();
         vfoParser = new VfoParser();
+        deviceStateParser = new DeviceStateParser();
         deviceConfigurationParser = new DeviceConfigurationParser();
+        licenseDataParser = new LicenseDataParser();
         probesParser = new ProbesParser(configuration.getFreqMeter());
         sweepResponseParser = new SweepResponseParser();
 
@@ -92,8 +94,8 @@ public class Radio3 {
         try {
             logger.debug("connecting...");
             dataLink.connect(portName);
-            writeVfoType(vfoType);
-            return readDeviceInfo();
+            sendVfoType(vfoType);
+            return readDeviceConfiguration();
         } catch (Exception e) {
             logger.error("connection error", e);
             disconnect();
@@ -137,24 +139,24 @@ public class Radio3 {
         return performRequest(new Frame(FrameCmd.SWEEP_REQUEST, builder.getBytes()), sweepResponseParser);
     }
 
-    public Response<Class<Void>> writeVfoFrequency(int frequency) {
+    public Response<Class<Void>> sendVfoFrequency(int frequency) {
         return performRequest(new Frame(FrameCmd.SET_VFO_FREQ, Binary.fromUInt32(frequency)), pingParser);
     }
 
-    public Response<Class<Void>> writeVfoType(VfoType vfoType) {
+    public Response<Class<Void>> sendVfoType(VfoType vfoType) {
         return performRequest(new Frame(FrameCmd.SET_VFO_TYPE, Binary.fromUInt8(vfoType.getCode())), pingParser);
     }
 
-    public Response<Class<Void>> writeVfoAttenuator(boolean att0, boolean att1, boolean att2) {
+    public Response<Class<Void>> sendVfoAttenuator(boolean att0, boolean att1, boolean att2) {
         int val = (att0 ? 1 : 0) + (att1 ? 2 : 0) + (att2 ? 4 : 0);
         return performRequest(new Frame(FrameCmd.SET_ATTENUATOR, Binary.fromUInt8(val)), pingParser);
     }
 
-    public Response<Class<Void>> writeVfoOutput(VfoOut vfoOut) {
+    public Response<Class<Void>> sendVfoOutput(VfoOut vfoOut) {
         return performRequest(new Frame(vfoOut.getFrameCmd()), pingParser);
     }
 
-    public Response<Class<Void>> writeAmplifierEnabled(boolean enabled) {
+    public Response<Class<Void>> sendAmplifierEnabled(boolean enabled) {
         return performRequest(new Frame(FrameCmd.SET_AMPLIFIER, Binary.fromUInt8(enabled ? 1 : 0)), pingParser);
     }
 
@@ -181,12 +183,16 @@ public class Radio3 {
         return performRequest(new Frame(GET_DEVICE_STATE), deviceStateParser);
     }
 
-    public Response<Integer> readVfoFrequency() {
-        return performRequest(new Frame(GET_VFO_FREQ), vfoParser);
+    public Response<DeviceConfiguration> readDeviceConfiguration() {
+        return performRequest(new Frame(GET_DEVICE_CONFIGURATION), deviceConfigurationParser);
     }
 
-    public Response<DeviceConfiguration> readDeviceInfo() {
-        return performRequest(new Frame(GET_DEVICE_CONFIGURATION), deviceConfigurationParser);
+    public Response<LicenseData> readLicenseData() {
+        return performRequest(new Frame(GET_LICENSE_DATA), licenseDataParser);
+    }
+
+    public Response<Integer> readVfoFrequency() {
+        return performRequest(new Frame(GET_VFO_FREQ), vfoParser);
     }
 
     public Response<Probes> readAllProbes() {

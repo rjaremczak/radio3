@@ -40,13 +40,12 @@ public class Frame {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(command.toString());
+        sb.append(":");
 
         int payloadSize = getPayloadSize();
         if(payloadSize > 0 && payloadSize <= 4) {
-            sb.append(":");
             sb.append(Arrays.toString(payload));
         } else if(payloadSize > 4) {
-            sb.append(": ");
             sb.append(Integer.toString(payloadSize));
             sb.append(" B");
         }
@@ -77,32 +76,5 @@ public class Frame {
 
         os.write((byte)(crc8.getCrc() & 0xff));
         return os.toByteArray();
-    }
-
-    public static Frame fromBytes(byte[] bytes) throws Crc8.Error {
-        int readPos = 0;
-
-        Crc8 crc8 = new Crc8();
-        crc8.process(bytes, readPos, 2);
-        FrameHeader header = FrameHeader.fromCode(Binary.toUInt16(bytes, readPos));
-        readPos += 2;
-
-        if(header.getSizeBytesCount()>0) {
-            int numSizeBytes = Math.max(2, header.getSizeBytesCount());
-            header.setSizeBytes(bytes, readPos, numSizeBytes);
-            crc8.process(bytes, readPos, numSizeBytes);
-            readPos += numSizeBytes;
-        }
-
-        int payloadStart = readPos;
-        crc8.process(bytes, payloadStart, header.getPayloadSize());
-        readPos += header.getPayloadSize();
-
-        int receivedCrc = bytes[readPos] & 0xff;
-        if(receivedCrc != crc8.getCrc()) {
-            throw new Crc8.Error(receivedCrc, crc8.getCrc());
-        }
-
-        return new Frame(header.getCommand(), Arrays.copyOfRange(bytes, payloadStart, payloadStart+header.getPayloadSize()));
     }
 }

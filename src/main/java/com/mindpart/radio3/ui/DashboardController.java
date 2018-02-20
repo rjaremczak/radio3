@@ -4,7 +4,6 @@ import com.mindpart.radio3.device.Probes;
 import com.mindpart.radio3.device.Radio3;
 import com.mindpart.radio3.device.Response;
 import com.mindpart.science.Power;
-import com.mindpart.science.UnitPrefix;
 import com.mindpart.science.Voltage;
 import com.mindpart.ui.DoubleSpinner;
 import javafx.application.Platform;
@@ -65,7 +64,7 @@ public class DashboardController {
         }, 200, 200, TimeUnit.MILLISECONDS);
 
         ui.initFrequencyFieldWithRanges(vfoFreq);
-        vfoFreq.getDoubleValueFactory().valueProperty().addListener((observable, oldValue, newFreq) -> radio3.writeVfoFrequency((int) MEGA.toBase(newFreq)));
+        vfoFreq.getDoubleValueFactory().valueProperty().addListener((observable, oldValue, newFreq) -> radio3.sendVfoFrequency((int) MEGA.toBase(newFreq)));
     }
 
     private void sampleAllProbes() {
