@@ -22,7 +22,7 @@ public class FrameHeaderTest {
 
     @Test
     public void testFormatB() {
-        FrameHeader header = FrameHeader.fromCode(0xE018);
+        FrameHeader header = FrameHeader.fromCode(0xE012);
         header.setSizeBytes(new byte[]{(byte)200});
         assertFalse(header.isFormatA());
         assertTrue(header.isFormatB());
@@ -31,7 +31,7 @@ public class FrameHeaderTest {
         assertEquals(214, header.getPayloadSize());
 
 
-        header = FrameHeader.fromCode(0xE020);
+        header = FrameHeader.fromCode(0xE012);
         header.setSizeBytes(new byte[]{(byte)0});
         assertEquals(FrameCmd.GET_ALL_PROBES, header.getCommand());
         assertEquals(14, header.getPayloadSize());
@@ -39,7 +39,7 @@ public class FrameHeaderTest {
 
     @Test
     public void testFormatC() {
-        FrameHeader header = FrameHeader.fromCode(0xF018);
+        FrameHeader header = FrameHeader.fromCode(0xF010);
         header.setSizeBytes(new byte[]{(byte)200, (byte)4});
         assertFalse(header.isFormatA());
         assertFalse(header.isFormatB());
@@ -47,7 +47,7 @@ public class FrameHeaderTest {
         assertEquals(FrameCmd.GET_VFO_FREQ, header.getCommand());
         assertEquals(1494, header.getPayloadSize());
 
-        header = FrameHeader.fromCode(0xF020);
+        header = FrameHeader.fromCode(0xF010);
         header.setSizeBytes(new byte[]{(byte)0, (byte)0});
         assertEquals(FrameCmd.GET_VFO_FREQ, header.getCommand());
         assertEquals(270, header.getPayloadSize());

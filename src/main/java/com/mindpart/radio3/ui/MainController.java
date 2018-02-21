@@ -156,18 +156,34 @@ public class MainController {
         Platform.runLater(() -> {
             Response<DeviceConfiguration> response = radio3.connect(serialPorts.getValue(), vfoType.getValue());
             if (response.isOK()) {
-                updateOnConnect();
                 DeviceConfiguration dc = response.getData();
                 manifestController.update(dc);
                 setUpVfoAtt(dc.hardwareRevision);
                 setUpVfoAmp(dc.hardwareRevision);
                 requestDeviceState();
-                requestLicenseData();
-            } else {
-                radio3.disconnect();
-                updateOnDisconnect(DeviceStatus.ERROR);
+                LicenseData ld = requestLicenseData();
+                if(checkLicenseData(dc, ld)) {
+                    updateOnConnect();
+                    return;
+                } else {
+                    showLicenseViolationDialog(dc, ld);
+                }
             }
+            radio3.disconnect();
+            updateOnDisconnect(DeviceStatus.ERROR);
         });
+    }
+
+    private void showLicenseViolationDialog(DeviceConfiguration dc, LicenseData ld) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(ui.text("license.alert.title"));
+        alert.setHeaderText(ui.text("license.alert.header"));
+        alert.setContentText(String.format(ui.text("license.alert.content"), dc.coreUniqueId0, dc.coreUniqueId1, dc.coreUniqueId2));
+        alert.showAndWait();
+    }
+
+    private boolean checkLicenseData(DeviceConfiguration dc, LicenseData ld) {
+        return dc.coreUniqueId0==ld.uniqueId0 && dc.coreUniqueId1==ld.uniqueId1 && dc.coreUniqueId2==ld.uniqueId2;
     }
 
     void doDisconnect() {
@@ -310,10 +326,13 @@ public class MainController {
         }
     }
 
-    private void requestLicenseData() {
+    private LicenseData requestLicenseData() {
         Response<LicenseData> response = radio3.readLicenseData();
         if(response.isOK()) {
             manifestController.update(response.getData());
+            return response.getData();
+        } else {
+            return null;
         }
     }
 

@@ -31,12 +31,12 @@
                 <ToggleButton fx:id="att20dB" mnemonicParsing="false" text="20dB" textOverrun="CLIP" />
                 <Separator orientation="VERTICAL" />
                 <Label text="%label.out" />
-                <ToggleButton fx:id="vfoToSocket" mnemonicParsing="false" text="VFO" textOverrun="CLIP">
+                <ToggleButton fx:id="vfoToSocket" focusTraversable="false" mnemonicParsing="false" text="VFO" textOverrun="CLIP">
                     <toggleGroup>
                         <ToggleGroup fx:id="vfoOut" />
                     </toggleGroup>
                 </ToggleButton>
-                <ToggleButton fx:id="vfoToVna" mnemonicParsing="false" text="VNA" textOverrun="CLIP" toggleGroup="$vfoOut" />
+                <ToggleButton fx:id="vfoToVna" focusTraversable="false" mnemonicParsing="false" text="VNA" textOverrun="CLIP" toggleGroup="$vfoOut" />
             </items>
         </ToolBar>
         <AnchorPane fx:id="mainPane" VBox.vgrow="ALWAYS">
