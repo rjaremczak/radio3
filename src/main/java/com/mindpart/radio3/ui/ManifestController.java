@@ -38,6 +38,9 @@ public class ManifestController {
     Label configVfoType;
 
     @FXML
+    Label configLicenseOk;
+
+    @FXML
     Label stateVfoOut;
 
     @FXML
@@ -85,6 +88,7 @@ public class ManifestController {
                 dc.firmwareVersionMajor, dc.firmwareVersionMinor,
                 ui.timestamp.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(dc.firmwareBuildTimestamp), ZoneId.systemDefault()))));
         configVfoType.setText(dc.vfoType.toString());
+        configLicenseOk.setText(ui.formatBoolean(dc.licenseOk));
     }
 
     public void update(DeviceState ds) {

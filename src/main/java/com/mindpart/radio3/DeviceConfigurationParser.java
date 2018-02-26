@@ -19,6 +19,7 @@ public class DeviceConfigurationParser implements FrameParser<DeviceConfiguratio
     public DeviceConfiguration parse(Frame frame) {
         BinaryIterator bi = frame.binaryIterator();
         DeviceConfiguration dc = new DeviceConfiguration();
+        dc.licenseOk = bi.nextBoolean();
         dc.coreUniqueId0 = bi.nextUInt32();
         dc.coreUniqueId1 = bi.nextUInt32();
         dc.coreUniqueId2 = bi.nextUInt32();

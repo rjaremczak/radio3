@@ -66,4 +66,8 @@ public class UserInterface {
     public Parent loadFXml(Object controller, String fxml) {
         return FxUtils.loadFXml(controller, fxml, resourceBundle);
     }
+
+    public String formatBoolean(boolean b) {
+        return resourceBundle.getString(b ? "text.yes" : "text.no");
+    }
 }

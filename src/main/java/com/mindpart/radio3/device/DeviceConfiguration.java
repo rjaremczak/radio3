@@ -5,6 +5,7 @@ package com.mindpart.radio3.device;
  * Date: 2018.02.16
  */
 public class DeviceConfiguration {
+    public boolean licenseOk;
     public long coreUniqueId0;
     public long coreUniqueId1;
     public long coreUniqueId2;
