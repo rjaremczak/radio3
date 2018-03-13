@@ -20,12 +20,12 @@ public abstract class AbstractConfigService<T> {
 
     private final Path ownDirectory;
     private final Path configurationFile;
-    private final String defaultsFileName;
+    private final T defaults;
     private final Class<T> theClass;
 
-    protected AbstractConfigService(Class<T> theClass, String appDirectory, String configFileName, String defaultsFileName) {
+    protected AbstractConfigService(Class<T> theClass, String appDirectory, String configFileName, T defaults) {
         this.theClass = theClass;
-        this.defaultsFileName = defaultsFileName;
+        this.defaults = defaults;
         this.ownDirectory = Paths.get(System.getProperty("user.home"), appDirectory);
         this.configurationFile = Paths.get(ownDirectory.toString(),configFileName);
     }
@@ -37,19 +37,22 @@ public abstract class AbstractConfigService<T> {
         }
         
         if(!Files.exists(configurationFile, LinkOption.NOFOLLOW_LINKS)) {
-            save(loadDefaults());
+            save(defaults);
         }
+    }
+
+    private T loadRaw() throws IOException {
+        return new ObjectMapper().readValue(configurationFile.toFile(), theClass);
     }
 
     public T load() throws IOException {
         try {
-            return new ObjectMapper().readValue(configurationFile.toFile(), theClass);
-        } catch (InvalidFormatException e) {
+            return loadRaw();
+        } catch (Exception e) {
             logger.error("error parsing file "+configurationFile.getFileName()+", delete and replace with defaults");
             Files.delete(configurationFile);
-            T defaults = loadDefaults();
             save(defaults);
-            return defaults;
+            return loadRaw();
         }
     }
 
@@ -60,10 +63,4 @@ public abstract class AbstractConfigService<T> {
             logger.error(e,e);
         }
     }
-
-    public T loadDefaults() throws IOException {
-        InputStream is = getClass().getResourceAsStream(defaultsFileName);
-        return new ObjectMapper().readValue(is, theClass);
-    }
-
 }

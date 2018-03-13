@@ -6,6 +6,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.ValueAxis;
 
 /**
  * Created by Robert Jaremczak
@@ -16,6 +18,10 @@ public class EnhancedLineChart<X,Y> extends LineChart<X,Y> {
     private final ObservableList<ChartRuler<Y>> horizontalRulers;
     private final ObservableList<ChartRuler<X>> verticalRulers;
     private final ObservableList<ChartSpanMarker<X>> spanMarkers;
+
+    EnhancedLineChart() {
+        this((Axis<X>) new NumberAxis(), (Axis<Y>) new NumberAxis());
+    }
 
     public EnhancedLineChart(Axis<X> xAxis, Axis<Y> yAxis) {
         super(xAxis, yAxis);

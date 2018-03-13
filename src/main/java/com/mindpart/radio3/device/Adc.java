@@ -10,7 +10,7 @@ public class Adc {
     private double base;
     private double multiplier;
 
-    private Adc(int adcValueMin, int adcValueMax, double valueMin, double valueMax) {
+    public Adc(int adcValueMin, int adcValueMax, double valueMin, double valueMax) {
         this.adcBase = adcValueMin;
         this.base = valueMin;
         this.multiplier = (valueMax - valueMin) / (adcValueMax - adcValueMin);
@@ -18,9 +18,5 @@ public class Adc {
 
     public double convert(int adcValue) {
         return base + ((adcValue - adcBase) * multiplier);
-    }
-
-    public static Adc getDefault() {
-        return new Adc(0, 4095, 0.0, 3.3);
     }
 }

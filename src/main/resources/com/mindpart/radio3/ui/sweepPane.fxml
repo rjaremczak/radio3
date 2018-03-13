@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.materialicons.MaterialIconView?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -13,9 +14,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepController">
+<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.SweepController">
    <children>
       <VBox fx:id="vBox" layoutX="211.0" layoutY="50.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -39,12 +39,21 @@
                       <RowConstraints vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" text="%button.start" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" textOverrun="CLIP" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <graphic>
+                              <MaterialIconView glyphName="PLAY_ARROW" />
+                           </graphic></Button>
                         <Label text="%label.in" />
                         <ChoiceBox fx:id="sourceProbe" focusTraversable="false" GridPane.rowIndex="1" />
                         <ToggleButton fx:id="btnNormalize" mnemonicParsing="false" text="Norm" textOverrun="CLIP" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="%button.continuous" textOverrun="CLIP" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                        <ToggleButton fx:id="btnTools" mnemonicParsing="false" text="%button.tools" textOverrun="CLIP" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" textOverrun="CLIP" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                           <graphic>
+                              <MaterialIconView glyphName="FAST_FORWARD" />
+                           </graphic></ToggleButton>
+                        <ToggleButton fx:id="btnTools" mnemonicParsing="false" textOverrun="CLIP" GridPane.columnIndex="5" GridPane.rowIndex="1">
+                           <graphic>
+                              <MaterialIconView glyphName="BUILD" />
+                           </graphic></ToggleButton>
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -56,36 +65,39 @@
                <children>
                   <VBox fx:id="boxRangeControl" alignment="CENTER" spacing="5.0">
                      <children>
-                        <Button fx:id="btnZoomIn" mnemonicParsing="false" text="⊕">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
+                        <Button fx:id="btnZoomIn" mnemonicParsing="false">
+                           <graphic>
+                              <MaterialIconView glyphName="ADD_CIRCLE_OUTLINE" />
+                           </graphic>
                         </Button>
-                        <Button fx:id="btnZoomOut" mnemonicParsing="false" text="⊖">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
+                        <Button fx:id="btnZoomOut" mnemonicParsing="false">
+                           <graphic>
+                              <MaterialIconView glyphName="REMOVE_CIRCLE_OUTLINE" />
+                           </graphic>
                         </Button>
-                        <Button fx:id="btnPanUp" mnemonicParsing="false" text="↑">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
+                        <Button fx:id="btnPanUp" mnemonicParsing="false">
                            <VBox.margin>
                               <Insets top="5.0" />
                            </VBox.margin>
+                           <graphic>
+                              <MaterialIconView glyphName="ARROW_UPWARD" />
+                           </graphic>
                         </Button>
-                        <Button fx:id="btnPanDown" mnemonicParsing="false" text="↓">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
+                        <Button fx:id="btnPanDown" mnemonicParsing="false">
+                           <graphic>
+                              <MaterialIconView glyphName="ARROW_DOWNWARD" />
+                           </graphic>
                         </Button>
-                        <Button fx:id="btnAutoRange" mnemonicParsing="false" prefWidth="30.0" text="A">
+                        <Button fx:id="btnAutoRange" mnemonicParsing="false" prefWidth="30.0">
                            <VBox.margin>
                               <Insets top="5.0" />
-                           </VBox.margin></Button>
+                           </VBox.margin>
+                           <graphic>
+                              <MaterialIconView glyphName="FILTER_CENTER_FOCUS" size="13" />
+                           </graphic></Button>
                      </children>
                      <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="5.0" />
                      </padding>
                   </VBox>
                </children></HBox>

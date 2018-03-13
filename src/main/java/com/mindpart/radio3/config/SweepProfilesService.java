@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public class SweepProfilesService extends AbstractConfigService<SweepProfiles> {
     public SweepProfilesService(String appDirectory) throws IOException {
-        super(SweepProfiles.class, appDirectory, "sweep.conf", "default-sweep.conf");
+        super(SweepProfiles.class, appDirectory, "sweep.conf", SweepProfiles.defaults());
         init();
     }
 }

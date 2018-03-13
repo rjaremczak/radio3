@@ -1,7 +1,11 @@
 package com.mindpart.radio3;
 
-import com.mindpart.radio3.device.*;
 import com.mindpart.bin.BinaryIterator;
+import com.mindpart.radio3.config.VfoConfig;
+import com.mindpart.radio3.device.DeviceConfiguration;
+import com.mindpart.radio3.device.Frame;
+import com.mindpart.radio3.device.FrameParser;
+import com.mindpart.radio3.device.HardwareRevision;
 
 import static com.mindpart.radio3.device.FrameCmd.GET_DEVICE_CONFIGURATION;
 
@@ -27,7 +31,7 @@ public class DeviceConfigurationParser implements FrameParser<DeviceConfiguratio
         dc.firmwareVersionMinor = bi.nextUInt8();
         dc.firmwareBuildTimestamp = bi.nextUInt32() * 1000;
         dc.hardwareRevision = HardwareRevision.values()[bi.nextUInt8()];
-        dc.vfoType = VfoType.values()[bi.nextUInt8()];
+        dc.vfoType = VfoConfig.Type.values()[bi.nextUInt8()];
         return dc;
     }
 }

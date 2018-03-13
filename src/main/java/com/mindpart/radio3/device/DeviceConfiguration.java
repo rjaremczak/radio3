@@ -1,5 +1,7 @@
 package com.mindpart.radio3.device;
 
+import com.mindpart.radio3.config.VfoConfig;
+
 /**
  * Created by Robert Jaremczak
  * Date: 2018.02.16
@@ -13,5 +15,5 @@ public class DeviceConfiguration {
     public int firmwareVersionMinor;
     public long firmwareBuildTimestamp;
     public HardwareRevision hardwareRevision;
-    public VfoType vfoType;
+    public VfoConfig.Type vfoType;
 }

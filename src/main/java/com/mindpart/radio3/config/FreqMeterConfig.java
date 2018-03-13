@@ -8,6 +8,21 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 public class FreqMeterConfig {
-    public int multiplier;
-    public int base;
+    int multiplier;
+    int base;
+
+    public int getMultiplier() {
+        return multiplier;
+    }
+
+    public int getBase() {
+        return base;
+    }
+
+    public static FreqMeterConfig defaults() {
+        FreqMeterConfig config = new FreqMeterConfig();
+        config.base = 0;
+        config.multiplier = 16;
+        return config;
+    }
 }

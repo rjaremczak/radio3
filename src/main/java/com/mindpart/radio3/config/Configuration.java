@@ -2,9 +2,7 @@ package com.mindpart.radio3.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mindpart.radio3.device.HardwareRevision;
-import com.mindpart.radio3.device.VfoType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Locale;
 
@@ -14,55 +12,67 @@ import java.util.Locale;
  */
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Configuration {
+    @JsonProperty("locale")
+    String localeStr;
 
     @JsonIgnore
     private Locale locale;
-    private String createdBy;
-    private String uiLocale;
-    private boolean keepAlive = false;
-    private HardwareRevision hardwareRevision = HardwareRevision.AUTODETECT;
-    private VfoType vfoType = VfoType.DDS_AD9851;
-    private FreqMeterConfig freqMeter;
+
+    @JsonProperty("vfo")
+    VfoConfig vfoConfig;
+
+    @JsonProperty("fmeter")
+    FreqMeterConfig freqMeterConfig;
+
+    @JsonProperty("log")
+    LogProbeConfig logProbeConfig;
+
+    @JsonProperty("lin")
+    LinProbeConfig linProbeConfig;
+
+    @JsonProperty("vna")
+    VnaConfig vnaConfig;
 
     public Locale getLocale() {
-        return uiLocale ==null ? Locale.getDefault() : Locale.forLanguageTag(uiLocale);
+        if(locale==null) {
+            locale = localeStr==null ? Locale.getDefault() : Locale.forLanguageTag(localeStr);
+        }
+        return locale;
     }
 
-    public HardwareRevision getHardwareRevision() {
-        return hardwareRevision;
+    public void setVfoType(VfoConfig.Type vfoType) {
+        vfoConfig.type = vfoType;
     }
 
-    public VfoType getVfoType() {
-        return vfoType;
+    public VfoConfig getVfoConfig() {
+        return vfoConfig;
     }
 
-    public FreqMeterConfig getFreqMeter() {
-        return freqMeter;
+    public FreqMeterConfig getFreqMeterConfig() {
+        return freqMeterConfig;
     }
 
-    public void setVfoType(VfoType vfoType) {
-        this.vfoType = vfoType;
+    public LogProbeConfig getLogProbeConfig() {
+        return logProbeConfig;
     }
 
-    public void setHardwareRevision(HardwareRevision hardwareRevision) {
-        this.hardwareRevision = hardwareRevision;
+    public LinProbeConfig getLinProbeConfig() {
+        return linProbeConfig;
     }
 
-    protected void setCreatedBy(String str) {
-        createdBy = str;
+    public VnaConfig getVnaConfig() {
+        return vnaConfig;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public String getUiLocale() {
-        return uiLocale;
-    }
-
-    public boolean isKeepAlive() {
-        return keepAlive;
+    public static final Configuration defaults() {
+        Configuration configuration = new Configuration();
+        configuration.localeStr = "pl";
+        configuration.freqMeterConfig = FreqMeterConfig.defaults();
+        configuration.logProbeConfig = LogProbeConfig.defaults();
+        configuration.linProbeConfig = LinProbeConfig.defaults();
+        configuration.vnaConfig = VnaConfig.defaults();
+        configuration.vfoConfig = VfoConfig.defaults();
+        return configuration;
     }
 }

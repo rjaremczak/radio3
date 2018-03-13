@@ -1,6 +1,6 @@
 package com.mindpart.radio3;
 
-import com.mindpart.radio3.config.FreqMeterConfig;
+import com.mindpart.radio3.config.Configuration;
 import com.mindpart.radio3.device.*;
 import com.mindpart.bin.Binary;
 
@@ -11,20 +11,34 @@ import static com.mindpart.radio3.device.FrameCmd.GET_ALL_PROBES;
  * Date: 2016.04.09
  */
 public class ProbesParser implements FrameParser<Probes> {
-    private final FreqMeterConfig freqMeterConfig;
+    private final double logBaseDbm;
+    private final double logRatioVToDbm;
+    private final Adc logAdc;
 
-    private double logRefDbm = -87;
-    private double logVToDbmRatio = 0.025;
-    private Adc logAdc = Adc.getDefault();
+    private final double linRefVrms;
+    private final double linRatioVToVrms;
+    private final Adc linAdc;
 
-    private double linRefVrms = -0.0265;
-    private double linVToVrmsRatio = 7.5 / 1.80;
-    private Adc linAdc = Adc.getDefault();
+    private final Adc vnaGainAdc;
+    private final Adc vnaPhaseAdc;
 
-    private Adc vnaAdc = Adc.getDefault();
+    private final int fmeterBase;
+    private final int fmeterMultiplier;
 
-    public ProbesParser(FreqMeterConfig freqMeterConfig) {
-        this.freqMeterConfig = freqMeterConfig;
+    public ProbesParser(Configuration configuration) {
+        logBaseDbm = configuration.getLogProbeConfig().getBaseDbm();
+        logRatioVToDbm = configuration.getLogProbeConfig().getRatioVToDbm();
+        logAdc = configuration.getLogProbeConfig().getAdcConfig().createAdc();
+
+        linRefVrms = configuration.getLinProbeConfig().getBaseVrms();
+        linRatioVToVrms = configuration.getLinProbeConfig().getRatioVToVrms();
+        linAdc = configuration.getLinProbeConfig().getAdcConfig().createAdc();
+
+        vnaGainAdc = configuration.getVnaConfig().getGainAdcConfig().createAdc();
+        vnaPhaseAdc = configuration.getVnaConfig().getPhaseAdcConfig().createAdc();
+
+        fmeterBase = configuration.getFreqMeterConfig().getBase();
+        fmeterMultiplier = configuration.getFreqMeterConfig().getMultiplier();
     }
 
     @Override
@@ -33,15 +47,15 @@ public class ProbesParser implements FrameParser<Probes> {
     }
 
     public Double convertLogValue(int adc) {
-        return logRefDbm + logAdc.convert(adc) / logVToDbmRatio;
+        return logBaseDbm + logAdc.convert(adc) / logRatioVToDbm;
     }
 
     public Double convertLinValue(int adcValue) {
-        return Math.max(0, (linRefVrms + this.linAdc.convert(adcValue)) / linVToVrmsRatio);
+        return Math.max(0, (linRefVrms + this.linAdc.convert(adcValue)) / linRatioVToVrms);
     }
 
     public double calculateReturnLoss(int adcValue) {
-        double v = vnaAdc.convert(adcValue);
+        double v = vnaGainAdc.convert(adcValue);
 
         if (v <= 0.3) {
             v = 0;
@@ -53,7 +67,7 @@ public class ProbesParser implements FrameParser<Probes> {
     }
 
     public double calculatePhaseDiff(int adcValue) {
-        double v = vnaAdc.convert(adcValue);
+        double v = vnaPhaseAdc.convert(adcValue);
 
         if (v <= 0.03) {
             v = 0;
@@ -69,7 +83,7 @@ public class ProbesParser implements FrameParser<Probes> {
     }
 
     Integer convertFreqMeterValue(long count) {
-        return Math.toIntExact((count * freqMeterConfig.multiplier) + freqMeterConfig.base);
+        return Math.toIntExact((count * fmeterMultiplier) + fmeterBase);
     }
 
     Probes parse(int logarithmic, int linear, int vnaGain, int vnaPhase, long freqMeter) {

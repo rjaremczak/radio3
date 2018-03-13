@@ -1,14 +1,16 @@
 package com.mindpart.radio3.device;
 
+import com.mindpart.bin.Binary;
+import com.mindpart.bin.BinaryBuilder;
 import com.mindpart.radio3.*;
 import com.mindpart.radio3.config.Configuration;
 import com.mindpart.radio3.config.ConfigurationService;
 import com.mindpart.radio3.config.SweepProfilesService;
+import com.mindpart.radio3.config.VfoConfig;
 import com.mindpart.radio3.ui.DeviceStatus;
-import com.mindpart.bin.Binary;
-import com.mindpart.bin.BinaryBuilder;
 import com.mindpart.science.Frequency;
 import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -29,30 +31,34 @@ import static com.mindpart.radio3.device.FrameCmd.*;
 public class Radio3 {
     private static final Logger logger = Logger.getLogger(Radio3.class);
 
-    private ConfigurationService configurationService;
-    private Configuration configuration;
+    private final ConfigurationService configurationService;
+    private final Configuration configuration;
 
-    private SweepProfilesService sweepProfilesService;
-    private SweepProfiles sweepProfiles;
+    private final SweepProfilesService sweepProfilesService;
 
-    private DataLink dataLink;
-    private PingParser pingParser;
-    private DeviceStateParser deviceStateParser;
-    private DeviceConfigurationParser deviceConfigurationParser;
-    private LicenseDataParser licenseDataParser;
-    private VfoParser vfoParser;
-    private ProbesParser probesParser;
-    private SweepResponseParser sweepResponseParser;
+    private final Consumer<Frame> requestHandler;
+    private final Consumer<Response> responseHandler;
+    private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
+    private final AtomicReference<Instant> lastResponseTime = new AtomicReference<>(Instant.MIN);
 
-    private Consumer<Frame> requestHandler;
-    private Consumer<Response> responseHandler;
-    private ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
-    private ScheduledExecutorService keepAliveExecutor = Executors.newSingleThreadScheduledExecutor();
-    private AtomicReference<Instant> lastResponseTime = new AtomicReference<>(Instant.MIN);
-    private Duration keepAlivePeriod = Duration.ofSeconds(10);
+    private final DataLink dataLink;
+    private final PingParser pingParser;
+    private final DeviceStateParser deviceStateParser;
+    private final DeviceConfigurationParser deviceConfigurationParser;
+    private final LicenseDataParser licenseDataParser;
+    private final VfoParser vfoParser;
+    private final ProbesParser probesParser;
+    private final SweepResponseParser sweepResponseParser;
+    private final int vfoOffset;
+    private final SweepProfiles sweepProfiles;
 
     public Radio3(String appDirectory, Consumer<Frame> requestHandler, Consumer<Response> responseHandler) throws IOException {
-        initConfiguration(appDirectory);
+        configurationService = new ConfigurationService(appDirectory);
+        configuration = configurationService.load();
+        logger.info("UI locale: "+configuration.getLocale());
+
+        sweepProfilesService = new SweepProfilesService(appDirectory);
+        sweepProfiles = sweepProfilesService.load();
 
         dataLink = new DataLinkJssc();
         logger.info("dataLink: "+dataLink);
@@ -65,32 +71,13 @@ public class Radio3 {
         deviceStateParser = new DeviceStateParser();
         deviceConfigurationParser = new DeviceConfigurationParser();
         licenseDataParser = new LicenseDataParser();
-        probesParser = new ProbesParser(configuration.getFreqMeter());
+        probesParser = new ProbesParser(configuration);
         sweepResponseParser = new SweepResponseParser();
 
-        initKeepAlive();
+        vfoOffset = configuration.getVfoConfig().getOffset();
     }
 
-    private void initKeepAlive() {
-        if(!configuration.isKeepAlive()) return;
-        
-        keepAliveExecutor.scheduleWithFixedDelay(() -> {
-            if(isConnected() && Duration.between(lastResponseTime.get(), Instant.now()).compareTo(keepAlivePeriod) > 0) {
-                sendPing();
-            }
-        }, keepAlivePeriod.toMillis(), keepAlivePeriod.toMillis(), TimeUnit.MILLISECONDS);
-    }
-
-    private void initConfiguration(String appDirectory) throws IOException {
-        configurationService = new ConfigurationService(appDirectory);
-        configuration = configurationService.load();
-        logger.info("UI locale: "+configuration.getLocale());
-
-        sweepProfilesService = new SweepProfilesService(appDirectory);
-        sweepProfiles = sweepProfilesService.load();
-    }
-
-    public Response<DeviceConfiguration> connect(String portName, VfoType vfoType) {
+    public Response<DeviceConfiguration> connect(String portName, VfoConfig.Type vfoType) {
         try {
             logger.debug("connecting...");
             dataLink.connect(portName);
@@ -120,7 +107,6 @@ public class Radio3 {
 
     public void shutdown() {
         backgroundExecutor.shutdown();
-        keepAliveExecutor.shutdown();
         disconnect();
     }
 
@@ -140,11 +126,11 @@ public class Radio3 {
     }
 
     public Response<Class<Void>> sendVfoFrequency(int frequency) {
-        return performRequest(new Frame(FrameCmd.SET_VFO_FREQ, Binary.fromUInt32(frequency)), pingParser);
+        return performRequest(new Frame(FrameCmd.SET_VFO_FREQ, Binary.fromUInt32(frequency + vfoOffset)), pingParser);
     }
 
-    public Response<Class<Void>> sendVfoType(VfoType vfoType) {
-        return performRequest(new Frame(FrameCmd.SET_VFO_TYPE, Binary.fromUInt8(vfoType.getCode())), pingParser);
+    public Response<Class<Void>> sendVfoType(VfoConfig.Type vfoType) {
+        return performRequest(new Frame(FrameCmd.SET_VFO_TYPE, Binary.fromUInt8(vfoType.ordinal())), pingParser);
     }
 
     public Response<Class<Void>> sendVfoAttenuator(boolean att0, boolean att1, boolean att2) {
@@ -223,24 +209,9 @@ public class Radio3 {
         return configurationService.getBuildId();
     }
 
-    public VfoType getVfoType() {
-        return configuration.getVfoType();
-    }
-
-    public void setVfoType(VfoType vfoType) {
+    public void setVfoType(VfoConfig.Type vfoType) {
         if(vfoType != null) {
             configuration.setVfoType(vfoType);
-            configurationService.save(configuration);
-        }
-    }
-
-    public HardwareRevision getHardwareRevision() {
-        return configuration.getHardwareRevision();
-    }
-
-    public void setHardwareRevision(HardwareRevision hardwareRevision) {
-        if(hardwareRevision != null) {
-            configuration.setHardwareRevision(hardwareRevision);
             configurationService.save(configuration);
         }
     }

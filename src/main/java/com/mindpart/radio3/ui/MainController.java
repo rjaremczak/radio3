@@ -1,5 +1,6 @@
 package com.mindpart.radio3.ui;
 
+import com.mindpart.radio3.config.VfoConfig;
 import com.mindpart.radio3.device.*;
 import com.mindpart.ui.FxUtils;
 import javafx.application.Platform;
@@ -66,7 +67,7 @@ public class MainController {
     Tab measurementsTab;
 
     @FXML
-    ChoiceBox<VfoType> vfoType;
+    ChoiceBox<VfoConfig.Type> vfoType;
 
     @FXML
     Circle mainIndicator;
@@ -267,8 +268,8 @@ public class MainController {
     }
 
     private void initVfoType() {
-        vfoType.getItems().addAll(VfoType.DDS_AD9850, VfoType.DDS_AD9851);
-        vfoType.getSelectionModel().select(radio3.getConfiguration().getVfoType());
+        vfoType.getItems().addAll(VfoConfig.Type.values());
+        vfoType.getSelectionModel().select(radio3.getConfiguration().getVfoConfig().getType());
         vfoType.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> radio3.setVfoType(newValue));
     }
 
