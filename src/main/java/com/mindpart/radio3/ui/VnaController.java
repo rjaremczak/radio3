@@ -118,6 +118,12 @@ public class VnaController extends AbstractSweepController {
 
         Parent sweepSettingsPane = ui.loadFXml(sweepSettingsController, "sweepSettingsPane.fxml");
         controlBox.getChildren().add(0, sweepSettingsPane);
+
+        swrAxisX.setLabel(ui.text("axis.swr")+" / "+ui.text("axis.freq"));
+        swrAxisY.setLabel("");
+        impedanceAxisX.setLabel(ui.text("axis.impedance")+" / "+ui.text("axis.freq"));
+        impedanceAxisY.setLabel("");
+
     }
 
     protected void sweepSettingsChangeListener() {

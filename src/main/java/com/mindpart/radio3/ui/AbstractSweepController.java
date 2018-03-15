@@ -63,10 +63,8 @@ public abstract class AbstractSweepController {
         if(continuous) {
             disableUI();
             runSweepOnce(this::displayDataAndSweepAgain);
-            btnContinuous.setText(ui.text("button.stop"));
         } else {
             enableUI();
-            btnContinuous.setText(ui.text("button.continuous"));
         }
     }
 

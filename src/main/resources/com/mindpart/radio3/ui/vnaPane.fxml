@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import de.jensd.fx.glyphs.materialicons.MaterialIconView?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.LineChart?>
@@ -16,7 +17,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.VnaController">
+<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mindpart.radio3.ui.VnaController">
    <children>
       <VBox layoutX="211.0" layoutY="50.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -38,8 +39,14 @@
                       <RowConstraints vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" text="%button.start" GridPane.rowIndex="2" />
-                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" text="%button.continuous" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Button fx:id="btnOnce" defaultButton="true" mnemonicParsing="false" GridPane.rowIndex="2">
+                           <graphic>
+                              <MaterialIconView glyphName="PLAY_ARROW" />
+                           </graphic></Button>
+                        <ToggleButton fx:id="btnContinuous" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <graphic>
+                              <MaterialIconView glyphName="FAST_FORWARD" />
+                           </graphic></ToggleButton>
                         <Label text=" " GridPane.rowIndex="1" />
                         <Label GridPane.rowIndex="1" />
                      </children>
@@ -60,7 +67,7 @@
                                     <NumberAxis fx:id="swrAxisX" autoRanging="false" label="%axis.freq" />
                                  </xAxis>
                                  <yAxis>
-                                    <NumberAxis fx:id="swrAxisY" autoRanging="false" label="%axis.swr" minWidth="-Infinity" prefWidth="70.0" tickUnit="0.5" upperBound="10.0" />
+                                    <NumberAxis fx:id="swrAxisY" autoRanging="false" minWidth="-Infinity" prefWidth="40.0" tickUnit="0.5" upperBound="10.0" />
                                  </yAxis>
                                  <padding>
                                     <Insets left="5.0" top="5.0" />
@@ -75,7 +82,7 @@
                                     <NumberAxis fx:id="impedanceAxisX" autoRanging="false" forceZeroInRange="false" />
                                  </xAxis>
                                  <yAxis>
-                                    <NumberAxis fx:id="impedanceAxisY" forceZeroInRange="false" label="%axis.impedance" minWidth="-Infinity" prefWidth="70.0" />
+                                    <NumberAxis fx:id="impedanceAxisY" forceZeroInRange="false" minWidth="-Infinity" prefWidth="40.0" />
                                  </yAxis>
                                  <padding>
                                     <Insets left="5.0" top="5.0" />
