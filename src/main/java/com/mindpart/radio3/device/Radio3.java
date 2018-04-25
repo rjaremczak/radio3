@@ -12,13 +12,10 @@ import com.mindpart.science.Frequency;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -41,7 +38,7 @@ public class Radio3 {
     private final ExecutorService backgroundExecutor = Executors.newSingleThreadExecutor();
     private final AtomicReference<Instant> lastResponseTime = new AtomicReference<>(Instant.MIN);
 
-    private final DataLink dataLink;
+    private final DeviceLink deviceLink;
     private final PingParser pingParser;
     private final DeviceStateParser deviceStateParser;
     private final DeviceConfigurationParser deviceConfigurationParser;
@@ -60,8 +57,8 @@ public class Radio3 {
         sweepProfilesService = new SweepProfilesService(appDirectory);
         sweepProfiles = sweepProfilesService.load();
 
-        dataLink = new DataLinkJssc();
-        logger.info("dataLink: "+dataLink);
+        deviceLink = new DeviceLinkJssc();
+        logger.info("dataLink: "+ deviceLink);
 
         this.requestHandler = requestHandler;
         this.responseHandler = responseHandler;
@@ -80,7 +77,7 @@ public class Radio3 {
     public Response<DeviceConfiguration> connect(String portName, VfoConfig.Type vfoType) {
         try {
             logger.debug("connecting...");
-            dataLink.connect(portName);
+            deviceLink.connect(portName);
             sendVfoType(vfoType);
             return readDeviceConfiguration();
         } catch (Exception e) {
@@ -91,14 +88,14 @@ public class Radio3 {
     }
 
     public void disconnect() {
-        if(dataLink!=null && dataLink.isOpened()) {
+        if(deviceLink !=null && deviceLink.isOpened()) {
             logger.debug("disconnect");
-            dataLink.disconnect();
+            deviceLink.disconnect();
         }
     }
 
     public boolean isConnected() {
-        return dataLink!=null && dataLink.isOpened();
+        return deviceLink !=null && deviceLink.isOpened();
     }
 
     public void executeInBackground(Runnable task) {
@@ -147,12 +144,12 @@ public class Radio3 {
     }
 
     public List<String> availablePorts() {
-        return dataLink.availablePorts();
+        return deviceLink.availablePorts();
     }
 
     private synchronized <T> Response<T> performRequest(Frame requestFrame, FrameParser<T> frameParser) {
         requestHandler.accept(requestFrame);
-        Response<Frame> response = dataLink.request(requestFrame);
+        Response<Frame> response = deviceLink.request(requestFrame);
         if(response.isOK() && frameParser.recognizes(response.getData())) {
             Response<T> responseOk =  Response.success(frameParser.parse(response.getData()));
             responseHandler.accept(responseOk);
@@ -190,7 +187,7 @@ public class Radio3 {
     }
 
     public String getPortName() {
-        return dataLink.getPortName();
+        return deviceLink.getPortName();
     }
 
     public DeviceStatus getDeviceStatus() {

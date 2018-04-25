@@ -19,8 +19,8 @@ import static jssc.SerialPort.*;
  * Date: 2016.02.08
  */
 
-public class DataLinkJssc implements DataLink {
-    private static final Logger logger = Logger.getLogger(DataLinkJssc.class);
+public class DeviceLinkJssc implements DeviceLink {
+    private static final Logger logger = Logger.getLogger(DeviceLinkJssc.class);
 
     private static final int TIMEOUT_MS = 1000;
     private static final int DATA_BITS = DATABITS_8;

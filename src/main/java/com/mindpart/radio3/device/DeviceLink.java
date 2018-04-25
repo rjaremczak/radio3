@@ -7,7 +7,7 @@ import java.util.List;
  * Date: 2016.02.08
  */
 
-public interface DataLink {
+public interface DeviceLink {
     void connect(String portName) throws Exception;
     void disconnect();
     String getPortName();
